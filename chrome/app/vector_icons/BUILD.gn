@@ -8,6 +8,8 @@ import("//components/vector_icons/vector_icons.gni")
 import("//device/vr/buildflags/buildflags.gni")
 import("//ui/webui/webui_features.gni")
 
+import("//rebel/rebel.gni")
+
 aggregate_vector_icons("chrome_vector_icons") {
   icon_directory = "."
 
@@ -168,6 +170,11 @@ aggregate_vector_icons("chrome_vector_icons") {
     "zoom_minus.icon",
     "zoom_plus.icon",
   ]
+
+  if (is_rebel_branded) {
+    sources -= [ "${branding_path_component}/product.icon" ]
+    sources += [ "$rebel_browser_branding_directory/vector_icons/product.icon" ]
+  }
 
   if (is_mac) {
     sources += [
