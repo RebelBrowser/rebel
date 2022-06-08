@@ -17,6 +17,9 @@
 #define PRODUCT_STRING "Google Chrome"
 #elif BUILDFLAG(USE_INTERNAL_CHROME_FOR_TESTING_ICONS)
 #define PRODUCT_STRING "Google Chrome for Testing"
+#elif BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#define PRODUCT_STRING REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME)
 #elif BUILDFLAG(CHROMIUM_BRANDING)
 #define PRODUCT_STRING "Chromium"
 #else

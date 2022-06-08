@@ -14,6 +14,10 @@
 #include "build/branding_buildflags.h"
 #include "crypto/apple_keychain.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 using crypto::AppleKeychain;
 
 #if defined(ALLOW_RUNTIME_CONFIGURABLE_KEY_STORAGE)
@@ -30,6 +34,9 @@ namespace {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 const char kDefaultServiceName[] = "Chrome Safe Storage";
 const char kDefaultAccountName[] = "Chrome";
+#elif BUILDFLAG(REBEL_BROWSER)
+const char kDefaultServiceName[] = REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) " Safe Storage";
+const char kDefaultAccountName[] = REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME);
 #else
 const char kDefaultServiceName[] = "Chromium Safe Storage";
 const char kDefaultAccountName[] = "Chromium";
