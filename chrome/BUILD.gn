@@ -54,6 +54,8 @@ if (is_android) {
   import("//third_party/icu/config.gni")
 }
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # Indicates whether keystone registration framework should be enabled (see
   # action("keystone_registration_framework") below).  There are some tests
@@ -650,6 +652,11 @@ if (is_win) {
   bundle_data("chrome_app_icon") {
     sources = [ "app/theme/$branding_path_component/mac/app.icns" ]
     outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
+
+    if (is_rebel_based) {
+      sources -= [ "app/theme/$branding_path_component/mac/app.icns" ]
+      sources += [ "$rebel_browser_branding_directory/mac/app.icns" ]
+    }
   }
 
   bundle_data("chrome_resources") {
@@ -664,6 +671,11 @@ if (is_win) {
       ":chrome_app_strings",
       "//components/policy:chrome_manifest_bundle",
     ]
+
+    if (is_rebel_based) {
+      sources -= [ "app/theme/$branding_path_component/mac/document.icns" ]
+      sources += [ "$rebel_browser_branding_directory/mac/document.icns" ]
+    }
   }
 
   bundle_data("chrome_versioned_bundle_data") {
@@ -958,6 +970,11 @@ if (is_win) {
       "app/theme/default_100_percent/$branding_path_component/product_logo_32.png",
       "browser/mac/install.sh",
     ]
+
+    if (is_rebel_based) {
+      sources -= [ "app/theme/default_100_percent/$branding_path_component/product_logo_32.png" ]
+      sources += [ "$rebel_browser_branding_directory/default_100_percent/product_logo_32.png" ]
+    }
 
     outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
 

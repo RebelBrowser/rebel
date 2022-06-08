@@ -19,6 +19,10 @@
 #include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_paths_internal.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace {
 
 // Return an NSBundle* as the internal implementation of
@@ -59,6 +63,9 @@ char* ProductDirNameForBundle(NSBundle* chrome_bundle) {
       product_dir_name = "Google/Chrome for Testing";
 #elif BUILDFLAG(GOOGLE_CHROME_BRANDING)
       product_dir_name = "Google/Chrome";
+#elif BUILDFLAG(REBEL_BROWSER)
+      product_dir_name = REBEL_STRING_BUILDFLAG(
+          REBEL_BROWSER_COMPANY_PATH) "/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME);
 #else
       product_dir_name = "Chromium";
 #endif
