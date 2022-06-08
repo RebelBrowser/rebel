@@ -1,0 +1,64 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Arguments to be overridden by downstream forks.
+#
+# For more details on these arguments, see:
+# https://github.com/RebelBrowser/rebel/wiki#branding
+declare_args() {
+  # The full product name of your browser.
+  rebel_browser_name = "Rebel"
+
+  # The path-component name of your browser which corresponds to the path under
+  # //rebel/branding containing image assets for your fork. These are analogous
+  # to the resources under //chrome/app/theme/chromium.
+  rebel_browser_name_path_component = "rebel"
+
+  # The full name of your company.
+  rebel_browser_company = "Viasat Inc."
+
+  # The path-component name of your company, used to create directories on disk.
+  # For example, the user's profile path will be under this path.
+  rebel_browser_company_path_component = "Viasat"
+
+  # The URL schema to use for internal pages. This is an alias to the chrome://
+  # schema.
+  rebel_browser_schema = "rebel"
+
+  # The application package name, used for e.g. Android applications and macOS
+  # bundles.
+  rebel_package = "com.viasat.rebel"
+}
+
+# Arguments to help with Chromium integration (i.e. not to be overridden).
+declare_args() {
+  is_rebel_based = true
+
+  rebel_browser_branding_directory =
+      "//rebel/branding/$rebel_browser_name_path_component"
+
+  # Branding build flags used by //build/BUILD.gn.
+  rebel_branding_flags = [
+    "CHROMIUM_BRANDING=0",
+    "GOOGLE_CHROME_BRANDING=0",
+
+    "REBEL_BROWSER=1",
+    "REBEL_BROWSER_NAME=\"$rebel_browser_name\"",
+    "REBEL_BROWSER_NAME_PATH=\"$rebel_browser_name_path_component\"",
+    "REBEL_BROWSER_COMPANY=\"$rebel_browser_company\"",
+    "REBEL_BROWSER_COMPANY_PATH=\"$rebel_browser_company_path_component\"",
+    "REBEL_BROWSER_SCHEMA=\"$rebel_browser_schema\"",
+  ]
+
+  # Arguments to be passed to //build/util/version.py to fill in Rebel-branded
+  # values while processing the BRANDING file.
+  rebel_process_version_arguments = [
+    "--eval",
+    "REBEL_BROWSER_NAME=\"${rebel_browser_name}\"",
+    "--eval",
+    "REBEL_BROWSER_COMPANY=\"${rebel_browser_company}\"",
+    "--eval",
+    "REBEL_PACKAGE=\"${rebel_package}\"",
+  ]
+}

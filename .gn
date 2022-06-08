@@ -5,6 +5,8 @@
 import("//build/dotfile_settings.gni")
 import("//third_party/angle/dotfile_settings.gni")
 
+import("//rebel/rebel.gni")
+
 # The location of the build configuration file.
 buildconfig = "//build/config/BUILDCONFIG.gn"
 
@@ -71,6 +73,14 @@ default_args = {
   devtools_visibility = [ "*" ]
 
   clang_unsafe_buffers_paths = "//build/config/unsafe_buffers_paths.txt"
+
+  # Rebel default configuration overrides.
+  branding_file_path = "//rebel/branding/BRANDING"
+  chrome_pgo_phase = 0
+  disable_fieldtrial_testing_config = true
+  enable_nacl = false
+  ffmpeg_branding = "Chrome"
+  proprietary_codecs = true
 }
 
 # These are the targets to skip header checking by default. The files in targets
