@@ -50,6 +50,10 @@
 #include "chromeos/startup/startup.h"  // nogncheck
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace {
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -596,6 +600,10 @@ bool PathProvider(int key, base::FilePath* result) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
       cur = base::FilePath(
           FILE_PATH_LITERAL("/Library/Google/Chrome/NativeMessagingHosts"));
+#elif BUILDFLAG(REBEL_BROWSER)
+      cur = base::FilePath(FILE_PATH_LITERAL(
+          "/Library/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH) "/"
+          REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) "/NativeMessagingHosts"));
 #else
       cur = base::FilePath(FILE_PATH_LITERAL(
           "/Library/Application Support/Chromium/NativeMessagingHosts"));
