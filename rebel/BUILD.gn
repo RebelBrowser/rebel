@@ -1,0 +1,11 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("rebel") {
+  testonly = true
+
+  if (is_win || is_mac || is_linux) {
+    deps = [ "//chrome" ]
+  }
+}
