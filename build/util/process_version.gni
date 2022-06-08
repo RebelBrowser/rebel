@@ -4,6 +4,8 @@
 
 import("//build/util/lastchange.gni")
 
+import("//rebel/rebel.gni")
+
 # Runs the version processing script over the given template file to produce
 # an output file. This is used for generating various forms of files that
 # incorporate the product name and version.
@@ -97,6 +99,10 @@ template("process_version") {
 
     if (defined(invoker.executable) && invoker.executable) {
       args += [ "-x" ]
+    }
+
+    if (is_rebel_based) {
+      args += rebel_process_version_arguments
     }
 
     if (defined(invoker.extra_args)) {
