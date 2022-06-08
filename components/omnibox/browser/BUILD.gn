@@ -16,6 +16,8 @@ if (is_android) {
   import("//build/config/android/rules.gni")
 }
 
+import("//rebel/rebel.gni")
+
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [ "ENABLE_VR=$enable_vr" ]
@@ -77,6 +79,11 @@ aggregate_vector_icons("omnibox_vector_icons") {
 
   if (is_win) {
     sources += [ "share_win.icon" ]
+  }
+
+  if (is_rebel_based) {
+    sources -= [ "product.icon" ]
+    sources += [ "$rebel_browser_branding_directory/vector_icons/product.icon" ]
   }
 }
 

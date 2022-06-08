@@ -1,0 +1,20 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Arguments to be overridden by downstream forks.
+declare_args() {
+  rebel_browser_name = "Rebel"
+  rebel_browser_name_path_component = "rebel"
+
+  rebel_browser_company = "Viasat Inc."
+  rebel_browser_company_path_component = "Viasat"
+
+  rebel_browser_schema = "rebel"
+}
+
+# Arguments to help with Chromium integration (i.e. not to be overridden).
+declare_args() {
+  is_rebel_based = true
+  rebel_browser_branding_directory = "//rebel/branding/$rebel_browser_name_path_component"
+}
