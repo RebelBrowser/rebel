@@ -6,6 +6,8 @@ import("//build/config/chromeos/ui_mode.gni")
 import("//build/util/branding.gni")
 import("//components/vector_icons/vector_icons.gni")
 
+import("//rebel/rebel.gni")
+
 aggregate_vector_icons("components_vector_icons") {
   icon_directory = "."
 
@@ -237,6 +239,11 @@ aggregate_vector_icons("components_vector_icons") {
     "warning.icon",
     "warning_outline.icon",
   ]
+
+  if (is_rebel_based) {
+    sources -= [ "${branding_path_component}/product.icon" ]
+    sources += [ "$rebel_browser_branding_directory/vector_icons/product.icon" ]
+  }
 
   if (is_chromeos_ash) {
     sources += [ "videogame_asset_outline.icon" ]

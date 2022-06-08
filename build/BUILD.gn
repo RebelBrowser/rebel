@@ -11,8 +11,15 @@ import("//build/config/features.gni")
 import("//build/util/process_version.gni")
 import("//build_overrides/build.gni")
 
+import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
+
 source_set("buildflag_header_h") {
   sources = [ "buildflag.h" ]
+
+  if (is_rebel_based) {
+    sources += rebel_build_sources
+  }
 }
 
 buildflag_header("branding_buildflags") {
@@ -23,6 +30,8 @@ buildflag_header("branding_buildflags") {
       "CHROMIUM_BRANDING=0",
       "GOOGLE_CHROME_BRANDING=1",
     ]
+  } else if (is_rebel_based) {
+    flags = rebel_branding_flags
   } else {
     flags = [
       "CHROMIUM_BRANDING=1",

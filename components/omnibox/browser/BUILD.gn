@@ -18,6 +18,8 @@ if (is_android) {
   import("//third_party/jni_zero/jni_zero.gni")
 }
 
+import("//rebel/rebel.gni")
+
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [ "ENABLE_VR=$enable_vr" ]
@@ -116,6 +118,11 @@ aggregate_vector_icons("omnibox_vector_icons") {
 
   if (is_linux) {
     sources += [ "share_linux_chrome_refresh.icon" ]
+  }
+
+  if (is_rebel_based) {
+    sources -= [ "product.icon" ]
+    sources += [ "$rebel_browser_branding_directory/vector_icons/product.icon" ]
   }
 }
 
