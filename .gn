@@ -5,6 +5,8 @@
 import("//build/dotfile_settings.gni")
 import("//third_party/angle/dotfile_settings.gni")
 
+import("//rebel/rebel.gni")
+
 # The location of the build configuration file.
 buildconfig = "//build/config/BUILDCONFIG.gn"
 
@@ -61,6 +63,17 @@ default_args = {
   fuchsia_target_api_level = 9
 
   devtools_visibility = [ "*" ]
+
+  # Rebel branding overrides.
+  branding_path_component = "$rebel_browser_name_path_component"
+  branding_file_path = "$rebel_browser_branding_directory/BRANDING"
+
+  # Rebel default configuration overrides.
+  chrome_pgo_phase = 0
+  disable_fieldtrial_testing_config = true
+  enable_nacl = false
+  ffmpeg_branding = "Chrome"
+  proprietary_codecs = true
 }
 
 # These are the targets to skip header checking by default. The files in targets
