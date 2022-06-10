@@ -6,6 +6,8 @@ import("//build/config/locales.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/rebel.gni")
+
 assert(enable_extensions)
 
 grit("strings") {
@@ -14,4 +16,9 @@ grit("strings") {
       [ "grit/extensions_strings.h" ] +
       process_file_template(all_chrome_locales,
                             [ "extensions_strings_{{source_name_part}}.pak" ])
+
+  if (is_rebel_based) {
+    source = "$root_gen_dir/rebel/extensions_strings/extensions_strings.grd"
+    deps = [ "//rebel/branding:extensions_strings" ]
+  }
 }
