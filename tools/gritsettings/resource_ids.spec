@@ -38,7 +38,8 @@
   # Chromium strings and Google Chrome strings must start at the same id.
   # We only use one file depending on whether we're building Chromium or
   # Google Chrome.
-  "chrome/app/chromium_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/chromium_strings/chromium_strings.grd": { # MODIFIED FOR REBEL BRANDING.
+    "META": {"sizes": {"messages": [1000],}},
     "messages": [400],
   },
   "chrome/app/google_chrome_strings.grd": {
@@ -47,9 +48,9 @@
 
   # Leave lots of space for generated_resources since it has most of our
   # strings.
-  "chrome/app/generated_resources.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/generated_resources/generated_resources.grd": { # MODIFIED FOR REBEL BRANDING.
     # Big alignment since strings (previous item) are frequently added.
-    "META": {"join": 2, "align": 200},
+    "META": {"join": 2, "align": 200, "sizes": {"messages": [20000],}},
     "messages": [600],
   },
 
@@ -658,7 +659,8 @@
   # Chromium strings and Google Chrome strings must start at the same id.
   # We only use one file depending on whether we're building Chromium or
   # Google Chrome.
-  "components/components_chromium_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/components_chromium_strings/components_chromium_strings.grd": { # MODIFIED FOR REBEL BRANDING.
+    "META": {"sizes": {"messages": [100],}},
     "messages": [3520],
   },
   "components/components_google_chrome_strings.grd": {
@@ -669,7 +671,8 @@
     "includes": [3540],
     "messages": [3560],
   },
-  "components/components_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/components_strings/components_strings.grd": { # MODIFIED FOR REBEL BRANDING.
+    "META": {"sizes": {"messages": [10000],}},
     "messages": [3580],
   },
   "components/omnibox/resources/omnibox_pedal_synonyms.grd": {
@@ -878,7 +881,8 @@
   "extensions/shell/app_shell_resources.grd": {
     "includes": [4360],
   },
-  "extensions/strings/extensions_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/extensions_strings/extensions_strings.grd": { # MODIFIED FOR REBEL BRANDING.
+    "META": {"sizes": {"messages": [1000],}},
     "messages": [4380],
   },
 
