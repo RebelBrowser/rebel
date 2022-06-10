@@ -1,0 +1,58 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//rebel/rebel.gni")
+
+# Action to create a Rebel-branded GRD (and GRDP/XTB) files from a Chromium-
+# branded source. Invokers should define:
+#
+#     grd_file = The path to the Chromium-branded GRD file to rebrand.
+#
+#     grdp_files = An array of paths to Chromium-branded GRDP files included by
+#     the GRD file to rebrand. All GRDP files must be included, the action will
+#     fail if an unlisted GRDP file is found.
+#
+# Note: While the script can auto-discover the GRDP files to rebrand, they must
+# be listed by the invoker to ensure proper GN dependencies are setup here.
+template("create_branded_grd") {
+  assert(defined(invoker.grd_file), "grd_file must be defined for $target_name")
+
+  output_path = "$root_gen_dir/rebel/$target_name"
+
+  action(target_name) {
+    forward_variables_from(invoker, [
+      "grd_file",
+      "grdp_files",
+    ])
+
+    script = "scripts/create_branded_grd.py"
+
+    inputs = [ grd_file ]
+    outputs = [ output_path + "/" + get_path_info(grd_file, "file") ]
+
+    if (defined(grdp_files)) {
+      inputs += grdp_files
+
+      foreach(grdp_file, grdp_files) {
+        outputs += [ output_path + "/" + get_path_info(grdp_file, "file") ]
+      }
+    }
+
+    args = [
+      "--browser-name", "$rebel_browser_name",
+      "--browser-company", "$rebel_browser_company",
+      "--browser-schema", "$rebel_browser_schema",
+      "--output-path", rebase_path(output_path),
+      "--grd-file", rebase_path(grd_file),
+    ]
+
+    if (defined(grdp_files)) {
+      args += [ "--grdp-files" ]
+
+      foreach(grdp_file, grdp_files) {
+        args += [ rebase_path(grdp_file) ]
+      }
+    }
+  }
+}

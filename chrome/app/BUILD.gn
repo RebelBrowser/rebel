@@ -22,6 +22,8 @@ if (is_android) {
   import("//third_party/fuchsia-sdk/sdk/build/package.gni")
 }
 
+import("//rebel/rebel.gni")
+
 # This target is for dependency tracking for the command ID header.
 source_set("command_ids") {
   sources = [ "chrome_command_ids.h" ]
@@ -100,6 +102,11 @@ grit("generated_resources") {
   if (is_android) {
     outputs += android_generated_java_resources
   }
+
+  if (is_rebel_branded) {
+    source = "$root_gen_dir/rebel/generated_resources/generated_resources.grd"
+    deps = [ "//rebel:generated_resources" ]
+  }
 }
 
 if (is_android) {
@@ -145,6 +152,11 @@ grit("chromium_strings") {
 
   if (is_android) {
     outputs += chromium_strings_java_resources
+  }
+
+  if (is_rebel_branded) {
+    source = "$root_gen_dir/rebel/chromium_strings/chromium_strings.grd"
+    deps = [ "//rebel:chromium_strings" ]
   }
 }
 
