@@ -1,0 +1,133 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//rebel/branding/create_branded_grd.gni")
+
+create_branded_grd("chromium_strings") {
+  grd_file = "//chrome/app/chromium_strings.grd"
+
+  grdp_files = [ "//chrome/app/settings_chromium_strings.grdp" ]
+
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("components_chromium_strings") {
+  grd_file = "//components/components_chromium_strings.grd"
+
+  xtb_relative_path = "strings"
+}
+
+create_branded_grd("components_strings") {
+  grd_file = "//components/components_strings.grd"
+
+  grdp_files = [
+    "//components/arc_strings.grdp",
+    "//components/autofill_payments_strings.grdp",
+    "//components/autofill_strings.grdp",
+    "//components/blocked_content_strings.grdp",
+    "//components/bookmark_bar_strings.grdp",
+    "//components/bookmark_component_strings.grdp",
+    "//components/browsing_data_strings.grdp",
+    "//components/commerce_strings.grdp",
+    "//components/components_settings_strings.grdp",
+    "//components/compose_strings.grdp",
+    "//components/content_creation_strings.grdp",
+    "//components/crash_strings.grdp",
+    "//components/dialog_strings.grdp",
+    "//components/dom_distiller_strings.grdp",
+    "//components/enterprise_strings.grdp",
+    "//components/error_page_strings.grdp",
+    "//components/find_in_page_strings.grdp",
+    "//components/flags_strings.grdp",
+    "//components/fullscreen_control_strings.grdp",
+    "//components/global_media_controls_strings.grdp",
+    "//components/heavy_ad_intervention_strings.grdp",
+    "//components/history_strings.grdp",
+    "//components/javascript_dialogs_strings.grdp",
+    "//components/live_caption_strings.grdp",
+    "//components/login_dialog_strings.grdp",
+    "//components/media_message_center_strings.grdp",
+    "//components/new_or_sad_tab_strings.grdp",
+    "//components/omnibox_pedal_ui_strings.grdp",
+    "//components/omnibox_strings.grdp",
+    "//components/page_info_strings.grdp",
+    "//components/paint_preview_strings.grdp",
+    "//components/password_manager_strings.grdp",
+    "//components/payments_strings.grdp",
+    "//components/pdf_strings.grdp",
+    "//components/permissions_strings.grdp",
+    "//components/policy_strings.grdp",
+    "//components/print_media_strings.grdp",
+    "//components/printing_component_strings.grdp",
+    "//components/privacy_sandbox_strings.grdp",
+    "//components/protocol_handler_strings.grdp",
+    "//components/reset_password_strings.grdp",
+    "//components/search_engine_choice_strings.grdp",
+    "//components/security_interstitials_strings.grdp",
+    "//components/send_tab_to_self_strings.grdp",
+    "//components/site_settings_strings.grdp",
+    "//components/sms_strings.grdp",
+    "//components/ssl_errors_strings.grdp",
+    "//components/subresource_filter_strings.grdp",
+    "//components/supervised_user_strings.grdp",
+    "//components/sync_ui_strings.grdp",
+    "//components/tab_groups_strings.grdp",
+    "//components/translate_strings.grdp",
+    "//components/undo_strings.grdp",
+    "//components/user_education_strings.grdp",
+    "//components/version_ui_strings.grdp",
+    "//components/webapps_strings.grdp",
+    "//components/webauthn_strings.grdp",
+
+    # TODO(tflynn): The following are included in only a subset of systems, but
+    # the branding script doesn't detect that.
+    "//components/android_system_error_page_strings.grdp",
+    "//components/external_intents_strings.grdp",
+    "//components/history_clusters_strings.grdp",
+    "//components/management_ios_strings.grdp",
+    "//components/management_strings.grdp",
+    "//components/webxr_strings.grdp",
+  ]
+
+  xtb_relative_path = "strings"
+}
+
+create_branded_grd("extensions_strings") {
+  grd_file = "//extensions/strings/extensions_strings.grd"
+}
+
+create_branded_grd("generated_resources") {
+  grd_file = "//chrome/app/generated_resources.grd"
+
+  grdp_files = [
+    "//chrome/app/access_code_cast_strings.grdp",
+    "//chrome/app/app_management_strings.grdp",
+    "//chrome/app/bookmarks_strings.grdp",
+    "//chrome/app/chromeos_shared_strings.grdp",
+    "//chrome/app/chromeos_strings.grdp",
+    "//chrome/app/extensions_strings.grdp",
+    "//chrome/app/gmc_strings.grdp",
+    "//chrome/app/media_router_strings.grdp",
+    "//chrome/app/nearby_share_strings.grdp",
+    "//chrome/app/os_settings_search_tag_strings.grdp",
+    "//chrome/app/os_settings_strings.grdp",
+    "//chrome/app/password_manager_ui_strings.grdp",
+    "//chrome/app/printing_strings.grdp",
+    "//chrome/app/profiles_strings.grdp",
+    "//chrome/app/settings_strings.grdp",
+    "//chrome/app/shared_settings_strings.grdp",
+    "//chrome/app/sharesheet_strings.grdp",
+    "//chrome/app/vr_strings.grdp",
+    "//chrome/app/welcome_strings.grdp",
+    "//chrome/app/whats_new_strings.grdp",
+
+    # TODO(tflynn): The following are included in only a subset of systems, but
+    # the branding script doesn't detect that.
+    "//chrome/app/support_tool_strings.grdp",
+  ]
+
+  grdp_extras = [ "//rebel/chrome/app/generated_resources.grdp" ]
+
+  xtb_relative_path = "resources"
+}

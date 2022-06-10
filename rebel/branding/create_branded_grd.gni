@@ -1,0 +1,100 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//base/win/embedded_i18n/generate_embedded_i18n.gni")
+import("//rebel/rebel.gni")
+
+# Action to create a Rebel-branded GRD (and GRDP/XTB) files from a Chromium-
+# branded source. Invokers should define:
+#
+#     grd_file = The path to the Chromium-branded GRD file to rebrand.
+#
+#     grdp_files = An array of paths to Chromium-branded GRDP files included by
+#     the GRD file to rebrand. All GRDP files must be included, the action will
+#     fail if an unlisted GRDP file is found.
+#
+#     grdp_extras = An array of paths to Rebel-owned GRDP files to insert into
+#     the Rebel-branded GRD file.
+#
+# Note: While the script can auto-discover the GRDP files to rebrand, they must
+# be listed by the invoker to ensure proper GN dependencies are setup here.
+template("create_branded_grd") {
+  assert(defined(invoker.grd_file), "grd_file must be defined for $target_name")
+
+  output_path = "$root_gen_dir/rebel/$target_name"
+  xtb_output_path = "$output_path"
+
+  if (defined(invoker.xtb_relative_path)) {
+    xtb_output_path = output_path + "/" + invoker.xtb_relative_path
+  }
+
+  action(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "grd_file",
+                             "grdp_files",
+                             "grdp_extras",
+                             "xtb_relative_path",
+                           ])
+
+    script = "//rebel/branding/create_branded_grd.py"
+
+    inputs = [ grd_file ]
+    outputs = [ output_path + "/" + get_path_info(grd_file, "file") ]
+
+    foreach(locale, default_embedded_i18_locales) {
+      outputs += [ "$xtb_output_path/${target_name}_${locale}.xtb" ]
+    }
+
+    if (defined(grdp_files)) {
+      inputs += grdp_files
+
+      foreach(grdp_file, grdp_files) {
+        outputs += [ output_path + "/" + get_path_info(grdp_file, "file") ]
+      }
+    }
+
+    if (defined(grdp_extras)) {
+      inputs += grdp_extras
+    }
+
+    args = [
+      "--browser-name",
+      "$rebel_browser_name",
+      "--browser-company",
+      "$rebel_browser_company",
+      "--browser-path-component",
+      "$rebel_browser_name_path_component",
+      "--browser-schema",
+      "$rebel_browser_schema",
+      "--output-path",
+      rebase_path(output_path),
+      "--grd-file",
+      rebase_path(grd_file),
+    ]
+
+    if (defined(grdp_files)) {
+      args += [ "--grdp-files" ]
+
+      foreach(grdp_file, grdp_files) {
+        args += [ rebase_path(grdp_file) ]
+      }
+    }
+
+    if (defined(grdp_extras)) {
+      args += [ "--grdp-extras" ]
+
+      foreach(grdp_extra, grdp_extras) {
+        args += [ rebase_path(grdp_extra) ]
+      }
+    }
+
+    if (defined(invoker.xtb_relative_path)) {
+      args += [
+        "--xtb-relative-path",
+        rebase_path(xtb_relative_path),
+      ]
+    }
+  }
+}
