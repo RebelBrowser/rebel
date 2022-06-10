@@ -21,6 +21,8 @@ if (is_android) {
   import("//build/config/android/rules.gni")
 }
 
+import("//rebel/rebel.gni")
+
 # This target is for dependency tracking for the command ID header.
 source_set("command_ids") {
   sources = [ "chrome_command_ids.h" ]
@@ -106,6 +108,11 @@ grit("generated_resources") {
   if (is_android) {
     outputs += android_generated_java_resources
   }
+
+  if (is_rebel_based) {
+    source = "$root_gen_dir/rebel/generated_resources/generated_resources.grd"
+    deps = [ "//rebel/branding:generated_resources" ]
+  }
 }
 
 if (is_android) {
@@ -132,6 +139,11 @@ grit("branded_strings") {
 
   if (is_android) {
     outputs += strings_java_resources
+  }
+
+  if (is_rebel_based) {
+    source = "$root_gen_dir/rebel/chromium_strings/chromium_strings.grd"
+    deps = [ "//rebel/branding:chromium_strings" ]
   }
 }
 
