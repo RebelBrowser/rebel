@@ -430,7 +430,7 @@ static_library("renderer") {
     }
   }
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     sources += rebase_path(rebel_chrome_renderer_sources, ".", "//rebel")
     deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
   }

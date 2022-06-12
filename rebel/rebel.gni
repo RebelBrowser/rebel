@@ -12,7 +12,7 @@ declare_args() {
 
 # Arguments to help with Chromium integration (i.e. not to be overridden).
 declare_args() {
-  is_rebel_branded = true
+  is_rebel_based = true
   rebel_browser_branding_directory = "//rebel/branding/$rebel_browser_path_component"
 }
 

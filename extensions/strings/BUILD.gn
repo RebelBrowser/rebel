@@ -17,7 +17,7 @@ grit("strings") {
       process_file_template(all_chrome_locales,
                             [ "extensions_strings_{{source_name_part}}.pak" ])
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     source = "$root_gen_dir/rebel/extensions_strings/extensions_strings.grd"
     deps = [ "//rebel:extensions_strings" ]
   }

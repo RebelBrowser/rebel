@@ -256,7 +256,7 @@
 #include "chrome/browser/supervised_user/supervised_user_navigation_observer.h"
 #endif
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
 #endif
 
@@ -452,7 +452,7 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents) {
   ukm::InitializeSourceUrlRecorderForWebContents(web_contents);
   vr::VrTabHelper::CreateForWebContents(web_contents);
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   rebel::RemoteNtpTabHelper::CreateForWebContents(web_contents);
 #endif
 

@@ -129,8 +129,8 @@
 #include "chrome/browser/offline_pages/offline_page_tab_helper.h"
 #endif
 
-#include "build/branding_buildflags.h"  // Needed for REBEL_BRANDING.
-#if BUILDFLAG(REBEL_BRANDING)
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #endif
@@ -621,7 +621,7 @@ void ChromeContentBrowserClient::
         &render_frame_host));
 #endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
     associated_registry.AddInterface(base::BindRepeating(
         [](content::RenderFrameHost* render_frame_host,
            mojo::PendingAssociatedReceiver<rebel::mojom::RemoteNtpConnector>

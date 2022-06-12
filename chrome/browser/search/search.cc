@@ -41,7 +41,7 @@
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 #endif
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 #endif
 
@@ -159,7 +159,7 @@ bool IsURLAllowedForSupervisedUser(const GURL& url, Profile* profile) {
 }
 
 bool ShouldShowLocalNewTab(Profile* profile) {
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   if (rebel::IsRemoteNtpEnabled()) {
     return false;
   }
@@ -205,7 +205,7 @@ struct NewTabURLDetails {
         TemplateURLRef::SearchTermsArgs(std::u16string()),
         UIThreadSearchTermsData()));
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
     // Override the NTP URL here rather than prepopulated_engines.json. This
     // way, if new search engines are added, we aren't caught off-guard.
     bool from_command_line = false;

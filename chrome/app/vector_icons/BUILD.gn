@@ -171,7 +171,7 @@ aggregate_vector_icons("chrome_vector_icons") {
     "zoom_plus.icon",
   ]
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     sources -= [ "${branding_path_component}/product.icon" ]
     sources += [ "$rebel_browser_branding_directory/vector_icons/product.icon" ]
   }

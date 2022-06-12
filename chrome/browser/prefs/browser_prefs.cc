@@ -473,7 +473,7 @@
 #include "chrome/browser/sessions/session_service_log.h"
 #endif
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
 #if defined(OS_ANDROID)
 #include "components/ntp_tiles/custom_links_manager_impl.h"
 #else
@@ -1345,7 +1345,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   SessionDataService::RegisterProfilePrefs(registry);
 #endif
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
 
 #if defined(OS_ANDROID)

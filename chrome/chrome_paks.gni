@@ -138,7 +138,7 @@ template("chrome_extra_paks") {
       sources += invoker.additional_paks
     }
 
-    if (is_rebel_branded) {
+    if (is_rebel_based) {
       sources += [ "$root_gen_dir/rebel/rebel_resources.pak" ]
       deps += [ "//rebel/chrome/browser/resources:rebel_resources" ]
     }

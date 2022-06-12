@@ -79,8 +79,8 @@
 #include "chrome/renderer/plugins/chrome_plugin_placeholder.h"
 #endif
 
-#include "build/branding_buildflags.h"  // Needed for REBEL_BRANDING.
-#if BUILDFLAG(REBEL_BRANDING)
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 #include "rebel/chrome/renderer/ntp/remote_ntp_extension.h"
 #endif
@@ -316,7 +316,7 @@ void ChromeRenderFrameObserver::DidCommitProvisionalLoad(
 }
 
 void ChromeRenderFrameObserver::DidClearWindowObject() {
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   if (rebel::IsRemoteNtpEnabled()) {
     rebel::RemoteNtpExtension::Install(render_frame()->GetWebFrame());
   }

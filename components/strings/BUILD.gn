@@ -49,7 +49,7 @@ grit("components_strings") {
     outputs += android_components_strings_java_resources
   }
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     source = "$root_gen_dir/rebel/components_strings/components_strings.grd"
     deps = [ "//rebel:components_strings" ]
   }
@@ -71,7 +71,7 @@ grit("components_chromium_strings") {
     outputs += [ "components_chromium_strings_$locale.pak" ]
   }
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     source = "$root_gen_dir/rebel/components_chromium_strings/components_chromium_strings.grd"
     deps = [ "//rebel:components_chromium_strings" ]
   }

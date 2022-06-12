@@ -6440,7 +6440,7 @@ static_library("browser") {
     deps += [ "//ui/views" ]
   }
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     sources += rebase_path(rebel_chrome_browser_sources, ".", "//rebel")
   }
 

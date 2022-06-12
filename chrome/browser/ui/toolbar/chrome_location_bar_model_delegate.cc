@@ -52,7 +52,7 @@
 const char kPreventElisionExtensionId[] = "jknemblkbdhdcpllfgbfekkdciegfboi";
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
 #endif
 
@@ -122,7 +122,7 @@ bool ChromeLocationBarModelDelegate::ShouldDisplayURL() const {
     return true;
 
   const auto is_ntp = [](const GURL& url) {
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
     if (rebel::RemoteNtpService::IsRemoteNtpUrl(url)) {
       return true;
     }

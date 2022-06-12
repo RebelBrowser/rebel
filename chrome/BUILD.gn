@@ -609,7 +609,7 @@ if (is_win) {
     sources = [ "app/theme/$branding_path_component/mac/app.icns" ]
     outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
 
-    if (is_rebel_branded) {
+    if (is_rebel_based) {
       sources -= [ "app/theme/$branding_path_component/mac/app.icns" ]
       sources += [ "//rebel/branding/$branding_path_component/mac/app.icns" ]
     }
@@ -628,7 +628,7 @@ if (is_win) {
       "//components/policy:chrome_manifest_bundle",
     ]
 
-    if (is_rebel_branded) {
+    if (is_rebel_based) {
       sources -= [ "app/theme/$branding_path_component/mac/document.icns" ]
       sources += [ "$rebel_browser_branding_directory/mac/document.icns" ]
     }
@@ -925,7 +925,7 @@ if (is_win) {
       "browser/mac/install.sh",
     ]
 
-    if (is_rebel_branded) {
+    if (is_rebel_based) {
       sources -= [ "app/theme/default_100_percent/$branding_path_component/product_logo_32.png" ]
       sources += [ "$rebel_browser_branding_directory/default_100_percent/product_logo_32.png" ]
     }
@@ -1529,7 +1529,7 @@ group("extra_resources") {
     "//components/autofill/core/browser:autofill_address_rewriter_resources",
   ]
 
-  if (is_rebel_branded) {
+  if (is_rebel_based) {
     public_deps += [ "//rebel/chrome/browser/resources:rebel_resources" ]
   }
 }

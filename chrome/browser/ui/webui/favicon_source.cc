@@ -36,7 +36,7 @@
 #include "ui/resources/grit/ui_resources.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
 #endif
@@ -225,7 +225,7 @@ bool FaviconSource::ShouldServiceRequest(
     content::BrowserContext* browser_context,
     int render_process_id) {
   if (url.SchemeIs(chrome::kChromeSearchScheme)) {
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
     if (rebel::RemoteNtpServiceImpl::ShouldServiceRequest(url, browser_context,
                                                           render_process_id)) {
       return true;

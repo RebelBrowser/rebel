@@ -633,7 +633,7 @@
 #include "components/services/screen_ai/public/cpp/utilities.h"
 #endif
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
@@ -1637,7 +1637,7 @@ GURL ChromeContentBrowserClient::GetEffectiveURL(
   if (!profile)
     return url;
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   // If the input |url| should be assigned to the RemoteNTP renderer, make its
   // effective URL distinct from other URLs on the provider's domain.
   if (rebel::RemoteNtpServiceImpl::ShouldAssignUrlToRemoteNtpRenderer(
@@ -1706,7 +1706,7 @@ bool ChromeContentBrowserClient::ShouldUseProcessPerSite(
     return true;
   }
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   if (rebel::RemoteNtpServiceImpl::ShouldUseProcessPerSiteForRemoteNtpUrl(
           site_url, profile)) {
     return true;
@@ -1741,7 +1741,7 @@ bool ChromeContentBrowserClient::ShouldUseSpareRenderProcessHost(
   if (IsTopChromeWebUIURL(site_url))
     return false;
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   // RemoteNTP renderers should not use a spare process, because they require
   // passing rebel::kRemoteNtpProcess to the renderer process when it
   // launches.  A spare process is launched earlier, before it is known which
@@ -1972,7 +1972,7 @@ bool ChromeContentBrowserClient::IsSuitableHost(
   if (!profile)
     return true;
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   // RemoteNTP URLs should only be in the RemoteNTP process and RemoteNTP
   // process should only have RemoteNTP URLs.
   rebel::RemoteNtpService* remote_ntp_service =
@@ -2088,7 +2088,7 @@ void ChromeContentBrowserClient::SiteInstanceGotProcess(
   if (!profile)
     return;
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   // Remember the ID of the RemoteNTP process to signal the renderer process
   // on startup in |AppendExtraCommandLineSwitches| below.
   if (rebel::RemoteNtpServiceImpl::ShouldAssignUrlToRemoteNtpRenderer(
@@ -2406,7 +2406,7 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
       if (prefs->GetBoolean(prefs::kPrintPreviewDisabled))
         command_line->AppendSwitch(switches::kDisablePrintPreview);
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
       rebel::RemoteNtpService* remote_ntp_service =
           rebel::RemoteNtpServiceFactory::GetForProfile(profile);
       if (remote_ntp_service &&
@@ -4484,7 +4484,7 @@ ChromeContentBrowserClient::CreateThrottlesForNavigation(
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) ||
         // BUILDFLAG(IS_CHROMEOS_ASH)
 
-#if BUILDFLAG(REBEL_BRANDING)
+#if BUILDFLAG(REBEL_BROWSER)
   // This must be created *before* NewTabPageNavigationThrottle, otherwise the
   // Chrome local NTP will be loaded instead of the RemoteNTP.
   MaybeAddThrottle(
