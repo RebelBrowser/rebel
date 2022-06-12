@@ -720,6 +720,10 @@ if (current_toolchain == default_toolchain) {
       "//url/mojom:url_mojom_gurl_java",
     ]
 
+    if (is_rebel_based) {
+      deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom_java" ]
+    }
+
     deps += feed_deps
 
     srcjar_deps = [
@@ -4180,6 +4184,10 @@ generate_jni("chrome_jni_headers") {
 
   if (enable_vr) {
     sources += [ "java/src/org/chromium/chrome/browser/component_updater/VrAssetsComponentInstaller.java" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_android_jni_sources, ".", "//rebel")
   }
 }
 

@@ -74,6 +74,11 @@
 #import "ui/base/device_form_factor.h"
 #import "url/gurl.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -351,6 +356,9 @@ const size_t kMaxURLDisplayChars = 32 * 1024;
   // When the NTP and fakebox are visible, make the fakebox animates into place
   // before focusing the omnibox.
   if (IsVisibleURLNewTabPage([self webState]) &&
+#if BUILDFLAG(REBEL_BROWSER)
+      !rebel::IsRemoteNtpEnabled() &&
+#endif
       !self.browserState->IsOffTheRecord()) {
     id<BrowserCoordinatorCommands> browserCoordinatorCommandsHandler =
         HandlerForProtocol(self.browser->GetCommandDispatcher(),

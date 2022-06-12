@@ -53,6 +53,9 @@ class ChromeTestChromeMainDelegate
   // ChromeMainDelegateOverrides.
   content::ContentBrowserClient* CreateContentBrowserClient() override;
   content::ContentUtilityClient* CreateContentUtilityClient() override;
+#if BUILDFLAG(REBEL_BROWSER)
+  content::ContentRendererClient* CreateContentRendererClient() override;
+#endif
 #if BUILDFLAG(IS_WIN)
   bool ShouldHandleConsoleControlEvents() override;
 #endif

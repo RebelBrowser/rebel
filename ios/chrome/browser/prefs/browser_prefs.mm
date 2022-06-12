@@ -87,6 +87,10 @@
 #import "ios/web/common/features.h"
 #import "ui/base/l10n/l10n_util.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/prefs/rebel_prefs.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -340,6 +344,10 @@ void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {
       base::to_underlying(
           prerender_prefs::NetworkPredictionSetting::kEnabledWifiOnly),
       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterProfilePrefs(registry);
+#endif
 }
 
 // This method should be periodically pruned of year+ old migrations.
