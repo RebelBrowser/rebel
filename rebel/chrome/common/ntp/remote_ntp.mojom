@@ -1,0 +1,158 @@
+// Copyright 2022 Viasat Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+[JavaPackage="org.rebel.mojom"]
+module rebel.mojom;
+
+import "mojo/public/mojom/base/string16.mojom";
+import "url/mojom/url.mojom";
+
+struct RemoteNtpTile {
+  mojo_base.mojom.String16 title;
+  string url;
+  string favicon_url;
+};
+
+// Maps to types in //components/omnibox/browser/autocomplete_match.h.
+struct ACMatchClassification {
+  uint32 offset;
+  int32 style;
+};
+
+struct AutocompleteMatch {
+  mojo_base.mojom.String16 contents;
+  array<ACMatchClassification> contents_class;
+
+  mojo_base.mojom.String16 description;
+  array<ACMatchClassification> description_class;
+
+  string destination_url;
+
+  string type;
+  bool is_search_type;
+
+  mojo_base.mojom.String16 fill_into_edit;
+  mojo_base.mojom.String16 inline_autocompletion;
+  bool allowed_to_be_default_match;
+};
+
+struct AutocompleteResult {
+  mojo_base.mojom.String16 input;
+  array<AutocompleteMatch> matches;
+};
+
+struct BackgroundCollection {
+  string collection_id;
+  string collection_name;
+  url.mojom.Url preview_image_url;
+};
+
+struct BackgroundImage {
+  url.mojom.Url image_url;
+  url.mojom.Url thumbnail_url;
+  string attribution_line_1;
+  string attribution_line_2;
+  url.mojom.Url attribution_url;
+};
+
+struct RemoteNtpTheme {
+  // System theme settings.
+  bool dark_mode_enabled;
+
+  // Information about the custom background chosen by the user.
+  string collection_id;
+  url.mojom.Url image_url;
+  string image_alignment;
+  string image_tiling;
+  string attribution_line_1;
+  string attribution_line_2;
+  url.mojom.Url attribution_url;
+  url.mojom.Url attribution_image_url;
+
+  // Information about the custom color chosen by the user.
+  int32 color_id = -1;
+  uint32 color;
+  uint32 color_dark;
+  uint32 color_light;
+};
+
+// Interface used to connect to the remote NTP interface. This is a separate
+// interface such that a reverse connection (|client| below) can be passed when
+// connecting.
+interface RemoteNtpConnector {
+  // Connect to the interface. |remote_ntp| is the connection which the client
+  // will use to query the remote NTP interface. |client| is the connection
+  // used by the remote NTP interface implementation to push browser state
+  // updates to the client.
+  Connect(pending_associated_receiver<RemoteNtp> remote_ntp,
+          pending_associated_remote<RemoteNtpClient> client);
+};
+
+// Browser interface to support remote NTP. Render frames connect to this
+// interface to query browser data.
+interface RemoteNtp {
+  AddCustomTile(url.mojom.Url tile_url, mojo_base.mojom.String16 tile_title);
+  RemoveCustomTile(url.mojom.Url tile_url);
+  EditCustomTile(url.mojom.Url old_tile_url,
+                 url.mojom.Url new_tile_url,
+                 mojo_base.mojom.String16 new_tile_title);
+
+  LoadInternalUrl(url.mojom.Url url);
+
+  QueryAutocomplete(mojo_base.mojom.String16 input,
+                    bool prevent_inline_autocomplete);
+  StopAutocomplete();
+  OpenAutocompleteMatch(uint32 index,
+                        url.mojom.Url url,
+                        bool middle_button,
+                        bool alt_key,
+                        bool ctrl_key,
+                        bool meta_key,
+                        bool shift_key);
+
+  LoadBackgroundCollections();
+  LoadBackgroundImages(string collection_id);
+  SetBackgroundImage(string collection_id, BackgroundImage? background_image);
+  SelectLocalBackgroundImage();
+  PreviewColor(uint32 color);
+  RevertColor();
+  CommitColor();
+};
+
+// Renderer interface used by the browser to push updates to the client.
+interface RemoteNtpClient {
+  NtpTilesChanged(array<RemoteNtpTile> tiles);
+
+  AutocompleteResultChanged(AutocompleteResult result);
+
+  ThemeChanged(RemoteNtpTheme theme);
+  BackgroundCollectionsChanged(
+      array<BackgroundCollection> background_collections);
+  BackgroundImagesChanged(
+      map<string, array<BackgroundImage>> background_images);
+  LocalBackgroundImageSelected();
+};
+
+// List of possible icon types parsed from <link> tags on the DOM.
+//
+// Note: These values are in order of least to most preferred icon type.
+enum RemoteNtpIconType {
+  Unknown,
+  Favicon,
+  Fluid,
+  Touch,
+};
+
+// Struct to store all information parsed for a domain and its icon.
+struct RemoteNtpIcon {
+  url.mojom.Url host_origin;
+  url.mojom.Url icon_url;
+  RemoteNtpIconType icon_type = Unknown;
+  int32 icon_size = -1;
+};
+
+// Browser interface to receive parsed icons from the renderer.
+interface RemoteNtpIconReceiver {
+  IconParsed(RemoteNtpIcon icon);
+};
