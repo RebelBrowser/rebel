@@ -1,0 +1,39 @@
+<!--
+Copyright 2022 Viasat Inc. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+-->
+<!DOCTYPE HTML>
+<html dir="$i18n{textdirection}">
+<head>
+  <meta charset="utf-8">
+  <title>$i18n{remoteNtpInternalsTitle}</title>
+  <link rel="stylesheet" href="chrome://resources/css/text_defaults.css">
+  <link rel="stylesheet" href="remote_ntp_icon.css">
+</head>
+
+<body style="font-size:$i18n{fontsize}">
+  <div class="header">
+    <h1>$i18n{remoteNtpInternalsTitle}</h1>
+  </div>
+
+  <h1 class="label">$i18n{remoteNtpInternalsIcon}</h1>
+
+  <table id="remote-ntp-icons">
+    <thead>
+      <tr>
+        <th></th>
+        <th id="origin">$i18n{remoteNtpInternalsIconTableOrigin}</th>
+        <th id="path">$i18n{remoteNtpInternalsIconTablePath}</th>
+        <th id="type">$i18n{remoteNtpInternalsIconTableType}</th>
+        <th id="image">$i18n{remoteNtpInternalsIconTableImage}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="remote-ntp-icons-body">
+    </tbody>
+  </table>
+
+  <script type="module" src="remote_ntp_icon.js"></script>
+</body>
+</html>
