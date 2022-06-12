@@ -330,6 +330,12 @@
 #include "chrome/browser/ui/webui/chromeos/chromebox_for_meetings/network_settings_dialog.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BRANDING.
+#if BUILDFLAG(REBEL_BRANDING)
+#include "rebel/chrome/browser/ntp/remote_ntp_icon_receiver.h"
+#include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
+#endif
+
 #if BUILDFLAG(IS_CHROMEOS_ASH)
 void ash::SystemExtensionsInternalsUI::BindInterface(
     mojo::PendingReceiver<ash::mojom::system_extensions_internals::PageHandler>
@@ -641,6 +647,11 @@ void PopulateChromeFrameBinders(
 
   map->Add<blink::mojom::AnchorElementMetricsHost>(
       base::BindRepeating(&NavigationPredictor::Create));
+
+#if BUILDFLAG(REBEL_BRANDING)
+  map->Add<rebel::mojom::RemoteNtpIconReceiver>(
+      base::BindRepeating(&rebel::RemoteNtpIconReceiver::Create));
+#endif
 
   if (base::FeatureList::IsEnabled(
           blink::features::kAnchorElementInteraction)) {

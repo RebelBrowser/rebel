@@ -79,6 +79,12 @@
 #include "chrome/renderer/plugins/chrome_plugin_placeholder.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BRANDING.
+#if BUILDFLAG(REBEL_BRANDING)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#include "rebel/chrome/renderer/ntp/remote_ntp_extension.h"
+#endif
+
 using blink::WebDocumentLoader;
 using blink::WebElement;
 using blink::WebFrameContentDumper;
@@ -310,6 +316,12 @@ void ChromeRenderFrameObserver::DidCommitProvisionalLoad(
 }
 
 void ChromeRenderFrameObserver::DidClearWindowObject() {
+#if BUILDFLAG(REBEL_BRANDING)
+  if (rebel::IsRemoteNtpEnabled()) {
+    rebel::RemoteNtpExtension::Install(render_frame()->GetWebFrame());
+  }
+#endif
+
 #if !BUILDFLAG(IS_ANDROID)
   const base::CommandLine& command_line =
       *base::CommandLine::ForCurrentProcess();

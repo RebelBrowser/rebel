@@ -633,6 +633,14 @@
 #include "components/services/screen_ai/public/cpp/utilities.h"
 #endif
 
+#if BUILDFLAG(REBEL_BRANDING)
+#include "rebel/chrome/browser/ntp/remote_ntp_service.h"
+#include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
+#include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
+#include "rebel/chrome/browser/ui/ntp/remote_ntp_navigation_throttle.h"
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#endif
+
 using blink::mojom::EffectiveConnectionType;
 using blink::web_pref::WebPreferences;
 using content::BrowserThread;
@@ -1629,6 +1637,15 @@ GURL ChromeContentBrowserClient::GetEffectiveURL(
   if (!profile)
     return url;
 
+#if BUILDFLAG(REBEL_BRANDING)
+  // If the input |url| should be assigned to the RemoteNTP renderer, make its
+  // effective URL distinct from other URLs on the provider's domain.
+  if (rebel::RemoteNtpServiceImpl::ShouldAssignUrlToRemoteNtpRenderer(
+          url, profile)) {
+    return rebel::RemoteNtpServiceImpl::GetEffectiveURLForRemoteNtp(url);
+  }
+#endif
+
 #if !BUILDFLAG(IS_ANDROID)
   // If the input |url| should be assigned to the Instant renderer, make its
   // effective URL distinct from other URLs on the search provider's domain.
@@ -1689,6 +1706,13 @@ bool ChromeContentBrowserClient::ShouldUseProcessPerSite(
     return true;
   }
 
+#if BUILDFLAG(REBEL_BRANDING)
+  if (rebel::RemoteNtpServiceImpl::ShouldUseProcessPerSiteForRemoteNtpUrl(
+          site_url, profile)) {
+    return true;
+  }
+#endif
+
 #if !BUILDFLAG(IS_ANDROID)
   if (search::ShouldUseProcessPerSiteForInstantSiteURL(site_url, profile))
     return true;
@@ -1716,6 +1740,16 @@ bool ChromeContentBrowserClient::ShouldUseSpareRenderProcessHost(
   // ensure the Spare Renderer is not assigned.
   if (IsTopChromeWebUIURL(site_url))
     return false;
+
+#if BUILDFLAG(REBEL_BRANDING)
+  // RemoteNTP renderers should not use a spare process, because they require
+  // passing rebel::kRemoteNtpProcess to the renderer process when it
+  // launches.  A spare process is launched earlier, before it is known which
+  // navigation will use it, so it lacks this flag.
+  if (rebel::RemoteNtpServiceImpl::ShouldAssignUrlToRemoteNtpRenderer(site_url,
+                                                                      profile))
+    return false;
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   // Instant renderers should not use a spare process, because they require
@@ -1938,6 +1972,23 @@ bool ChromeContentBrowserClient::IsSuitableHost(
   if (!profile)
     return true;
 
+#if BUILDFLAG(REBEL_BRANDING)
+  // RemoteNTP URLs should only be in the RemoteNTP process and RemoteNTP
+  // process should only have RemoteNTP URLs.
+  rebel::RemoteNtpService* remote_ntp_service =
+      rebel::RemoteNtpServiceFactory::GetForProfile(profile);
+  if (remote_ntp_service) {
+    bool is_remote_ntp_process =
+        remote_ntp_service->IsRemoteNtpProcess(process_host->GetID());
+    bool should_be_in_remote_ntp_process =
+        rebel::RemoteNtpServiceImpl::ShouldAssignUrlToRemoteNtpRenderer(
+            site_url, profile);
+    if (is_remote_ntp_process || should_be_in_remote_ntp_process) {
+      return is_remote_ntp_process && should_be_in_remote_ntp_process;
+    }
+  }
+#endif
+
 #if !BUILDFLAG(IS_ANDROID)
   // Instant URLs should only be in the instant process and instant process
   // should only have Instant URLs.
@@ -2036,6 +2087,20 @@ void ChromeContentBrowserClient::SiteInstanceGotProcess(
       Profile::FromBrowserContext(site_instance->GetBrowserContext());
   if (!profile)
     return;
+
+#if BUILDFLAG(REBEL_BRANDING)
+  // Remember the ID of the RemoteNTP process to signal the renderer process
+  // on startup in |AppendExtraCommandLineSwitches| below.
+  if (rebel::RemoteNtpServiceImpl::ShouldAssignUrlToRemoteNtpRenderer(
+          site_instance->GetSiteURL(), profile)) {
+    rebel::RemoteNtpService* remote_ntp_service =
+        rebel::RemoteNtpServiceFactory::GetForProfile(profile);
+    if (remote_ntp_service) {
+      remote_ntp_service->AddRemoteNtpProcess(
+          site_instance->GetProcess()->GetID());
+    }
+  }
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   // Remember the ID of the Instant process to signal the renderer process
@@ -2340,6 +2405,15 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
 
       if (prefs->GetBoolean(prefs::kPrintPreviewDisabled))
         command_line->AppendSwitch(switches::kDisablePrintPreview);
+
+#if BUILDFLAG(REBEL_BRANDING)
+      rebel::RemoteNtpService* remote_ntp_service =
+          rebel::RemoteNtpServiceFactory::GetForProfile(profile);
+      if (remote_ntp_service &&
+          remote_ntp_service->IsRemoteNtpProcess(process->GetID())) {
+        command_line->AppendSwitch(rebel::kRemoteNtpProcess);
+      }
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
       InstantService* instant_service =
@@ -4409,6 +4483,14 @@ ChromeContentBrowserClient::CreateThrottlesForNavigation(
                    &throttles);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) ||
         // BUILDFLAG(IS_CHROMEOS_ASH)
+
+#if BUILDFLAG(REBEL_BRANDING)
+  // This must be created *before* NewTabPageNavigationThrottle, otherwise the
+  // Chrome local NTP will be loaded instead of the RemoteNTP.
+  MaybeAddThrottle(
+      rebel::RemoteNtpNavigationThrottle::MaybeCreateThrottleFor(handle),
+      &throttles);
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   MaybeAddThrottle(DevToolsWindow::MaybeCreateNavigationThrottle(handle),

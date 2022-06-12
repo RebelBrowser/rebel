@@ -29,6 +29,8 @@ import("//third_party/protobuf/proto_library.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/views/features.gni")
 
+import("//rebel/rebel.gni")
+
 # Use a static library here because many test binaries depend on this but don't
 # require many files from it. This makes linking more efficient.
 static_library("ui") {
@@ -5599,6 +5601,11 @@ static_library("ui") {
       "webui/tab_strip/thumbnail_tracker.cc",
       "webui/tab_strip/thumbnail_tracker.h",
     ]
+  }
+
+  if (is_rebel_branded) {
+    sources += rebase_path(rebel_chrome_browser_ui_sources, ".", "//rebel")
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
   }
 }
 
