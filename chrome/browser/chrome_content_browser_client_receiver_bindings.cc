@@ -129,6 +129,12 @@
 #include "chrome/browser/offline_pages/offline_page_tab_helper.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BRANDING.
+#if BUILDFLAG(REBEL_BRANDING)
+#include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
+#include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
+#endif
+
 namespace {
 
 // Helper method for ExposeInterfacesToRenderer() that checks the latest
@@ -614,6 +620,17 @@ void ChromeContentBrowserClient::
         },
         &render_frame_host));
 #endif  // BUILDFLAG(ENABLE_SUPERVISED_USERS)
+
+#if BUILDFLAG(REBEL_BRANDING)
+    associated_registry.AddInterface(base::BindRepeating(
+        [](content::RenderFrameHost* render_frame_host,
+           mojo::PendingAssociatedReceiver<rebel::mojom::RemoteNtpConnector>
+               receiver) {
+          rebel::RemoteNtpTabHelper::BindRemoteNtpConnector(std::move(receiver),
+                                                            render_frame_host);
+        },
+        &render_frame_host));
+#endif
 }
 
 void ChromeContentBrowserClient::BindGpuHostReceiver(

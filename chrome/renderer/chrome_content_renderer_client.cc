@@ -244,6 +244,12 @@
 #include "chrome/renderer/supervised_user/supervised_user_error_page_controller_delegate_impl.h"
 #endif
 
+#if BUILDFLAG(REBEL_BRANDING)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#include "rebel/chrome/renderer/ntp/remote_ntp.h"
+#include "rebel/chrome/renderer/ntp/remote_ntp_icon_parser.h"
+#endif
+
 using autofill::AutofillAgent;
 using autofill::PasswordAutofillAgent;
 using autofill::PasswordGenerationAgent;
@@ -473,8 +479,14 @@ void ChromeContentRendererClient::RenderThreadStarted() {
 
   // The Instant process can only display the content but not read it.  Other
   // processes can't display it or read it.
+#if BUILDFLAG(REBEL_BRANDING)
+  if (!command_line->HasSwitch(switches::kInstantProcess) &&
+      !command_line->HasSwitch(rebel::kRemoteNtpProcess))
+    WebSecurityPolicy::RegisterURLSchemeAsDisplayIsolated(chrome_search_scheme);
+#else
   if (!command_line->HasSwitch(switches::kInstantProcess))
     WebSecurityPolicy::RegisterURLSchemeAsDisplayIsolated(chrome_search_scheme);
+#endif
 
   WebString dom_distiller_scheme(
       WebString::FromASCII(dom_distiller::kDomDistillerScheme));
@@ -694,6 +706,13 @@ void ChromeContentRendererClient::RenderFrameCreated(
     new translate::PerFrameTranslateAgent(
         render_frame, ISOLATED_WORLD_ID_TRANSLATE, associated_interfaces);
   }
+
+#if BUILDFLAG(REBEL_BRANDING)
+  if (render_frame->IsMainFrame() && rebel::IsRemoteNtpEnabled()) {
+    new rebel::RemoteNtp(render_frame);
+    new rebel::RemoteNtpIconParser(render_frame);
+  }
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();

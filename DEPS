@@ -546,6 +546,11 @@ deps = {
     'condition': 'host_os == "linux"',
   },
 
+  # Rebel deps:
+  'src/rebel/third_party/remote_ntp': {
+    'url': 'https://github.com/RebelBrowser/remote_ntp.git@984936098ea8623c2a7711c900ad03f76d3e9e0d',
+  },
+
   # We don't know target_cpu at deps time. At least until there's a universal
   # binary of httpd-php, pull both intel and arm versions in DEPS and then pick
   # the right one at runtime.
@@ -4077,6 +4082,16 @@ hooks = [
                 '-u',
                 '--bucket', 'v8-wasm-fuzzer',
                 '-s', 'src/v8/test/fuzzer/wasm_corpus.tar.gz.sha1',
+    ],
+  },
+
+  # Rebel hooks:
+  {
+    'name': 'remote_ntp',
+    'pattern': '.',
+    'action': [ 'python3',
+                'src/rebel/third_party/remote_ntp/deploy.py',
+                '--target', 'local',
     ],
   },
 
