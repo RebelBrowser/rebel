@@ -51,6 +51,11 @@ import org.chromium.ui.base.DeviceFormFactor;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.util.ColorUtils;
 
+// REBEL
+import org.chromium.chrome.browser.ntp.RemoteNtpBridge;
+import org.chromium.ui.base.PageTransition;
+// REBEL
+
 /**
  * Creates NativePage objects to show chrome-native:// URLs using the native Android view system.
  */
@@ -199,6 +204,17 @@ public class NativePageFactory {
             if (tab.isIncognito()) {
                 return new IncognitoNewTabPage(mActivity, nativePageHost, tab.getProfile());
             }
+
+            // REBEL
+            if (RemoteNtpBridge.IsRemoteNtpEnabled()) {
+                LoadUrlParams params = new LoadUrlParams(
+                        RemoteNtpBridge.GetRemoteNtpUrl(), PageTransition.HOME_PAGE);
+                params.setShouldReplaceCurrentEntry(true);
+                tab.loadUrl(params);
+
+                return null;
+            }
+            // REBEL
 
             return new NewTabPage(
                     mActivity,

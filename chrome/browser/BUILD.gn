@@ -56,6 +56,8 @@ if (is_win) {
   import("//build/config/win/manifest.gni")
 }
 
+import("//rebel/sources.gni")
+
 assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
 
 declare_args() {
@@ -6812,6 +6814,10 @@ static_library("browser") {
       "page_load_metrics/observers/side_search_page_load_metrics_observer.h",
     ]
     deps += [ "//ui/views" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_browser_sources, ".", "//rebel")
   }
 
   if (use_aura) {

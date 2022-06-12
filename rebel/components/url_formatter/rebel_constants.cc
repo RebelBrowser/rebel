@@ -61,4 +61,8 @@ bool ReplaceChromeSchemeWithRebelScheme(std::u16string& url) {
   return true;
 }
 
+bool SchemeIsRebelOrChrome(const GURL& url) {
+  return url.SchemeIs(kRebelScheme) || url.SchemeIs(kChromeScheme);
+}
+
 }  // namespace rebel

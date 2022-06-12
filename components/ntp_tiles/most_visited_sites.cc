@@ -39,6 +39,8 @@
 #include "extensions/common/constants.h"  // nogncheck
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 using history::TopSites;
 
 namespace ntp_tiles {
@@ -542,10 +544,13 @@ NTPTilesVector MostVisitedSites::CreatePopularSitesTiles(
     if (top_sites_ && top_sites_->IsBlocked(popular_site.url))
       continue;
 
+#if !BUILDFLAG(REBEL_BROWSER)
+    // Rebel: This is removed to allow multiple sites under the same domain.
     const std::string& host = popular_site.url.host();
     if (IsHostOrMobilePageKnown(hosts_to_skip, host)) {
       continue;
     }
+#endif
 
     NTPTile tile;
     tile.title = popular_site.title;
@@ -553,6 +558,11 @@ NTPTilesVector MostVisitedSites::CreatePopularSitesTiles(
     tile.title_source = popular_site.title_source;
     tile.source = popular_site.baked_in ? TileSource::POPULAR_BAKED_IN
                                         : TileSource::POPULAR;
+#if BUILDFLAG(REBEL_BROWSER)
+    tile.favicon_url = popular_site.large_icon_url.is_valid()
+                           ? popular_site.large_icon_url
+                           : popular_site.favicon_url;
+#endif
     popular_sites_tiles.push_back(std::move(tile));
     icon_cacher_->StartFetchPopularSites(
         popular_site,

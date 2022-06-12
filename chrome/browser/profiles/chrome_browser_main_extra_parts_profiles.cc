@@ -519,6 +519,10 @@
 #include "chrome/browser/enterprise/data_controls/rules_service.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
+#endif
+
 namespace chrome {
 
 void AddProfilesExtraParts(ChromeBrowserMainParts* main_parts) {
@@ -1275,6 +1279,10 @@ void ChromeBrowserMainExtraPartsProfiles::
   webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
   WebUIContentsPreloadManager::EnsureFactoryBuilt();
+#endif
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RemoteNtpServiceFactory::GetInstance();
 #endif
 }
 

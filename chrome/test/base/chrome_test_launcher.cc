@@ -80,6 +80,11 @@
 #include "chrome/browser/chrome_browser_main_extra_parts.h"
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/rebel_content_browser_client.h"
+#include "rebel/chrome/renderer/rebel_content_renderer_client.h"
+#endif
+
 namespace {
 #if BUILDFLAG(IS_CHROMEOS_ASH)
 class TestControllerSetupMainExtraParts : public ChromeBrowserMainExtraParts {
@@ -98,6 +103,7 @@ class TestControllerSetupMainExtraParts : public ChromeBrowserMainExtraParts {
 };
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
 }  // namespace
+
 
 // static
 int ChromeTestSuiteRunner::RunTestSuiteInternal(ChromeTestSuite* test_suite) {
@@ -180,7 +186,11 @@ ChromeTestLauncherDelegate::GetUserDataDirectoryCommandLineSwitch() {
 // watch for long-running tasks and produce a useful timeout message in order to
 // find the cause of flaky timeout tests.
 class BrowserTestChromeContentBrowserClient
+#if BUILDFLAG(REBEL_BROWSER)
+    : public rebel::RebelContentBrowserClient {
+#else
     : public ChromeContentBrowserClient {
+#endif
  public:
   bool CreateThreadPool(base::StringPiece name) override {
     base::test::TaskEnvironment::CreateThreadPool();
@@ -232,6 +242,14 @@ std::optional<int> ChromeTestChromeMainDelegate::PostEarlyInitialization(
   return result;
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
+
+#if BUILDFLAG(REBEL_BROWSER)
+content::ContentRendererClient*
+ChromeTestChromeMainDelegate::CreateContentRendererClient() {
+  static rebel::RebelContentRendererClient rebel_content_renderer_client;
+  return &rebel_content_renderer_client;
+}
+#endif
 
 #if BUILDFLAG(IS_WIN)
 bool ChromeTestChromeMainDelegate::ShouldHandleConsoleControlEvents() {

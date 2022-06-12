@@ -297,6 +297,10 @@
 #include "chrome/browser/rlz/chrome_rlz_tracker_web_contents_observer.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
+#endif
+
 using content::WebContents;
 
 namespace {
@@ -532,6 +536,10 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents) {
           features::kFileSystemAccessPersistentPermissions)) {
     OneTimePermissionsTrackerHelper::CreateForWebContents(web_contents);
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RemoteNtpTabHelper::CreateForWebContents(web_contents);
+#endif
 
   // NO! Do not just add your tab helper here. This is a large alphabetized
   // block; please insert your tab helper above in alphabetical order.

@@ -257,7 +257,7 @@ import java.util.List;
  * @param <C> - type of associated Dagger component.
  */
 public abstract class ChromeActivity<C extends ChromeActivityComponent>
-        extends AsyncInitializationActivity
+        extends RebelActivity // Rebel: Replaced |extends AsyncInitializationActivity|
         implements TabCreatorManager,
                 PolicyChangeListener,
                 ContextualSearchTabPromotionDelegate,
