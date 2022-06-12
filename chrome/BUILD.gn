@@ -55,6 +55,7 @@ if (is_android) {
 }
 
 import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 declare_args() {
   # Indicates whether keystone registration framework should be enabled (see
@@ -264,6 +265,10 @@ if (!is_android && !is_mac) {
         "app/chrome_main_delegate.h",
       ]
 
+      if (is_rebel_based) {
+        sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
+      }
+
       deps += [
         # On Linux, link the dependencies (libraries) that make up actual
         # Chromium functionality directly into the executable.
@@ -420,6 +425,10 @@ if (is_win) {
 
     if (use_aura) {
       deps += [ "//ui/compositor" ]
+    }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
     }
   }
 
@@ -1165,6 +1174,10 @@ if (is_win) {
     ]
 
     configs += [ "//build/config/compiler:wexit_time_destructors" ]
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
+    }
   }
 
   mac_framework_bundle("chrome_framework") {
@@ -1536,6 +1549,10 @@ group("extra_resources") {
     "//chrome/browser/resources:resources",
     "//components/autofill/core/browser:autofill_address_rewriter_resources",
   ]
+
+  if (is_rebel_based) {
+    public_deps += [ "//rebel/chrome/browser/resources:rebel_resources" ]
+  }
 }
 
 if (is_chrome_branded && !is_android) {
@@ -1715,6 +1732,10 @@ if (is_android) {
 
     if (enable_gwp_asan) {
       deps += [ "//components/gwp_asan/client" ]
+    }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
     }
   }
 }

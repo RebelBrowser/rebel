@@ -11,6 +11,8 @@ declare_args() {
   rebel_browser_company_path_component = "Viasat"
 
   rebel_browser_schema = "rebel"
+
+  rebel_new_tab_page_url = "https://browser.viasat.com/rebel_ntp/index.html"
 }
 
 # Arguments to help with Chromium integration (i.e. not to be overridden).

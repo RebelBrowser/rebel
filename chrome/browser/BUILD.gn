@@ -53,6 +53,8 @@ if (is_win) {
   import("//build/config/win/manifest.gni")
 }
 
+import("//rebel/sources.gni")
+
 declare_args() {
   # You can set the variable 'use_official_enterprise_connectors_api_keys' to
   # true to use the Google-internal file containing official API keys
@@ -6644,6 +6646,10 @@ static_library("browser") {
       "page_load_metrics/observers/side_search_page_load_metrics_observer.h",
     ]
     deps += [ "//ui/views" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_browser_sources, ".", "//rebel")
   }
 
   if (use_aura) {
