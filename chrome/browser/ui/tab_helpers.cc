@@ -291,6 +291,10 @@
 #include "components/compose/core/browser/compose_features.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
+#endif
+
 using content::WebContents;
 
 namespace {
@@ -514,6 +518,10 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents) {
   v8_compile_hints::V8CompileHintsTabHelper::MaybeCreateForWebContents(
       web_contents);
   vr::VrTabHelper::CreateForWebContents(web_contents);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RemoteNtpTabHelper::CreateForWebContents(web_contents);
+#endif
 
   // NO! Do not just add your tab helper here. This is a large alphabetized
   // block; please insert your tab helper above in alphabetical order.

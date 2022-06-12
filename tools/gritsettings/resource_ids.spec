@@ -1267,6 +1267,10 @@
     "includes": [8440],
   },
 
+  "rebel/chrome/browser/resources/rebel_resources.grd": { # ADDED FOR REBEL BRANDING.
+    "includes": [31000],
+  },
+
   # END "everything else" section.
   # Everything but chrome/, components/, content/, and ios/
 

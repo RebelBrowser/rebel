@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grit latest_public_release="0" current_release="1" output_all_resource_defines="false">
+  <outputs>
+    <output filename="grit/rebel_resources.h" type="rc_header">
+      <emit emit_type='prepend'></emit>
+    </output>
+    <output filename="rebel_resources.pak" type="data_package" />
+  </outputs>
+  <release seq="1">
+    <includes>
+      <!-- Note: remote_ntp_resources.grdp is generated during runhooks -->
+      <part file="../../../third_party/remote_ntp/remote_ntp_resources.grdp" />
+
+      <include name="IDR_REMOTE_NTP_INTERNALS_HTML" file="remote_ntp_internals.html" preprocess="true" type="BINDATA" />
+      <include name="IDR_REMOTE_NTP_INTERNALS_CSS" file="remote_ntp_internals.css" preprocess="true" type="BINDATA" />
+      <include name="IDR_REMOTE_NTP_INTERNALS_JS" file="remote_ntp_internals.js" preprocess="true" type="BINDATA" />
+    </includes>
+  </release>
+</grit>

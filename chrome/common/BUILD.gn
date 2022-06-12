@@ -505,6 +505,7 @@ static_library("common_lib") {
 
   if (is_rebel_based) {
     sources += rebase_path(rebel_chrome_common_sources, ".", "//rebel")
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
   }
 }
 

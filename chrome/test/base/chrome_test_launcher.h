@@ -56,6 +56,9 @@ class ChromeTestChromeMainDelegate
 #if !BUILDFLAG(IS_ANDROID)
   absl::optional<int> PostEarlyInitialization(InvokedIn invoked_in) override;
 #endif  // !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(REBEL_BROWSER)
+  content::ContentRendererClient* CreateContentRendererClient() override;
+#endif
 #if BUILDFLAG(IS_WIN)
   bool ShouldHandleConsoleControlEvents() override;
 #endif
