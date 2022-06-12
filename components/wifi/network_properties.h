@@ -15,6 +15,8 @@
 #include "base/values.h"
 #include "components/wifi/wifi_export.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 namespace wifi {
 
 typedef int32_t Frequency;
@@ -51,6 +53,13 @@ struct WIFI_EXPORT NetworkProperties {
   bool auto_connect;
   Frequency frequency;
   FrequencySet frequency_set;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  double link_speed{-1.0};
+  int32_t rx_mbps{-1};
+  int32_t tx_mbps{-1};
+  int32_t noise_measurement{-1};
+#endif
 
   base::Value::Dict ToValue(bool network_list) const;
   // Updates only properties set in |value|.

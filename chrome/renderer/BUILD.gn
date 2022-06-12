@@ -18,6 +18,8 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/sources.gni")
+
 grit("resources") {
   source = "resources/renderer_resources.grd"
   defines = chrome_grit_defines
@@ -478,5 +480,17 @@ static_library("renderer") {
       "cco/multiline_detector.cc",
       "cco/multiline_detector.h",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_renderer_sources, ".", "//rebel")
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
+
+    if (!is_android) {
+      deps += [
+        "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
+        "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info",
+      ]
+    }
   }
 }

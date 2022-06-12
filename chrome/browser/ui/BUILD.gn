@@ -32,6 +32,8 @@ import("//third_party/protobuf/proto_library.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/views/features.gni")
 
+import("//rebel/sources.gni")
+
 # Use a static library here because many test binaries depend on this but don't
 # require many files from it. This makes linking more efficient.
 static_library("ui") {
@@ -6641,6 +6643,11 @@ static_library("ui") {
       "//chrome/common/compose:mojo_bindings",
       "//components/compose/core/browser",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_browser_ui_sources, ".", "//rebel")
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
   }
 }
 

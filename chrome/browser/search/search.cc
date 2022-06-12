@@ -42,6 +42,10 @@
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#endif
+
 namespace search {
 
 namespace {
@@ -179,6 +183,9 @@ struct NewTabURLDetails {
                              ? chrome::kChromeUINewTabPageURL
                              : chrome::kChromeUINewTabPageThirdPartyURL);
     if (default_is_google) {
+#if BUILDFLAG(REBEL_BROWSER)
+      if (!rebel::IsRemoteNtpEnabled())
+#endif
       return NewTabURLDetails(local_url, NEW_TAB_URL_VALID);
     }
 #endif
@@ -191,6 +198,22 @@ struct NewTabURLDetails {
     GURL search_provider_url(template_url->new_tab_url_ref().ReplaceSearchTerms(
         TemplateURLRef::SearchTermsArgs(std::u16string()),
         UIThreadSearchTermsData()));
+
+#if BUILDFLAG(REBEL_BROWSER)
+    // Override the NTP URL here rather than prepopulated_engines.json. This
+    // way, if new search engines are added, we aren't caught off-guard.
+    bool from_command_line = false;
+    GURL remote_ntp_url(rebel::GetRemoteNtpUrl(from_command_line));
+
+    if (remote_ntp_url.is_valid()) {
+      search_provider_url = std::move(remote_ntp_url);
+
+      if (from_command_line) {
+        // Return early to avoid security checks, so we can use localhost URLs.
+        return NewTabURLDetails(search_provider_url, NEW_TAB_URL_VALID);
+      }
+    }
+#endif
 
     if (!search_provider_url.is_valid())
       return NewTabURLDetails(local_url, NEW_TAB_URL_NOT_SET);

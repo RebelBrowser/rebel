@@ -51,6 +51,24 @@ class WiFiServiceMac : public WiFiService {
                             base::Value::Dict* managed_properties,
                             std::string* error) override;
 
+#if BUILDFLAG(REBEL_BROWSER)
+  void GetNetworkProperties(const std::string& network_guid,
+                            NetworkProperties* properties,
+                            std::string* error) override {
+    NetworkList::iterator it = FindNetwork(network_guid);
+    if (it == networks_.end()) {
+      DVLOG(1) << "Network not found:" << network_guid;
+      *error = kErrorNotFound;
+      return;
+    }
+
+    it->connection_state = GetNetworkConnectionState(network_guid);
+    it->link_speed = [interface_ transmitRate];
+
+    *properties = *it;
+  }
+#endif
+
   void GetState(const std::string& network_guid,
                 base::Value::Dict* properties,
                 std::string* error) override;
@@ -529,6 +547,10 @@ void WiFiServiceMac::NetworkPropertiesFromCWNetwork(
 
   properties->security = SecurityFromCWNetwork(network);
   properties->signal_strength = network.rssiValue;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  properties->noise_measurement = [network noiseMeasurement];
+#endif
 }
 
 std::string WiFiServiceMac::SecurityFromCWNetwork(

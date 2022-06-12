@@ -1,0 +1,72 @@
+<html>
+<head>
+  <title>NTP</title>
+</head>
+<body>
+<script type="text/javascript">
+  let ntpTilesLoaded = false;
+  let ntpAutocompleteResult = null;
+  let ntpBackground = {};
+  let ntpColors = {};
+  let ntpDarkMode = false;
+  let ntpWiFiStatus = null;
+
+  if (rebel) {
+    rebel.onNtpTilesChanged = function() {
+      ntpTilesLoaded = rebel.ntpTilesAvailable;
+    }
+
+    if (rebel.search) {
+      rebel.search.onAutocompleteResultChanged = function() {
+        ntpAutocompleteResult = rebel.search.autocompleteResult;
+      }
+    }
+
+    if (rebel.theme) {
+      rebel.theme.onThemeChanged = function() {
+        ntpBackground = rebel.theme.theme.background;
+        ntpColors = rebel.theme.theme.colors;
+        ntpDarkMode = rebel.theme.theme.darkModeEnabled;
+      }
+
+      ntpBackground = rebel.theme.theme.background;
+      ntpColors = rebel.theme.theme.colors;
+      ntpDarkMode = rebel.theme.theme.darkModeEnabled;
+    }
+
+    if (rebel.network) {
+      rebel.network.onWiFiStatusChanged = function() {
+        ntpWiFiStatus = rebel.network.wiFiStatus;
+      }
+    }
+
+    ntpTilesLoaded = rebel.ntpTilesAvailable;
+  }
+
+  // Helpers for the browser test.
+
+  function hasNtpTile(url, title) {
+    for (let i = 0; ntpTilesLoaded && (i < rebel.ntpTiles.length); ++i) {
+      const tile = rebel.ntpTiles[i];
+
+      if ((tile.url === url) && (tile.title === title)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function injectTouchIcon(origin) {
+    const icon = new URL('chrome-search://remote-ntp-offline/icon');
+    icon.searchParams.set('size', `85@${window.devicePixelRatio}x`);
+    icon.searchParams.set('url', origin);
+
+    const img = document.createElement('img');
+    img.src = icon.toString();
+
+    document.body.appendChild(img);
+  }
+</script>
+</body>
+</html>

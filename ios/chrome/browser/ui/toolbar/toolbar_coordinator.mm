@@ -39,6 +39,11 @@
 #import "ios/chrome/browser/ui/toolbar/toolbar_mediator.h"
 #import "ios/components/webui/web_ui_url_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#endif
+
 @interface ToolbarCoordinator () <PrimaryToolbarViewControllerDelegate,
                                   ToolbarCommands,
                                   ToolbarMediatorDelegate> {
@@ -259,6 +264,10 @@
   BOOL isNTP = NTPHelper && NTPHelper->IsActive();
   BOOL isOffTheRecord = self.browser->GetBrowserState()->IsOffTheRecord();
   BOOL canShowTabStrip = IsRegularXRegularSizeClass(self.traitEnvironment);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  isNTP &= !rebel::IsRemoteNtpEnabled();
+#endif
 
   // Hide the toolbar when displaying content suggestions without the tab
   // strip, without the focused omnibox, and for UI Refresh, only when in

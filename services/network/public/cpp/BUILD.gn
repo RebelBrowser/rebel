@@ -8,6 +8,8 @@ import("//net/features.gni")
 import("//services/network/public/cpp/features.gni")
 import("//testing/libfuzzer/fuzzer_test.gni")
 
+import("//rebel/sources.gni")
+
 _is_directory_transfer_required = is_fuchsia
 buildflag_header("buildflags") {
   header = "network_service_buildflags.h"
@@ -166,6 +168,10 @@ component("cpp") {
       "server/web_socket_encoder.cc",
       "server/web_socket_encoder.h",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_services_network_public_cpp_sources, ".", "//rebel")
   }
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]

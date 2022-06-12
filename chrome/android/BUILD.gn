@@ -675,6 +675,10 @@ if (current_toolchain == default_toolchain) {
       "//url/mojom:url_mojom_gurl_java",
     ]
 
+    if (is_rebel_based) {
+      deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom_java" ]
+    }
+
     deps += feed_deps
 
     srcjar_deps = [
@@ -3718,6 +3722,10 @@ generate_jni("chrome_jni_headers") {
   }
 
   public_deps = [ ":base_module_jni" ]
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_android_jni_sources, ".", "//rebel")
+  }
 }
 
 source_set("chrome_test_util") {

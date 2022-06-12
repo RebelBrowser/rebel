@@ -28,6 +28,16 @@
 #import "ios/web/text_fragments/text_fragments_java_script_feature.h"
 #import "ios/web/webui/web_ui_messaging_java_script_feature.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#import "rebel/ios/chrome/browser/ntp/remote_ntp_icon_parser.h"
+
+static rebel::RemoteNtpIconParser* GetRemoteNtpIconParserFeature() {
+  static base::NoDestructor<rebel::RemoteNtpIconParser> remote_ntp_icon_parser;
+  return remote_ntp_icon_parser.get();
+}
+#endif
+
 namespace web {
 namespace {
 
@@ -80,6 +90,9 @@ std::vector<JavaScriptFeature*> GetBuiltInJavaScriptFeatures(
       ErrorPageJavaScriptFeature::GetInstance(),
       FindInPageJavaScriptFeature::GetInstance(),
       GetFaviconJavaScriptFeature(),
+#if BUILDFLAG(REBEL_BROWSER)
+      GetRemoteNtpIconParserFeature(),
+#endif
       GetScrollHelperJavaScriptFeature(),
       GetWindowErrorJavaScriptFeature(),
       NavigationJavaScriptFeature::GetInstance(),
