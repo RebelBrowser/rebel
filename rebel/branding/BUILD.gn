@@ -124,5 +124,9 @@ create_branded_grd("generated_resources") {
     "//chrome/app/whats_new_strings.grdp",
   ]
 
+  grdp_extras = [
+    "//rebel/chrome/app/generated_resources.grdp",
+  ]
+
   xtb_relative_path = "resources"
 }

@@ -257,6 +257,10 @@
 #include "chrome/browser/supervised_user/supervised_user_navigation_observer.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
+#endif
+
 using content::WebContents;
 
 namespace {
@@ -442,6 +446,10 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents) {
   tasks::TaskTabHelper::CreateForWebContents(web_contents);
   ukm::InitializeSourceUrlRecorderForWebContents(web_contents);
   vr::VrTabHelper::CreateForWebContents(web_contents);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RemoteNtpTabHelper::CreateForWebContents(web_contents);
+#endif
 
   // NO! Do not just add your tab helper here. This is a large alphabetized
   // block; please insert your tab helper above in alphabetical order.
