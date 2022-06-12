@@ -101,6 +101,14 @@
 #import "ios/web/public/web_state_observer_bridge.h"
 #import "ui/base/l10n/l10n_util_mac.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ntp/remote_ntp_service.h"
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#import "rebel/ios/chrome/browser/ntp/remote_ntp_service_factory_ios.h"
+#import "rebel/ios/chrome/browser/ui/ntp/remote_ntp_view_controller.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -165,6 +173,11 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
 
 // View controller for the incognito NTP.
 @property(nonatomic, strong) IncognitoViewController* incognitoViewController;
+
+#if BUILDFLAG(REBEL_BROWSER)
+// View controller for the RemoteNTP.
+@property(nonatomic, strong) RemoteNtpViewController* remoteNtpViewController;
+#endif
 
 // The timetick of the last time the NTP was displayed.
 @property(nonatomic, assign) base::TimeTicks didAppearTime;
@@ -309,6 +322,29 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
   // NOTE: anything that executes below WILL NOT execute for OffTheRecord
   // browsers!
 
+#if BUILDFLAG(REBEL_BROWSER)
+  auto* remote_ntp_service = rebel::RemoteNtpServiceFactory::GetForBrowserState(
+      self.browser->GetBrowserState());
+
+  if (remote_ntp_service) {
+    DCHECK(!self.remoteNtpViewController);
+
+    UrlLoadingBrowserAgent* URLLoader =
+        UrlLoadingBrowserAgent::FromBrowser(self.browser);
+
+    self.remoteNtpViewController =
+        [[RemoteNtpViewController alloc] initWithUrlLoader:URLLoader
+                                          remoteNtpService:remote_ntp_service];
+    self.remoteNtpViewController.dispatcher =
+        static_cast<id<ApplicationCommands, BrowserCoordinatorCommands>>(
+            self.browser->GetCommandDispatcher());
+    self.remoteNtpViewController.browserState = self.browser->GetBrowserState();
+
+    self.started = YES;
+    return;
+  }
+#endif
+
   [self initializeServices];
   [self initializeNTPComponents];
   [self startObservers];
@@ -371,6 +407,9 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
   [self.contentSuggestionsCoordinator stop];
   self.contentSuggestionsCoordinator = nil;
   self.headerController = nil;
+#if BUILDFLAG(REBEL_BROWSER)
+  self.remoteNtpViewController = nil;
+#endif
   // Remove before nil to ensure View Hierarchy doesn't hold last strong
   // reference.
   [self.containedViewController willMoveToParentViewController:nil];
@@ -455,6 +494,11 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
 }
 
 - (void)reload {
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::IsRemoteNtpEnabled()) {
+    return;
+  }
+#endif
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     return;
   }
@@ -476,6 +520,11 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
 }
 
 - (void)constrainDiscoverHeaderMenuButtonNamedGuide {
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::IsRemoteNtpEnabled()) {
+    return;
+  }
+#endif
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     return;
   }
@@ -747,6 +796,10 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
   DCHECK(self.started);
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     return self.incognitoViewController;
+#if BUILDFLAG(REBEL_BROWSER)
+  } else if (self.remoteNtpViewController) {
+    return self.remoteNtpViewController;
+#endif
   } else {
     return self.containerViewController;
   }
@@ -1373,6 +1426,11 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
     return;
   }
   self.visible = visible;
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::IsRemoteNtpEnabled()) {
+    return;
+  }
+#endif
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     // Do not report metrics on incognito NTP.
     return;
@@ -1612,6 +1670,14 @@ bool IsNTPActiveForWebState(web::WebState* web_state) {
 - (void)NTPDidChangeVisibility:(BOOL)visible {
   DCHECK(self.started);
   DCHECK(self.webState);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::IsRemoteNtpEnabled()) {
+    self.viewPresented = visible;
+    [self updateVisible];
+    return;
+  }
+#endif
 
   if (!self.browser->GetBrowserState()->IsOffTheRecord()) {
     [self updateStartForVisibilityChange:visible];

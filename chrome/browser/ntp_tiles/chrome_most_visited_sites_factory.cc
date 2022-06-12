@@ -42,6 +42,8 @@
 #include "chrome/browser/supervised_user/supervised_user_url_filter.h"  // nogncheck
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 #if BUILDFLAG(ENABLE_SUPERVISED_USERS)
 namespace {
 
@@ -129,12 +131,12 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
 
   auto most_visited_sites = std::make_unique<ntp_tiles::MostVisitedSites>(
       profile->GetPrefs(), TopSitesFactory::GetForProfile(profile),
-#if BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(REBEL_BROWSER)
       ChromePopularSitesFactory::NewForProfile(profile),
 #else
       nullptr,
 #endif
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(REBEL_BROWSER)
       ChromeCustomLinksManagerFactory::NewForProfile(profile),
 #else
       nullptr,

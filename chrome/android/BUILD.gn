@@ -592,6 +592,10 @@ if (current_toolchain == default_toolchain) {
       "//url/mojom:url_mojom_gurl_java",
     ]
 
+    if (is_rebel_based) {
+      deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom_java" ]
+    }
+
     deps += feed_deps
 
     srcjar_deps = [
@@ -3686,6 +3690,10 @@ generate_jni("chrome_jni_headers") {
   # Used for testing only, should not be shipped to end users.
   if (enable_offline_pages_harness) {
     sources += [ "java/src/org/chromium/chrome/browser/offlinepages/evaluation/OfflinePageEvaluationBridge.java" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_android_jni_sources, ".", "//rebel")
   }
 }
 
