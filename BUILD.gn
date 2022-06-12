@@ -47,6 +47,8 @@ if (!is_ios) {
   import("//v8/gni/snapshot_toolchain.gni")
 }
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # A list of extra dependencies to add to the root target. This allows a
   # checkout to add additional targets without explicitly changing any checked-
@@ -1691,6 +1693,17 @@ if (enable_js_type_check) {
     if (is_android) {
       data_deps += [ "components/offline_pages/resources:closure_compile" ]
     }
+  }
+}
+
+if (is_rebel_based) {
+  group("rebel") {
+    testonly = true
+
+    deps = [
+      "//chrome",
+      "//rebel/chrome/test:rebel_browser_tests",
+    ]
   }
 }
 

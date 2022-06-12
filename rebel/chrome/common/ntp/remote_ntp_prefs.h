@@ -11,9 +11,7 @@
 
 namespace rebel {
 
-extern const char kRemoteNtpCommandLine[];
 extern const char kRemoteNtpUrl[];
-
 extern const char kRemoteNtpProcess[];
 
 extern const char kRemoteNtpOfflineHost[];

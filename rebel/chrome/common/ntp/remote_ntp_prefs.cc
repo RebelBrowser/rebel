@@ -10,9 +10,7 @@
 
 namespace rebel {
 
-const char kRemoteNtpCommandLine[] = "enable-remote-ntp";
 const char kRemoteNtpUrl[] = "remote-ntp-url";
-
 const char kRemoteNtpProcess[] = "remote-ntp-process";
 
 const char kRemoteNtpOfflineHost[] = "remote-ntp-offline";
