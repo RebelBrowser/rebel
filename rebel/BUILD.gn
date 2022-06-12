@@ -117,4 +117,8 @@ create_branded_grd("generated_resources") {
     "//chrome/app/welcome_strings.grdp",
     "//chrome/app/whats_new_strings.grdp",
   ]
+
+  grdp_extras = [
+    "//rebel/chrome/app/generated_resources.grdp",
+  ]
 }

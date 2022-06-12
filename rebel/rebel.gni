@@ -49,6 +49,8 @@ rebel_chrome_browser_ui_sources = [
   "chrome/browser/ui/ntp/remote_ntp_router.h",
   "chrome/browser/ui/ntp/remote_ntp_tab_helper.cc",
   "chrome/browser/ui/ntp/remote_ntp_tab_helper.h",
+  "chrome/browser/ui/webui/remote_ntp_internals_ui.cc",
+  "chrome/browser/ui/webui/remote_ntp_internals_ui.h",
 ]
 
 rebel_chrome_common_sources = [

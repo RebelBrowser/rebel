@@ -137,7 +137,7 @@ class ResourceGroup(object):
                 raise Exception(f'Could not find file: {grdp_file}')
 
         for grdp_extra in self.grdp_extras:
-            if not os.path.isfile(os.path.join(self.base_path, grdp_extra)):
+            if not os.path.isfile(grdp_extra):
                 raise Exception(f'Could not find file: {grdp_extra}')
 
         for xtb_extra in self.xtb_extras:
@@ -427,6 +427,9 @@ def main():
     req.add_argument(
         '-p', '--grdp-files', dest='grdp_files', nargs='*',
         help='Optional list of paths to GRDP files to brand')
+    req.add_argument(
+        '-e', '--grdp-extras', dest='grdp_extras', nargs='*',
+        help='Optional list of Rebel-owned GRDP files to insert')
 
     args = parser.parse_args()
 
@@ -442,7 +445,8 @@ def main():
         base_path=os.path.dirname(args.grd_file),
         output_path=args.output_path,
         grd_file=os.path.basename(args.grd_file),
-        grdp_files=[os.path.basename(g) for g in args.grdp_files or []]
+        grdp_files=[os.path.basename(g) for g in args.grdp_files or []],
+        grdp_extras=args.grdp_extras or []
     )
 
     (xtb_files, translation_ids) = generate_grd_file(

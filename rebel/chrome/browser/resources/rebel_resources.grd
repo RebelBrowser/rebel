@@ -10,6 +10,10 @@
     <includes>
       <!-- Note: remote_ntp_resources.grdp is generated during runhooks -->
       <part file="../../../third_party/remote_ntp/remote_ntp_resources.grdp" />
+
+      <include name="IDR_REMOTE_NTP_INTERNALS_HTML" file="remote_ntp_internals.html" preprocess="true" type="BINDATA" />
+      <include name="IDR_REMOTE_NTP_INTERNALS_CSS" file="remote_ntp_internals.css" preprocess="true" type="BINDATA" />
+      <include name="IDR_REMOTE_NTP_INTERNALS_JS" file="remote_ntp_internals.js" preprocess="true" type="BINDATA" />
     </includes>
   </release>
 </grit>
