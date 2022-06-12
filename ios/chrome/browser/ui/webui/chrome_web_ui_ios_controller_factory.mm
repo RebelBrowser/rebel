@@ -46,7 +46,13 @@
 #import "ios/components/webui/web_ui_url_constants.h"
 #import "url/gurl.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ui/webui/remote_ntp_internals_ui.h"
+#endif
+
 using ::version_info::Channel;
+
 using web::WebUIIOS;
 using web::WebUIIOSController;
 
@@ -143,6 +149,12 @@ WebUIIOSFactoryFunction GetWebUIIOSFactoryFunction(const GURL& url) {
       GetChannel() != Channel::STABLE) {
     return &NewWebUIIOS<UserDefaultsInternalsUI>;
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (url_host == rebel::kRemoteNtpInternalsHost) {
+    return &NewWebUIIOS<rebel::RemoteNtpInternalsUI>;
+  }
+#endif
 
   return nullptr;
 }

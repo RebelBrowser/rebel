@@ -17,7 +17,9 @@
 #include "rebel/chrome/common/rebel_content_client.h"
 
 namespace content {
+class ContentBrowserClient;
 class ContentClient;
+class ContentRendererClient;
 }  // namespace content
 
 namespace rebel {
@@ -46,6 +48,8 @@ class RebelMainDelegate : public RebelMainDelegateBase {
   // content::ContentMainDelegate:
   absl::optional<int> PreBrowserMain() override;
   content::ContentClient* CreateContentClient() override;
+  content::ContentBrowserClient* CreateContentBrowserClient() override;
+  content::ContentRendererClient* CreateContentRendererClient() override;
 
  private:
   RebelContentClient rebel_content_client_;

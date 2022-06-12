@@ -548,6 +548,10 @@
 #include "components/enterprise/data_controls/prefs.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/prefs/rebel_prefs.h"
+#endif
+
 namespace {
 
 // Please keep the list of deprecated prefs in chronological order. i.e. Add to
@@ -2117,6 +2121,10 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 
 #if BUILDFLAG(ENABLE_COMPOSE)
   registry->RegisterBooleanPref(prefs::kPrefHasAcceptedComposeConsent, false);
+#endif
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterProfilePrefs(registry);
 #endif
 }
 

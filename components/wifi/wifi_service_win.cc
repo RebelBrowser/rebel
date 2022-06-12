@@ -208,6 +208,37 @@ class WiFiServiceImpl : public WiFiService {
                             base::Value::Dict* managed_properties,
                             std::string* error) override;
 
+#if BUILDFLAG(REBEL_BROWSER)
+  void GetNetworkProperties(const std::string& network_guid,
+                            NetworkProperties* properties,
+                            std::string* error) override {
+    DWORD error_code = EnsureInitialized();
+    if (CheckError(error_code, kErrorWiFiService, error))
+      return;
+
+    NetworkProperties connected_properties;
+    error_code = GetCurrentProperties(&connected_properties);
+    if (error_code == ERROR_SUCCESS &&
+        connected_properties.guid == network_guid) {
+      *properties = connected_properties;
+      return;
+    }
+
+    NetworkList network_list;
+    error_code = GetVisibleNetworkList(&network_list);
+    if (error_code == ERROR_SUCCESS) {
+      NetworkList::const_iterator it = FindNetwork(network_list, network_guid);
+      if (it != network_list.end()) {
+        *properties = *it;
+        return;
+      }
+      error_code = ERROR_NOT_FOUND;
+    }
+
+    CheckError(error_code, kErrorWiFiService, error);
+  }
+#endif
+
   void GetState(const std::string& network_guid,
                 base::Value::Dict* properties,
                 std::string* error) override;
@@ -1433,6 +1464,11 @@ DWORD WiFiServiceImpl::GetCurrentProperties(NetworkProperties* properties) {
     properties->security = SecurityFromDot11AuthAlg(
         wlan_connection_attributes->wlanSecurityAttributes.dot11AuthAlgorithm);
     properties->signal_strength = connected_wlan.wlanSignalQuality;
+
+#if BUILDFLAG(REBEL_BROWSER)
+    properties->rx_mbps = connected_wlan.ulRxRate >> 10;
+    properties->tx_mbps = connected_wlan.ulTxRate >> 10;
+#endif
 
     error = WlanGetNetworkBssList_function_(
         client_, &interface_guid_, &connected_wlan.dot11Ssid,

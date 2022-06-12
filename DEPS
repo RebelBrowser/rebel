@@ -575,6 +575,11 @@ deps = {
     'dep_type': 'cipd',
   },
 
+  # Rebel deps:
+  'src/rebel/third_party/remote_ntp': {
+    'url': 'https://github.com/RebelBrowser/remote_ntp.git@745b552df801b8483c3e6db443715e9ff2ebfab7',
+  },
+
   # We don't know target_cpu at deps time. At least until there's a universal
   # binary of httpd-php, pull both intel and arm versions in DEPS and then pick
   # the right one at runtime.
@@ -4732,6 +4737,16 @@ hooks = [
                 '--extract',
                 '--bucket', 'chromium-tfhub-models',
                 '-s', 'src/third_party/tfhub_models/models.tar.gz.sha1',
+    ],
+  },
+
+  # Rebel hooks:
+  {
+    'name': 'remote_ntp',
+    'pattern': '.',
+    'action': [ 'python3',
+                'src/rebel/third_party/remote_ntp/deploy.py',
+                '--target', 'local',
     ],
   },
 
