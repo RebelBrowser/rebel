@@ -40,6 +40,8 @@
 #include "chrome/browser/web_applications/preinstalled_app_install_features.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 // static
 std::unique_ptr<ntp_tiles::MostVisitedSites>
 ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
@@ -66,12 +68,12 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
   auto most_visited_sites = std::make_unique<ntp_tiles::MostVisitedSites>(
       profile->GetPrefs(), SupervisedUserServiceFactory::GetForProfile(profile),
       TopSitesFactory::GetForProfile(profile),
-#if BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(REBEL_BROWSER)
       ChromePopularSitesFactory::NewForProfile(profile),
 #else
       nullptr,
 #endif
-#if !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(REBEL_BROWSER)
       ChromeCustomLinksManagerFactory::NewForProfile(profile),
 #else
       nullptr,

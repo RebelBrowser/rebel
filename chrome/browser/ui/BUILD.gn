@@ -32,6 +32,8 @@ import("//third_party/protobuf/proto_library.gni")
 import("//ui/base/ui_features.gni")
 import("//ui/views/features.gni")
 
+import("//rebel/sources.gni")
+
 assert(enable_supervised_users)
 assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
 
@@ -7133,6 +7135,11 @@ static_library("ui") {
       "//components/compose/core/browser",
       "//components/compose/core/browser:mojo_bindings",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_browser_ui_sources, ".", "//rebel")
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
   }
 }
 

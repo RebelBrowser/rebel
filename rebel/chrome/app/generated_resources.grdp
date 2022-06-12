@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grit-part>
+  <!-- chrome://remote-ntp-internals -->
+  <message name="IDS_REMOTE_NTP_INTERNALS_TITLE" desc="Title for the chrome://remote-ntp-internals page">
+    RemoteNTP Internals
+  </message>
+  <message name="IDS_REMOTE_NTP_INTERNALS_ICON" desc="Header for the RemoteNTP cached icon table">
+    Cached Icons
+  </message>
+  <message name="IDS_REMOTE_NTP_INTERNALS_ICON_DELETE" desc="Title for button to delete a RemoteNTP cached icon">
+    Delete
+  </message>
+  <message name="IDS_REMOTE_NTP_INTERNALS_ICON_ORIGIN" desc="Header for the origin column of the RemoteNTP cached icon table">
+    Origin
+  </message>
+  <message name="IDS_REMOTE_NTP_INTERNALS_ICON_PATH" desc="Header for the path column of the RemoteNTP cached icon table">
+    Path
+  </message>
+  <message name="IDS_REMOTE_NTP_INTERNALS_ICON_TYPE" desc="Header for the type column of the RemoteNTP cached icon table">
+    Type
+  </message>
+  <message name="IDS_REMOTE_NTP_INTERNALS_ICON_IMAGE" desc="Header for the image column of the RemoteNTP cached icon table">
+    Icon
+  </message>
+</grit-part>

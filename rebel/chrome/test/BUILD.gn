@@ -1,0 +1,32 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/ui.gni")
+import("//chrome/version.gni")
+import("//testing/test.gni")
+
+test("rebel_browser_tests") {
+  use_xvfb = use_xvfb_in_this_config
+
+  configs += [ "//build/config:precompiled_headers" ]
+
+  defines = [
+    "HAS_OUT_OF_PROC_TEST_RUNNER",
+    "CHROME_VERSION_MAJOR=" + chrome_version_major,
+  ]
+
+  sources = [ "//rebel/chrome/browser/ntp/remote_ntp_browsertest.cc" ]
+
+  deps = [
+    "//chrome/test:browser_tests_runner",
+    "//chrome/test:test_support",
+    "//ui/native_theme:test_support",
+  ]
+
+  if (is_mac || is_win) {
+    deps += [ "//components/wifi:test_support" ]
+  }
+
+  data = [ "data/" ]
+}

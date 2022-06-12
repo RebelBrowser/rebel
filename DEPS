@@ -766,6 +766,9 @@ deps = {
     'url': 'https://github.com/EngFlow/reclient-configs.git@21c8fe69ff771956c179847b8c1d9fd216181967',
     'condition': 'rebel_enable_reclient',
   },
+  'src/rebel/third_party/remote_ntp': {
+    'url': 'https://github.com/RebelBrowser/remote_ntp.git@912ef71a9728beb8a711b7768167f7d71f2ee668',
+  },
 
   # We don't know target_cpu at deps time. At least until there's a universal
   # binary of httpd-php, pull both intel and arm versions in DEPS and then pick
@@ -5766,6 +5769,14 @@ hooks = [
                 'python3',
                 'src/rebel/third_party/reclient_configs/configure_reclient.py',
                 '--src_dir=src',
+    ],
+  },
+  {
+    'name': 'remote_ntp',
+    'pattern': '.',
+    'action': [ 'python3',
+                'src/rebel/third_party/remote_ntp/deploy.py',
+                '--target', 'local',
     ],
   },
 ]

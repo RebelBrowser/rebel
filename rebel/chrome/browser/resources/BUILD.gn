@@ -1,0 +1,23 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//tools/grit/grit_rule.gni")
+
+if (!is_ios) {
+  import("//chrome/common/features.gni")
+}
+
+grit("rebel_resources") {
+  source = "rebel_resources.grd"
+  output_dir = "$root_gen_dir/rebel"
+
+  if (!is_ios) {
+    defines = chrome_grit_defines
+  }
+
+  outputs = [
+    "grit/rebel_resources.h",
+    "rebel_resources.pak",
+  ]
+}

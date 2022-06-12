@@ -108,6 +108,10 @@
 #import "ios/web/common/features.h"
 #import "ui/base/l10n/l10n_util.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/prefs/rebel_prefs.h"
+#endif
+
 namespace {
 
 // Deprecated 09/2022.
@@ -802,6 +806,10 @@ void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {
       prefs::kContentNotificationsEnrollmentEligibility);
 
   registry->RegisterStringPref(kSyncCachedTrustedVaultAutoUpgradeDebugInfo, "");
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterProfilePrefs(registry);
+#endif
 }
 
 // This method should be periodically pruned of year+ old migrations.

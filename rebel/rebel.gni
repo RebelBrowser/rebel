@@ -35,6 +35,21 @@ declare_args() {
   # The application package name, used for e.g. Android applications and macOS
   # bundles.
   rebel_package = "com.viasat.rebel"
+
+  # The remote URL of your New Tab Page. The New Tab Page may make use of the
+  # Rebel Browser API (https://rebelbrowser.github.io/browser_api/) to render
+  # e.g. most-visited tiles, theme settings, autocomplete results, etc.
+  rebel_new_tab_page_url = "https://browser.viasat.com/rebel_ntp/index.html"
+
+  # The remote URL containing the default set of New Tab Page tiles to display.
+  # It is recommended to bundle this list with your NTP application.
+  rebel_default_sites_url =
+      "https://browser.viasat.com/rebel_ntp/default_sites.json"
+
+  # The remote URL containing a JSON list of websites allowed to use the Rebel
+  # browser APIs.
+  rebel_browser_api_allow_list_url =
+      "https://browser.viasat.com/rebel_ntp/remote_ntp_allow_list.json"
 }
 
 # Arguments to help with Chromium integration (i.e. not to be overridden).
@@ -55,6 +70,9 @@ declare_args() {
     "REBEL_BROWSER_COMPANY=\"$rebel_browser_company\"",
     "REBEL_BROWSER_COMPANY_PATH=\"$rebel_browser_company_path_component\"",
     "REBEL_BROWSER_SCHEMA=\"$rebel_browser_schema\"",
+    "REBEL_BROWSER_NEW_TAB_PAGE=\"$rebel_new_tab_page_url\"",
+    "REBEL_BROWSER_DEFAULT_SITES=\"$rebel_default_sites_url\"",
+    "REBEL_BROWSER_API_ALLOW_LIST=\"$rebel_browser_api_allow_list_url\"",
   ]
 
   # Arguments to be passed to //build/util/version.py to fill in Rebel-branded

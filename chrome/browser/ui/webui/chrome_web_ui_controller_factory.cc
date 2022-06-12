@@ -272,6 +272,10 @@
 #include "chrome/browser/ui/webui/lens/lens_ui.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ui/webui/remote_ntp_internals_ui.h"
+#endif
+
 using content::WebUI;
 using content::WebUIController;
 using ui::WebDialogUI;
@@ -477,6 +481,11 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui,
     return &NewWebUI<UserActionsUI>;
   if (url.host_piece() == chrome::kChromeUIVersionHost)
     return &NewWebUI<VersionUI>;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (url.host() == rebel::kRemoteNtpInternalsHost)
+    return &NewWebUI<rebel::RemoteNtpInternalsUI>;
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
 #if !BUILDFLAG(IS_CHROMEOS)
