@@ -499,6 +499,18 @@
 #include "ui/color/system_theme.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_ANDROID)
+#include "components/ntp_tiles/custom_links_manager_impl.h"
+#else
+#include "components/ntp_tiles/popular_sites_impl.h"
+
+#include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
+#endif
+
+#include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
+#endif
+
 namespace {
 
 // Please keep the list of deprecated prefs in chronological order. i.e. Add to
@@ -1403,6 +1415,17 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
   RegisterSessionServiceLogProfilePrefs(registry);
   SessionDataService::RegisterProfilePrefs(registry);
+#endif
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
+
+#if BUILDFLAG(IS_ANDROID)
+  ntp_tiles::CustomLinksManagerImpl::RegisterProfilePrefs(registry);
+#else
+  ntp_tiles::PopularSitesImpl::RegisterProfilePrefs(registry);
+  rebel::RemoteNtpThemeProvider::RegisterProfilePrefs(registry);
+#endif
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)

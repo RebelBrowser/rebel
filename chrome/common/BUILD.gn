@@ -20,6 +20,8 @@ import("//printing/buildflags/buildflags.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/sources.gni")
+
 grit("resources") {
   source = "common_resources.grd"
   defines = chrome_grit_defines
@@ -489,6 +491,11 @@ static_library("common_lib") {
       "media/cdm_host_file_path.h",
     ]
     public_deps += [ "//chrome/common:version_header" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_common_sources, ".", "//rebel")
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
   }
 }
 
