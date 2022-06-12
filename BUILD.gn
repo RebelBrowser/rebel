@@ -54,6 +54,8 @@ if (use_blink) {
   import("//v8/gni/snapshot_toolchain.gni")
 }
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # A list of extra dependencies to add to the root target. This allows a
   # checkout to add additional targets without explicitly changing any checked-
@@ -1731,6 +1733,13 @@ if (is_chromeos_ash && enable_js_type_check) {
       "mojo/public/tools/bindings/generators/js_templates/lite/test:closure_compile_modules",
       "ui/file_manager:closure_compile",
     ]
+  }
+}
+
+if (is_rebel_based) {
+  group("rebel_all") {
+    testonly = true
+    deps = [ "//rebel:rebel" ]
   }
 }
 

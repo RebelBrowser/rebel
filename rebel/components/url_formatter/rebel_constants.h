@@ -18,6 +18,8 @@ bool ReplaceRebelSchemeWithChromeScheme(GURL& url);
 
 bool ReplaceChromeSchemeWithRebelScheme(std::u16string& url);
 
+bool SchemeIsRebelOrChrome(const GURL& url);
+
 }  // namespace rebel
 
 #endif  // REBEL_COMPONENTS_URL_FORMATTER_REBEL_CONSTANTS_H_

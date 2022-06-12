@@ -485,6 +485,10 @@
 #include "chrome/browser/offline_pages/request_coordinator_factory.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
+#endif
+
 namespace chrome {
 
 void AddProfilesExtraParts(ChromeBrowserMainParts* main_parts) {
@@ -1205,6 +1209,10 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   WebDataServiceFactory::GetInstance();
   webrtc_event_logging::WebRtcEventLogManagerKeyedServiceFactory::GetInstance();
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RemoteNtpServiceFactory::GetInstance();
+#endif
 }
 
 void ChromeBrowserMainExtraPartsProfiles::PreProfileInit() {

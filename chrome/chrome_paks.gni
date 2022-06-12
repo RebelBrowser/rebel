@@ -17,6 +17,8 @@ import("//ui/base/ui_features.gni")
 import("//ui/webui/webui_features.gni")
 import("chrome_repack_locales.gni")
 
+import("//rebel/rebel.gni")
+
 # Generates a rule to repack a set of resources, substituting a given string
 # in for the percentage (e.g. "100", "200"). It generates the repacked files in
 # the "gen" directory, and then introduces a copy rule to copy it to the root
@@ -145,6 +147,11 @@ template("chrome_extra_paks") {
     }
     if (defined(invoker.additional_paks)) {
       sources += invoker.additional_paks
+    }
+
+    if (is_rebel_based) {
+      sources += [ "$root_gen_dir/rebel/rebel_resources.pak" ]
+      deps += [ "//rebel/chrome/browser/resources:rebel_resources" ]
     }
 
     if (!is_android) {

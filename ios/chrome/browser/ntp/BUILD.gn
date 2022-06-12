@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//rebel/sources.gni")
+
 source_set("ntp") {
   sources = [
     "browser_policy_new_tab_page_rewriter.h",
@@ -30,6 +32,15 @@ source_set("ntp") {
     "//ios/web/public",
     "//ui/base:base",
   ]
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_ios_chrome_browser_ntp_sources, ".", "//rebel")
+
+    deps += [
+      "//components/omnibox/browser",
+      "//rebel/chrome/common/ntp:remote_ntp_mojom"
+    ]
+  }
 }
 
 source_set("util") {

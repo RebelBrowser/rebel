@@ -1649,6 +1649,10 @@ group("extra_resources") {
     "//chrome/browser/resources:resources",
     "//components/autofill/core/browser:autofill_address_rewriter_resources",
   ]
+
+  if (is_rebel_based) {
+    public_deps += [ "//rebel/chrome/browser/resources:rebel_resources" ]
+  }
 }
 
 if (is_chrome_branded && !is_android) {

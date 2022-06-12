@@ -73,6 +73,11 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/rebel_content_browser_client.h"
+#include "rebel/chrome/renderer/rebel_content_renderer_client.h"
+#endif
+
 // static
 int ChromeTestSuiteRunner::RunTestSuiteInternal(ChromeTestSuite* test_suite) {
   // Browser tests are expected not to tear-down various globals.
@@ -154,7 +159,11 @@ ChromeTestLauncherDelegate::GetUserDataDirectoryCommandLineSwitch() {
 // watch for long-running tasks and produce a useful timeout message in order to
 // find the cause of flaky timeout tests.
 class BrowserTestChromeContentBrowserClient
+#if BUILDFLAG(REBEL_BROWSER)
+    : public rebel::RebelContentBrowserClient {
+#else
     : public ChromeContentBrowserClient {
+#endif
  public:
   bool CreateThreadPool(base::StringPiece name) override {
     base::test::TaskEnvironment::CreateThreadPool();
@@ -206,6 +215,14 @@ absl::optional<int> ChromeTestChromeMainDelegate::PostEarlyInitialization(
   return result;
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
+
+#if BUILDFLAG(REBEL_BROWSER)
+content::ContentRendererClient*
+ChromeTestChromeMainDelegate::CreateContentRendererClient() {
+  static rebel::RebelContentRendererClient rebel_content_renderer_client;
+  return &rebel_content_renderer_client;
+}
+#endif
 
 #if BUILDFLAG(IS_WIN)
 bool ChromeTestChromeMainDelegate::ShouldHandleConsoleControlEvents() {
