@@ -17,6 +17,10 @@
 #include "build/chromeos_buildflags.h"
 #include "components/version_info/version_info.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace chrome {
 
 namespace {
@@ -141,6 +145,8 @@ std::string GetDesktopName(base::Environment* env) {
       // Extended stable is not differentiated from regular stable.
       return "google-chrome.desktop";
   }
+#elif BUILDFLAG(REBEL_BROWSER)
+  return REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) ".desktop";
 #else  // BUILDFLAG(CHROMIUM_BRANDING)
   // Allow $CHROME_DESKTOP to override the built-in value, so that development
   // versions can set themselves as the default without interfering with
