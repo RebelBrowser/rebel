@@ -7,6 +7,12 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/files/file_path.h"
+
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace policy {
 
 // Directory for system-wide read-only policy files that allow sys-admins to set
@@ -16,6 +22,9 @@ namespace policy {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) || \
     BUILDFLAG(GOOGLE_CHROME_FOR_TESTING_BRANDING)
 const char kPolicyPath[] = "/etc/opt/chrome/policies";
+#elif BUILDFLAG(REBEL_BROWSER)
+const char kPolicyPath[] = FILE_PATH_LITERAL(
+    "/etc/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME_PATH) "/policies");
 #else
 const char kPolicyPath[] = "/etc/chromium/policies";
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) || \
