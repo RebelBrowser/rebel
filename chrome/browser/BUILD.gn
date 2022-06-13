@@ -53,7 +53,7 @@ if (is_win) {
   import("//build/config/win/manifest.gni")
 }
 
-import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 declare_args() {
   # You can set the variable 'use_official_enterprise_connectors_api_keys' to
