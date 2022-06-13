@@ -23,6 +23,8 @@ if (bundle_widevine_cdm) {
   import("//media/cdm/library_cdm/cdm_paths.gni")
 }
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # Enables checks that ensure the packages are installable on all supported
   # distributions.
@@ -263,6 +265,11 @@ group("linux") {
 branding_dir = "//chrome/app/theme/$branding_path_component"
 branding_dir_100 =
     "//chrome/app/theme/default_100_percent/$branding_path_component"
+
+if (is_rebel_based) {
+  branding_dir = "$rebel_browser_branding_directory"
+  branding_dir_100 = "$rebel_browser_branding_directory/default_100_percent"
+}
 
 copy("common_packaging_files") {
   visibility = [ ":*" ]

@@ -149,6 +149,14 @@ if (!is_android && !is_mac) {
       output_name = "chrome"
     }
 
+    if (is_rebel_based) {
+      if (is_win) {
+        output_name = "initialexe/$rebel_browser_name_path_component"
+      } else {
+        output_name = "$rebel_browser_name_path_component"
+      }
+    }
+
     # Because the sources list varies so significantly per-platform, generally
     # each platform lists its own files rather than relying on filtering or
     # removing unused files.
@@ -1864,6 +1872,9 @@ if (is_linux || is_chromeos) {
       "//third_party/xdg-utils/scripts/xdg-mime",
       "//third_party/xdg-utils/scripts/xdg-settings",
     ]
+    if (is_rebel_based) {
+      sources += [ "$rebel_browser_branding_directory/product_logo_48.png" ]
+    } else
     if (is_linux) {
       sources +=
           [ "//chrome/app/theme/$branding_path_component/product_logo_48.png" ]
