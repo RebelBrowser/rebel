@@ -15,7 +15,7 @@ sys.path.insert(
                  'pefile_py3'))
 import pefile
 
-def reorder_imports(input_dir, output_dir, architecture):
+def reorder_imports(input_dir, output_dir, architecture, browser):
   """Swap chrome_elf.dll to be the first import of chrome.exe.
   Also copy over any related files that might be needed
   (pdbs, manifests etc.).
@@ -24,8 +24,11 @@ def reorder_imports(input_dir, output_dir, architecture):
   # correct executable in the first place, so that this script
   # only needs to verify that and not write a whole new exe.
 
-  input_image = os.path.join(input_dir, 'chrome.exe')
-  output_image = os.path.join(output_dir, 'chrome.exe')
+  # Rebel: Upstream hard-codes 'chrome.exe' here and at the bottom of this
+  # function (in the invocation to |iglob|). These were changed to retrieve
+  # the real file name from the invoker in //chrome:reorder_imports.
+  input_image = os.path.join(input_dir, browser)
+  output_image = os.path.join(output_dir, browser)
 
   # pefile mmap()s the whole executable, and then parses parts of
   # it into python data structures for ease of processing.
@@ -73,7 +76,7 @@ def reorder_imports(input_dir, output_dir, architecture):
 
   pe.write(filename=output_image)
 
-  for fname in glob.iglob(os.path.join(input_dir, 'chrome.exe.*')):
+  for fname in glob.iglob(os.path.join(input_dir, '%s.*' % (browser))):
     shutil.copy(fname, os.path.join(output_dir, os.path.basename(fname)))
   return 0
 
@@ -87,11 +90,13 @@ def main(argv):
       metavar='DIR')
   parser.add_option('-a', '--arch', help='architecture of build (optional)',
       default='ia32')
+  parser.add_option('-b', '--browser', help='Rebel-branded browser name',
+      default='chrome.exe') # Added for Rebel branding
   opts, args = parser.parse_args()
 
   if not opts.input or not opts.output:
     parser.error('Please provide and input and output directory')
-  return reorder_imports(opts.input, opts.output, opts.arch)
+  return reorder_imports(opts.input, opts.output, opts.arch, opts.browser)
 
 if __name__ == "__main__":
   sys.exit(main(sys.argv[1:]))
