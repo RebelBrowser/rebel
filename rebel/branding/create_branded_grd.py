@@ -102,9 +102,6 @@ class ResourceGroup(object):
 
     Attributes
     ----------
-    base_path : str
-        The path to the directory containing the top-level GRD file. All files
-        provided in other parameters must be relative to this path.
     grd_file : str
         The path to the Chromium version of the top-level GRD file.
     grdp_files : list of str, optional
@@ -115,25 +112,19 @@ class ResourceGroup(object):
         A list of Rebel-owned XTB files to insert into branded GRD file.
     """
 
-    def __init__(self, base_path, output_path, grd_file, grdp_files=[], grdp_extras=[], xtb_extras=[]):
-        self.base_path = base_path
-        self.output_path = output_path
-
+    def __init__(self, base_path, grd_file, grdp_files=[], grdp_extras=[], xtb_extras=[]):
         self.grd_file = grd_file
         self.grdp_files = grdp_files
         self.grdp_extras = grdp_extras
         self.xtb_extras = xtb_extras
 
-        if not os.path.isdir(self.base_path):
-            raise Exception(f'Could not find path: {self.base_path}')
-        if not os.path.isdir(self.output_path):
-            raise Exception(f'Could not find path: {self.output_path}')
-
-        if not os.path.isfile(os.path.join(self.base_path, self.grd_file)):
+        if not os.path.isdir(base_path):
+            raise Exception(f'Could not find path: {base_path}')
+        if not os.path.isfile(os.path.join(base_path, self.grd_file)):
             raise Exception(f'Could not find file: {self.grd_file}')
 
         for grdp_file in self.grdp_files:
-            if not os.path.isfile(os.path.join(self.base_path, grdp_file)):
+            if not os.path.isfile(os.path.join(base_path, grdp_file)):
                 raise Exception(f'Could not find file: {grdp_file}')
 
         for grdp_extra in self.grdp_extras:
@@ -141,7 +132,7 @@ class ResourceGroup(object):
                 raise Exception(f'Could not find file: {grdp_extra}')
 
         for xtb_extra in self.xtb_extras:
-            if not os.path.isfile(os.path.join(self.base_path, xtb_extra)):
+            if not os.path.isfile(xtb_extra):
                 raise Exception(f'Could not find file: {xtb_extra}')
 
 
@@ -337,10 +328,7 @@ def generate_grd_file(browser, base_path, output_path, grd_file, grdp_files, grd
             xtb_file = element.get('path')
 
             xtb_input = os.path.join(base_path, xtb_file)
-            xtb_output = os.path.join(output_path, os.path.basename(xtb_file))
-            xtb_files[language] = (xtb_input, xtb_output)
-
-            element.set('path', xtb_output)
+            xtb_files[language] = (xtb_input, xtb_file)
 
         # Step 1c: Perform Rebel branding on the contents of all <message> tags
         # (and any children <ph> tags). Compute the translation IDs of the
@@ -378,7 +366,7 @@ def generate_grd_file(browser, base_path, output_path, grd_file, grdp_files, grd
     rebel_grd = ET.tostring(chromium_grd.getroot(),
                             method='xml', encoding='unicode')
 
-    with open(rebel_grd_path, 'w') as rebel_grd_file:
+    with open(rebel_grd_path, 'w', encoding='utf8') as rebel_grd_file:
         rebel_grd_file.write(GRD_HEADER)
         rebel_grd_file.write(rebel_grd)
 
@@ -392,7 +380,7 @@ def generate_xtb_files(output_path, xtb_files, localizations):
     for ((grd_language, xtb_language), translations) in localizations.items():
         xtb_file_path = os.path.join(output_path, xtb_files[grd_language][1])
 
-        with open(xtb_file_path, 'w') as xtb_file:
+        with open(xtb_file_path, 'w', encoding='utf8') as xtb_file:
             xtb_file.write(XTB_HEADER.format(language=xtb_language))
 
             for (message_id, translation) in translations.items():
@@ -422,6 +410,9 @@ def main():
         '-o', '--output-path', dest='output_path', required=True,
         help='The directory to generate the Rebel-branded files')
     req.add_argument(
+        '-x', '--xtb-relative-path', dest='xtb_relative_path',
+        help='The path relative to --output-path to generate XTB files')
+    req.add_argument(
         '-g', '--grd-file', dest='grd_file', required=True,
         help='The path to the GRD file to brand')
     req.add_argument(
@@ -441,9 +432,14 @@ def main():
         schema=args.browser_schema
     )
 
+    base_path = os.path.dirname(args.grd_file)
+
+    if args.xtb_relative_path:
+        xtb_path = os.path.join(args.output_path, args.xtb_relative_path)
+        pathlib.Path(xtb_path).mkdir(parents=True, exist_ok=True)
+
     resource_group = ResourceGroup(
-        base_path=os.path.dirname(args.grd_file),
-        output_path=args.output_path,
+        base_path=base_path,
         grd_file=os.path.basename(args.grd_file),
         grdp_files=[os.path.basename(g) for g in args.grdp_files or []],
         grdp_extras=args.grdp_extras or []
@@ -451,8 +447,8 @@ def main():
 
     (xtb_files, translation_ids) = generate_grd_file(
         browser,
-        resource_group.base_path,
-        resource_group.output_path,
+        base_path,
+        args.output_path,
         resource_group.grd_file,
         resource_group.grdp_files,
         resource_group.grdp_extras,
@@ -461,12 +457,12 @@ def main():
 
     for grdp_file in resource_group.grdp_files:
         (_, grdp_ids) = generate_grd_file(
-            browser, resource_group.base_path, resource_group.output_path,
-            grdp_file, resource_group.grdp_files, [], [])
+            browser, base_path, args.output_path, grdp_file,
+            resource_group.grdp_files, [], [])
         translation_ids.update(grdp_ids)
 
     localizations = get_localized_strings(browser, xtb_files, translation_ids)
-    generate_xtb_files(resource_group.output_path, xtb_files, localizations)
+    generate_xtb_files(args.output_path, xtb_files, localizations)
 
 
 if __name__ == '__main__':
