@@ -17,6 +17,11 @@
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #define PRODUCT_NAME L"Google\\Chrome"
+#elif BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#define PRODUCT_NAME                                 \
+  REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH) \
+  "\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME)
 #elif BUILDFLAG(CHROMIUM_BRANDING)
 #define PRODUCT_NAME L"Chromium"
 #else
