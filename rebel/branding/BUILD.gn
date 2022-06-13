@@ -131,3 +131,47 @@ create_branded_grd("generated_resources") {
 
   xtb_relative_path = "resources"
 }
+
+action("linux_package_info") {
+  input_appdata =
+      "//rebel/chrome/installer/linux/common/chromium-browser.appdata.xml"
+  input_info = "//rebel/chrome/installer/linux/common/chromium-browser.info"
+
+  output_appdata = "$root_gen_dir/rebel/chrome/installer/linux/common/chromium-browser.appdata.xml"
+  output_info =
+      "$root_gen_dir/rebel/chrome/installer/linux/common/chromium-browser.info"
+
+  script = "//rebel/branding/create_linux_package_info.py"
+
+  inputs = [
+    input_appdata,
+    input_info,
+  ]
+  outputs = [
+    output_appdata,
+    output_info,
+  ]
+
+  args = [
+    "--browser-name",
+    "$rebel_browser_name",
+    "--browser-path",
+    "$rebel_browser_name_path_component",
+    "--browser-company",
+    "$rebel_browser_company",
+    "--browser-email",
+    "$rebel_browser_email",
+    "--browser-website",
+    "$rebel_browser_website",
+    "--browser-help",
+    "$rebel_help_url",
+    "--input-appdata",
+    rebase_path(input_appdata),
+    "--input-info",
+    rebase_path(input_info),
+    "--output-appdata",
+    rebase_path(output_appdata),
+    "--output-info",
+    rebase_path(output_info),
+  ]
+}
