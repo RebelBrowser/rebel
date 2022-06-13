@@ -22,6 +22,12 @@ declare_args() {
   # For example, the user's profile path will be under this path.
   rebel_browser_company_path_component = "Viasat"
 
+  # The contact email address for your browser.
+  rebel_browser_email = "browser@rebel.com"
+
+  # The website URL for your browser.
+  rebel_browser_website = "https://github.com/RebelBrowser/rebel"
+
   # The URL schema to use for internal pages. This is an alias to the chrome://
   # schema.
   rebel_browser_schema = "rebel"

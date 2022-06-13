@@ -23,6 +23,8 @@ if (bundle_widevine_cdm) {
   import("//media/cdm/library_cdm/cdm_paths.gni")
 }
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # Enables checks that ensure the packages are installable on all supported
   # distributions.
@@ -41,6 +43,17 @@ packaging_files_executables = [
   "$root_out_dir/chrome_sandbox",
 ]
 packaging_files_shlibs = []
+
+if (is_rebel_based) {
+  packaging_files_executables -= [
+    "$root_out_dir/chrome",
+    "$root_out_dir/chrome_sandbox",
+  ]
+  packaging_files_executables += [
+    "$root_out_dir/$rebel_browser_name",
+    "$root_out_dir/${rebel_browser_name}_sandbox",
+  ]
+}
 
 # Don't attempt to package NaCl when building the ARM32-NaCl-on-ARM64
 # configuration.  That could be made to work, but it would be somewhat
@@ -188,6 +201,10 @@ action("merge_rpm_dependencies") {
 strip_binary("strip_chrome_binary") {
   binary_input = "$root_out_dir/chrome"
   deps = [ "//chrome" ]
+
+  if (is_rebel_based) {
+    binary_input = "$root_out_dir/$rebel_browser_name"
+  }
 }
 
 strip_binary("strip_chrome_crashpad_handler") {
@@ -203,6 +220,10 @@ strip_binary("strip_chrome_management_service") {
 strip_binary("strip_chrome_sandbox") {
   binary_input = "$root_out_dir/chrome_sandbox"
   deps = [ "//sandbox/linux:chrome_sandbox" ]
+
+  if (is_rebel_based) {
+    binary_input = "$root_out_dir/${rebel_browser_name}_sandbox"
+  }
 }
 
 strip_binary("strip_libEGL_shlib") {
@@ -267,11 +288,25 @@ group("linux") {
     ":stable",
     ":unstable",
   ]
+
+  if (is_rebel_based) {
+    # Rebel: The packages are rather slow to create. Only create the stable
+    # channel package for now.
+    deps -= [
+      ":beta",
+      ":unstable",
+    ]
+  }
 }
 
 branding_dir = "//chrome/app/theme/$branding_path_component"
 branding_dir_100 =
     "//chrome/app/theme/default_100_percent/$branding_path_component"
+
+if (is_rebel_based) {
+  branding_dir = "$rebel_browser_branding_directory"
+  branding_dir_100 = "$rebel_browser_branding_directory/default_100_percent"
+}
 
 copy("common_packaging_files") {
   visibility = [ ":*" ]
@@ -298,6 +333,12 @@ copy("common_packaging_files") {
       "common/google-chrome/google-chrome.appdata.xml.template",
       "common/google-chrome/google-chrome.info",
     ]
+  } else if (is_rebel_based) {
+    sources += [
+      "$root_gen_dir/rebel/chrome/installer/linux/common/chromium-browser.appdata.xml",
+      "$root_gen_dir/rebel/chrome/installer/linux/common/chromium-browser.info",
+    ]
+    deps = [ "//rebel/branding:linux_package_info" ]
   } else {
     sources += [
       "common/chromium-browser/chromium-browser.appdata.xml",
@@ -357,6 +398,23 @@ copy("theme_files") {
       "$branding_dir_100/linux/product_logo_32_dev.png",
     ]
   }
+
+  if (is_rebel_based) {
+    # FIXME(tflynn): Figure out a nicer way to handle sharing images between
+    # Linux and other platforms so we do not have to list these all here.
+    sources = []
+    sources = [
+      "$branding_file_path",
+      "$branding_dir/product_logo_128.png",
+      "$branding_dir/product_logo_24.png",
+      "$branding_dir/product_logo_256.png",
+      "$branding_dir/product_logo_48.png",
+      "$branding_dir/product_logo_64.png",
+      "$branding_dir_100/product_logo_16.png",
+      "$branding_dir_100/product_logo_32.png",
+    ]
+  }
+
   outputs = [ "$root_out_dir/installer/theme/{{source_file_part}}" ]
 }
 
@@ -474,6 +532,8 @@ template("linux_package") {
 
   if (is_chrome_branded) {
     package = "google-chrome"
+  } else if (is_rebel_based) {
+    package = rebel_browser_name_without_spaces
   } else {
     package = "chromium-browser"
   }

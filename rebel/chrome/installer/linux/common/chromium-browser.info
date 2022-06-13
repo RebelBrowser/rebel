@@ -1,0 +1,38 @@
+# Copyright 2024 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+#
+# This file provides common configuration information for building Rebel-branded
+# browser packages for various platforms.
+
+# Base name of the package.
+PACKAGE="{package_name}"
+
+# Base name of the snap package
+SNAPNAME="{package_name}"
+
+# Filename of the main executable (for generating launcher scripts, etc.)
+PROGNAME="{browser_name}"
+
+# Base directory for package installation.
+INSTALLDIR="/opt/{browser_path}/{package_name}"
+
+# Directory for device policy enrollments.
+ENROLLMENTDIR="/etc/{browser_path}/policies/enrollment"
+
+# Display string for desktop menu/icon.
+MENUNAME="{browser_name}"
+
+# Brief package description.
+SHORTDESC="The web browser from {browser_company}"
+
+# Detailed package description.
+FULLDESC="{browser_name} is web browser from {browser_company}"
+
+# Package maintainer information.
+# TODO(mmoss) Setup a mailbox for this address
+MAINTNAME="{browser_company}"
+MAINTMAIL="{browser_email}"
+PRODUCTURL="{browser_website}"
+
+REPOCONFIG=""

@@ -165,6 +165,14 @@ if (!is_android && !is_mac) {
         output_name = "chrome"
       }
 
+      if (is_rebel_based) {
+        if (is_win) {
+          output_name = "initialexe/$rebel_browser_name"
+        } else {
+          output_name = "$rebel_browser_name"
+        }
+      }
+
       # Because the sources list varies so significantly per-platform, generally
       # each platform lists its own files rather than relying on filtering or
       # removing unused files.
@@ -1797,6 +1805,10 @@ if (is_linux || is_chromeos) {
     extract_symbols("chrome_symbols") {
       binary = "$root_out_dir/chrome"
 
+      if (is_rebel_based) {
+        binary = "$root_out_dir/$rebel_browser_name"
+      }
+
       if (current_cpu == "x86") {
         # GYP used "ia32" so keep that naming for back-compat.
         symbol_file = "$root_out_dir/chrome.breakpad.ia32"
@@ -1892,6 +1904,9 @@ if (is_linux || is_chromeos) {
       "//third_party/xdg-utils/scripts/xdg-mime",
       "//third_party/xdg-utils/scripts/xdg-settings",
     ]
+    if (is_rebel_based) {
+      sources += [ "$rebel_browser_branding_directory/product_logo_48.png" ]
+    } else
     if (is_linux) {
       sources +=
           [ "//chrome/app/theme/$branding_path_component/product_logo_48.png" ]
