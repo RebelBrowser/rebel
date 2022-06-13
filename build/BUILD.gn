@@ -34,7 +34,9 @@ buildflag_header("branding_buildflags") {
 
       "REBEL_BROWSER=1",
       "REBEL_BROWSER_NAME=\"$rebel_browser_name\"",
+      "REBEL_BROWSER_NAME_PATH=\"$rebel_browser_name_path_component\"",
       "REBEL_BROWSER_COMPANY=\"$rebel_browser_company\"",
+      "REBEL_BROWSER_COMPANY_PATH=\"$rebel_browser_company_path_component\"",
       "REBEL_BROWSER_SCHEMA=\"$rebel_browser_schema\"",
     ]
   } else {
