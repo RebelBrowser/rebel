@@ -14,6 +14,8 @@ import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
 import("//ui/base/ui_features.gni")
 import("//v8/gni/v8.gni")
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # The Chrome archive is compressed in official builds to reduce the size of
   # the installer. By default: non-official or component builds, a build mode
@@ -126,6 +128,11 @@ action("mini_installer_archive") {
     "//chrome/tools/build/win/makecab.py",
     release_file,
   ]
+
+  if (is_rebel_based) {
+    inputs -= [ "$root_out_dir/chrome.exe" ]
+    inputs += [ "$root_out_dir/$rebel_browser_name_path_component.exe" ]
+  }
 
   outputs = [
     # See also chrome.packed.7z conditionally added below.
