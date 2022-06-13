@@ -10,10 +10,14 @@ create_branded_grd("chromium_strings") {
   grdp_files = [
     "//chrome/app/settings_chromium_strings.grdp",
   ]
+
+  xtb_relative_path = "resources"
 }
 
 create_branded_grd("components_chromium_strings") {
   grd_file = "//components/components_chromium_strings.grd"
+
+  xtb_relative_path = "strings"
 }
 
 create_branded_grd("components_strings") {
@@ -85,6 +89,8 @@ create_branded_grd("components_strings") {
     "//components/management_strings.grdp",
     "//components/webxr_strings.grdp",
   ]
+
+  xtb_relative_path = "strings"
 }
 
 create_branded_grd("extensions_strings") {
@@ -121,4 +127,6 @@ create_branded_grd("generated_resources") {
   grdp_extras = [
     "//rebel/chrome/app/generated_resources.grdp",
   ]
+
+  xtb_relative_path = "resources"
 }
