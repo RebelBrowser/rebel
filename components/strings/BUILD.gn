@@ -51,7 +51,7 @@ grit("components_strings") {
 
   if (is_rebel_based) {
     source = "$root_gen_dir/rebel/components_strings/components_strings.grd"
-    deps = [ "//rebel:components_strings" ]
+    deps = [ "//rebel/branding:components_strings" ]
   }
 }
 
@@ -73,7 +73,7 @@ grit("components_chromium_strings") {
 
   if (is_rebel_based) {
     source = "$root_gen_dir/rebel/components_chromium_strings/components_chromium_strings.grd"
-    deps = [ "//rebel:components_chromium_strings" ]
+    deps = [ "//rebel/branding:components_chromium_strings" ]
   }
 }
 

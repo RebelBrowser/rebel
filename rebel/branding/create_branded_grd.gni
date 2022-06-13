@@ -30,7 +30,7 @@ template("create_branded_grd") {
       "grdp_extras",
     ])
 
-    script = "scripts/create_branded_grd.py"
+    script = "//rebel/branding/create_branded_grd.py"
 
     inputs = [ grd_file ]
     outputs = [ output_path + "/" + get_path_info(grd_file, "file") ]

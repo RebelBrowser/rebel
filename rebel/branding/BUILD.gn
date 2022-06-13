@@ -2,7 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//rebel/scripts/create_branded_grd.gni")
+import("//rebel/branding/create_branded_grd.gni")
 
 create_branded_grd("chromium_strings") {
   grd_file = "//chrome/app/chromium_strings.grd"

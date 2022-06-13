@@ -19,6 +19,6 @@ grit("strings") {
 
   if (is_rebel_based) {
     source = "$root_gen_dir/rebel/extensions_strings/extensions_strings.grd"
-    deps = [ "//rebel:extensions_strings" ]
+    deps = [ "//rebel/branding:extensions_strings" ]
   }
 }

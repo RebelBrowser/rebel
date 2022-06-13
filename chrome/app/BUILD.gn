@@ -105,7 +105,7 @@ grit("generated_resources") {
 
   if (is_rebel_based) {
     source = "$root_gen_dir/rebel/generated_resources/generated_resources.grd"
-    deps = [ "//rebel:generated_resources" ]
+    deps = [ "//rebel/branding:generated_resources" ]
   }
 }
 
@@ -156,7 +156,7 @@ grit("chromium_strings") {
 
   if (is_rebel_based) {
     source = "$root_gen_dir/rebel/chromium_strings/chromium_strings.grd"
-    deps = [ "//rebel:chromium_strings" ]
+    deps = [ "//rebel/branding:chromium_strings" ]
   }
 }
 
