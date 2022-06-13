@@ -20,7 +20,7 @@ import("//printing/buildflags/buildflags.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
-import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 grit("resources") {
   source = "common_resources.grd"

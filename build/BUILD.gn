@@ -9,6 +9,7 @@ import("//build/config/chromeos/args.gni")
 import("//build/config/chromeos/ui_mode.gni")
 
 import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 source_set("buildflag_header_h") {
   sources = [ "buildflag.h" ]

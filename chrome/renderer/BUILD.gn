@@ -17,7 +17,7 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
-import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 grit("resources") {
   source = "resources/renderer_resources.grd"

@@ -1,0 +1,59 @@
+# Copyright 2022 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//rebel/rebel.gni")
+
+rebel_build_sources = [
+  "build/buildflag.h",
+]
+
+rebel_chrome_browser_sources = [
+  "chrome/browser/ntp/remote_ntp_icon_receiver.cc",
+  "chrome/browser/ntp/remote_ntp_icon_receiver.h",
+  "chrome/browser/ntp/remote_ntp_icon_storage.cc",
+  "chrome/browser/ntp/remote_ntp_icon_storage.h",
+  "chrome/browser/ntp/remote_ntp_offline_resources.cc",
+  "chrome/browser/ntp/remote_ntp_offline_resources.h",
+  "chrome/browser/ntp/remote_ntp_search_provider.cc",
+  "chrome/browser/ntp/remote_ntp_search_provider.h",
+  "chrome/browser/ntp/remote_ntp_service.cc",
+  "chrome/browser/ntp/remote_ntp_service.h",
+  "chrome/browser/ntp/remote_ntp_service_factory.cc",
+  "chrome/browser/ntp/remote_ntp_service_factory.h",
+  "chrome/browser/ntp/remote_ntp_service_impl.cc",
+  "chrome/browser/ntp/remote_ntp_service_impl.h",
+  "chrome/browser/ntp/remote_ntp_source.cc",
+  "chrome/browser/ntp/remote_ntp_source.h",
+  "chrome/browser/ntp/remote_ntp_theme_delegate.h",
+  "chrome/browser/ntp/remote_ntp_theme_provider.cc",
+  "chrome/browser/ntp/remote_ntp_theme_provider.h",
+]
+
+rebel_chrome_browser_ui_sources = [
+  "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.cc",
+  "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.h",
+  "chrome/browser/ui/ntp/remote_ntp_router.cc",
+  "chrome/browser/ui/ntp/remote_ntp_router.h",
+  "chrome/browser/ui/ntp/remote_ntp_tab_helper.cc",
+  "chrome/browser/ui/ntp/remote_ntp_tab_helper.h",
+  "chrome/browser/ui/webui/remote_ntp_internals_ui.cc",
+  "chrome/browser/ui/webui/remote_ntp_internals_ui.h",
+]
+
+rebel_chrome_common_sources = [
+  "chrome/common/ntp/remote_ntp_icon_util.cc",
+  "chrome/common/ntp/remote_ntp_icon_util.h",
+  "chrome/common/ntp/remote_ntp_prefs.cc",
+  "chrome/common/ntp/remote_ntp_prefs.h",
+  "chrome/common/ntp/remote_ntp_types.h",
+]
+
+rebel_chrome_renderer_sources = [
+  "chrome/renderer/ntp/remote_ntp.cc",
+  "chrome/renderer/ntp/remote_ntp.h",
+  "chrome/renderer/ntp/remote_ntp_extension.cc",
+  "chrome/renderer/ntp/remote_ntp_extension.h",
+  "chrome/renderer/ntp/remote_ntp_icon_parser.cc",
+  "chrome/renderer/ntp/remote_ntp_icon_parser.h",
+]
