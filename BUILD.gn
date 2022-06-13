@@ -1699,11 +1699,7 @@ if (enable_js_type_check) {
 if (is_rebel_based) {
   group("rebel") {
     testonly = true
-
-    deps = [
-      "//chrome",
-      "//rebel/chrome/test:rebel_browser_tests",
-    ]
+    deps = [ "//rebel:rebel" ]
   }
 }
 
