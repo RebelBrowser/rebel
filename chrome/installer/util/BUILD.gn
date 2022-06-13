@@ -7,6 +7,8 @@ import("//build/config/chrome_build.gni")
 
 import("//testing/test.gni")
 
+import("//rebel/rebel.gni")
+
 if (is_win) {
   source_set("metainstaller_utils") {
     sources = [
@@ -223,6 +225,14 @@ generate_embedded_i18n("generate_strings") {
     grdfile_name = "chromium_strings"
   }
   xtb_relative_path = "resources"
+
+  if (is_rebel_based) {
+    grdfile_folder = "$root_gen_dir/rebel/chromium_strings"
+    grdfile_name = "chromium_strings"
+
+    deps = [ "//rebel/branding:chromium_strings" ]
+  }
+
   grd_files_info = [ [
         grdfile_folder,
         grdfile_name,
@@ -233,6 +243,13 @@ generate_embedded_i18n("generate_strings") {
   output_file_name_base = "installer_util_strings"
 
   branding = branding_path_product
+
+  if (is_rebel_based) {
+    # create_installer_string_rc.py just contains dictionaries of grit resource
+    # IDs keyed by brand. For Rebel-banded browsers, we can get away with using
+    # Chromium-branded resource IDs.
+    branding = "chromium"
+  }
 }
 
 # Compile the generated .rc file.

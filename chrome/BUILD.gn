@@ -95,6 +95,19 @@ if (is_win) {
       current_cpu,
     ]
     deps = [ ":chrome_initial" ]
+
+    if (is_rebel_based) {
+      inputs = []
+      inputs += [ "$root_out_dir/initialexe/$rebel_browser_name.exe" ]
+
+      outputs = []
+      outputs += [
+        "$root_out_dir/$rebel_browser_name.exe",
+        "$root_out_dir/$rebel_browser_name.exe.pdb",
+      ]
+
+      args += [ "-b", "$rebel_browser_name.exe" ]
+    }
   }
 }
 
@@ -1593,6 +1606,18 @@ copy("visual_elements_resources") {
       "//chrome/app/theme/$branding_path_component/win/tiles/SmallLogoDev.png",
     ]
   }
+
+  if (is_rebel_based) {
+    sources -= [
+      "//chrome/app/theme/$branding_path_component/win/tiles/Logo.png",
+      "//chrome/app/theme/$branding_path_component/win/tiles/SmallLogo.png",
+    ]
+    sources += [
+      "$rebel_browser_branding_directory/win/tiles/Logo.png",
+      "$rebel_browser_branding_directory/win/tiles/SmallLogo.png",
+    ]
+  }
+
 
   outputs = [ "$root_out_dir/{{source_file_part}}" ]
 }
