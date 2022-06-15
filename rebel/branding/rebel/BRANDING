@@ -5,6 +5,6 @@ PRODUCT_SHORTNAME=Rebel
 PRODUCT_INSTALLER_FULLNAME=Rebel Installer
 PRODUCT_INSTALLER_SHORTNAME=Rebel Installer
 COPYRIGHT=Copyright @LASTCHANGE_YEAR@ Viasat Inc. and The Chromium Authors. All rights reserved.
-MAC_BUNDLE_ID=com.rebel.Rebel
+MAC_BUNDLE_ID=com.viasat.rebel
 MAC_CREATOR_CODE=Cr24
 MAC_TEAM_ID=

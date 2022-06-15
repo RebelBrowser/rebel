@@ -11,6 +11,8 @@ declare_args() {
   rebel_browser_company_path_component = "Viasat"
 
   rebel_browser_schema = "rebel://"
+
+  rebel_package = "com.viasat.rebel"
 }
 
 # Arguments to help with Chromium integration (i.e. not to be overridden).

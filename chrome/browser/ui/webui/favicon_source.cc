@@ -6,6 +6,8 @@
 
 #include <cmath>
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 #include "base/bind.h"
 #include "base/callback_helpers.h"
 #include "base/metrics/histogram_functions.h"
@@ -15,7 +17,9 @@
 #include "chrome/browser/favicon/history_ui_favicon_request_handler_factory.h"
 #include "chrome/browser/history/top_sites_factory.h"
 #include "chrome/browser/profiles/profile.h"
+#if BUILDFLAG(REBEL_BROWSER) && !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/search/instant_service.h"
+#endif
 #include "chrome/browser/ui/webui/webui_util.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
@@ -24,9 +28,11 @@
 #include "components/history/core/browser/top_sites.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/web_contents.h"
+#if BUILDFLAG(REBEL_BROWSER) && !BUILDFLAG(IS_ANDROID)
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/manifest.h"
+#endif
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/base/layout.h"
 #include "ui/base/resource/resource_bundle.h"
@@ -39,6 +45,19 @@
 #if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
+
+#if BUILDFLAG(IS_ANDROID)
+static bool is_dark_mode_enabled_on_android(Profile* profile) {
+  auto* remote_ntp_service =
+      rebel::RemoteNtpServiceFactory::GetForProfile(profile);
+  if (!remote_ntp_service) {
+    return false;
+  }
+
+  const auto& theme = remote_ntp_service->theme();
+  return theme && theme->dark_mode_enabled;
+}
+#endif
 #endif
 
 namespace {
@@ -126,6 +145,7 @@ void FaviconSource::StartDataRequest(
     return;
   }
 
+#if BUILDFLAG(REBEL_BROWSER) && !BUILDFLAG(IS_ANDROID)
   if (url_format_ == chrome::FaviconUrlFormat::kFaviconLegacy) {
     const extensions::Extension* extension =
         extensions::ExtensionRegistry::Get(profile_)
@@ -137,6 +157,7 @@ void FaviconSource::StartDataRequest(
                                     extensions::Manifest::NUM_LOAD_TYPES);
     }
   }
+#endif
 
   if (parsed.page_url.empty()) {
     // Request by icon url.
@@ -231,8 +252,10 @@ bool FaviconSource::ShouldServiceRequest(
       return true;
     }
 #endif
+#if BUILDFLAG(REBEL_BROWSER) && !BUILDFLAG(IS_ANDROID)
     return InstantService::ShouldServiceRequest(url, browser_context,
                                                 render_process_id);
+#endif
   }
   return URLDataSource::ShouldServiceRequest(url, browser_context,
                                              render_process_id);
@@ -240,7 +263,11 @@ bool FaviconSource::ShouldServiceRequest(
 
 ui::NativeTheme* FaviconSource::GetNativeTheme(
     const content::WebContents::Getter& wc_getter) {
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_ANDROID)
+  return nullptr;
+#else
   return webui::GetNativeTheme(wc_getter.Run());
+#endif
 }
 
 void FaviconSource::OnFaviconDataAvailable(
@@ -263,7 +290,11 @@ void FaviconSource::SendDefaultResponse(
   if (!parsed.show_fallback_monogram) {
     SendDefaultResponse(std::move(callback), parsed.size_in_dip,
                         parsed.device_scale_factor,
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_ANDROID)
+                        is_dark_mode_enabled_on_android(profile_));
+#else
                         GetNativeTheme(wc_getter)->ShouldUseDarkColors());
+#endif
     return;
   }
   int icon_size = std::ceil(parsed.size_in_dip * parsed.device_scale_factor);
@@ -279,7 +310,11 @@ void FaviconSource::SendDefaultResponse(
     content::URLDataSource::GotDataCallback callback,
     const content::WebContents::Getter& wc_getter) {
   SendDefaultResponse(std::move(callback), 16, 1.0f,
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_ANDROID)
+                      is_dark_mode_enabled_on_android(profile_));
+#else
                       GetNativeTheme(wc_getter)->ShouldUseDarkColors());
+#endif
 }
 
 void FaviconSource::SendDefaultResponse(

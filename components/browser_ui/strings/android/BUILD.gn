@@ -5,10 +5,17 @@
 import("//build/config/locales.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/rebel.gni")
+
 java_strings_grd("browser_ui_strings_grd") {
   grd_file = "browser_ui_strings.grd"
   outputs = [ "values/browser_ui_strings.xml" ] +
             process_file_template(
                 android_bundle_locales_as_resources,
                 [ "values-{{source_name_part}}/browser_ui_strings.xml" ])
+
+  if (is_rebel_based) {
+    grd_file = "$root_gen_dir/rebel/browser_ui_strings/browser_ui_strings.grd"
+    deps = [ "//rebel/branding:browser_ui_strings" ]
+  }
 }
