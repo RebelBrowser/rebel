@@ -474,7 +474,7 @@
 #endif
 
 #if BUILDFLAG(REBEL_BROWSER)
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "components/ntp_tiles/custom_links_manager_impl.h"
 #else
 #include "components/ntp_tiles/popular_sites_impl.h"
@@ -1348,7 +1348,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #if BUILDFLAG(REBEL_BROWSER)
   rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   ntp_tiles::CustomLinksManagerImpl::RegisterProfilePrefs(registry);
 #else
   ntp_tiles::PopularSitesImpl::RegisterProfilePrefs(registry);

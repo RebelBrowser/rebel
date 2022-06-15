@@ -14,7 +14,7 @@
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_finder.h"
 #include "chrome/browser/ui/singleton_tabs.h"
 #endif
@@ -22,7 +22,7 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "rebel/chrome/browser/android/ntp/remote_ntp_bridge.h"
 #else
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
@@ -40,7 +40,7 @@ RemoteNtpTabHelper::RemoteNtpTabHelper(content::WebContents* web_contents)
     remote_ntp_service_->AddObserver(this);
   }
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_ =
       std::make_unique<rebel::RemoteNtpThemeProvider>(this, profile());
 #endif
@@ -98,7 +98,7 @@ void RemoteNtpTabHelper::DidStartNavigation(
     return;
   }
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   content::RenderProcessHost* process_host =
       web_contents()->GetMainFrame()->GetProcess();
 
@@ -110,7 +110,7 @@ void RemoteNtpTabHelper::DidStartNavigation(
 }
 
 void RemoteNtpTabHelper::WebContentsDestroyed() {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   content::RenderProcessHost* process_host =
       web_contents()->GetMainFrame()->GetProcess();
 
@@ -145,7 +145,7 @@ void RemoteNtpTabHelper::OnEditCustomTile(
 }
 
 void RemoteNtpTabHelper::OnLoadInternalUrl(const GURL& url) {
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (remote_ntp_bridge_) {
     remote_ntp_bridge_->LoadInternalUrl(url);
   }
@@ -187,7 +187,7 @@ void RemoteNtpTabHelper::OnOpenAutocompleteMatch(uint32_t index,
     return;
   }
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (remote_ntp_bridge_) {
     remote_ntp_bridge_->LoadAutocompleteMatchUrl(destination_url,
                                                  transition_type);
@@ -224,25 +224,25 @@ void RemoteNtpTabHelper::OnSetBackgroundImage(
 }
 
 void RemoteNtpTabHelper::OnSelectLocalBackgroundImage() {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->SelectLocalBackgroundImage(web_contents());
 #endif
 }
 
 void RemoteNtpTabHelper::OnPreviewColor(SkColor color) {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->PreviewColor(web_contents(), color);
 #endif
 }
 
 void RemoteNtpTabHelper::OnRevertColor() {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->RevertColor(nullptr);
 #endif
 }
 
 void RemoteNtpTabHelper::OnCommitColor() {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->CommitColor();
 #endif
 }

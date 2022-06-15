@@ -11,7 +11,7 @@
 
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 
-#if !defined(OS_IOS)
+#if !BUILDFLAG(IS_IOS)
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
 #endif
 
@@ -46,7 +46,7 @@ bool RemoteNtpService::IsRemoteNtpUrl(const GURL& url) {
     return false;
   }
 
-#if !defined(OS_IOS)
+#if !BUILDFLAG(IS_IOS)
   if (RemoteNtpServiceImpl::IsRemoteNtpUrl(url)) {
     return true;
   }

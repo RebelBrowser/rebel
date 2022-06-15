@@ -8,7 +8,7 @@
 
 #include "build/build_config.h"
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
 #include "ios/rebel/grit/ios_rebel_resources.h"
 #else
 #include "rebel/grit/rebel_resources.h"

@@ -14,7 +14,7 @@
 #include "ui/gfx/codec/png_codec.h"
 #include "url/gurl.h"
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
 #include "ios/chrome/browser/browser_state/chrome_browser_state.h"
 #include "ios/web/public/webui/web_ui_ios.h"
 #include "ios/web/public/webui/web_ui_ios_data_source.h"
@@ -54,7 +54,7 @@ static std::string GetPNGDataUrl(const SkBitmap& bitmap) {
   return url;
 }
 
-#if !defined(OS_IOS)
+#if !BUILDFLAG(IS_IOS)
 class RemoteNtpHandler : public content::WebUIMessageHandler {
 #else
 class RemoteNtpHandler : public web::WebUIIOSMessageHandler {
@@ -123,7 +123,7 @@ class RemoteNtpHandler : public web::WebUIIOSMessageHandler {
                          weak_factory_.GetWeakPtr(), origin));
     }
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
     web_ui()->CallJavascriptFunction("cachedIconsAvailable", {&icons});
 #else
     AllowJavascript();
@@ -136,7 +136,7 @@ class RemoteNtpHandler : public web::WebUIIOSMessageHandler {
     icon.SetStringKey("origin", origin.spec());
     icon.SetStringKey("icon", GetPNGDataUrl(bitmap));
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
     web_ui()->CallJavascriptFunction("iconImageAvailable", {&icon});
 #else
     AllowJavascript();
@@ -153,7 +153,7 @@ class RemoteNtpHandler : public web::WebUIIOSMessageHandler {
 
 const char kRemoteNtpInternalsHost[] = "remote-ntp-internals";
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
 
 RemoteNtpInternalsUI::RemoteNtpInternalsUI(web::WebUIIOS* web_ui,
                                            const std::string& host)

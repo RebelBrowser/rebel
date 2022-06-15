@@ -59,7 +59,7 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
   std::unique_ptr<AutocompleteController> CreateAutocompleteController()
       const override;
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // Used only for testing.
   RemoteNtpThemeProvider* GetThemeProviderForTesting() const {
     return remote_ntp_theme_provider_.get();
@@ -83,7 +83,7 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<RemoteNtpThemeProvider> remote_ntp_theme_provider_;
 #endif
 
