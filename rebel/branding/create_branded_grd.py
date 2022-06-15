@@ -9,13 +9,7 @@ import collections
 import os
 import pathlib
 import sys
-
-try:
-    from lxml import etree as ET
-except ImportError:
-    # lxml is needed to preserve comment tags and attribute order in GRD files.
-    print('Please run `pip3 install lxml` before running this script')
-    sys.exit(1)
+import xml.etree.ElementTree as ET
 
 
 GRIT_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'grit')
@@ -43,7 +37,7 @@ GOOGLE_MESSAGES_TO_BRAND = [
 ]
 
 GRD_HEADER = '''<?xml version="1.0" encoding="UTF-8"?>
-<!-- This file was created by //rebel/scripts/create_branded_grd.py. -->
+<!-- This file was created by //rebel/branding/create_branded_grd.py. -->
 '''
 
 XTB_HEADER = '''<?xml version="1.0" ?>
