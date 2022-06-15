@@ -31,7 +31,7 @@
 #include "ui/gfx/image/image.h"
 #include "ui/gfx/image/image_skia_operations.h"
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
 #include "components/image_fetcher/ios/ios_image_decoder_impl.h"
 #else
 #include "chrome/browser/image_fetcher/image_decoder_impl.h"
@@ -80,7 +80,7 @@ constexpr const gfx::Size kTouchIconExpectedSize(180, 180);
 constexpr const int kMinimumFaviconSize = 64;
 
 std::unique_ptr<image_fetcher::ImageDecoder> CreateImageDecoder() {
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
   return image_fetcher::CreateIOSImageDecoder();
 #else
   return std::make_unique<ImageDecoderImpl>();
@@ -574,7 +574,7 @@ void RemoteNtpIconStorage::InitializeFromPrefs() {
       continue;
     }
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
     // On iOS, the browser state path changes after updates. The user's profile
     // directory is migrated, but the paths stored in prefs will be stale.
     icon_file = storage_path_.Append(icon_file->BaseName());
@@ -600,7 +600,7 @@ void RemoteNtpIconStorage::InitializeFromPrefs() {
     cached_icons_.emplace(GURL(*host_origin), std::move(cached_icon));
   }
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
   SerializeToPrefs();
 #endif
 }

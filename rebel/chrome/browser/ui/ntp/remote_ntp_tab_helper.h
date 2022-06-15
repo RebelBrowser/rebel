@@ -46,7 +46,7 @@ class RemoteNtpTabHelper
           receiver,
       content::RenderFrameHost* render_frame_host);
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   void SetRemoteNtpBridge(rebel::RemoteNtpBridge* remote_ntp_bridge) {
     remote_ntp_bridge_ = remote_ntp_bridge;
   }
@@ -113,7 +113,7 @@ class RemoteNtpTabHelper
   rebel::RemoteNtpService* remote_ntp_service_;
   rebel::RemoteNtpSearchProvider remote_ntp_search_provider_;
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   rebel::RemoteNtpBridge* remote_ntp_bridge_;
 #else
   std::unique_ptr<rebel::RemoteNtpThemeProvider> remote_ntp_theme_provider_;

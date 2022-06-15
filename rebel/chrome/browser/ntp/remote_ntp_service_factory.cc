@@ -10,7 +10,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/new_tab_page/chrome_colors/chrome_colors_factory.h"
 #include "chrome/browser/search/background/ntp_background_service_factory.h"
 #include "chrome/browser/themes/theme_service_factory.h"
@@ -41,7 +41,7 @@ RemoteNtpServiceFactory::RemoteNtpServiceFactory()
           "RemoteNtpService",
           BrowserContextDependencyManager::GetInstance()) {
   DependsOn(TopSitesFactory::GetInstance());
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   DependsOn(chrome_colors::ChromeColorsFactory::GetInstance());
   DependsOn(NtpBackgroundServiceFactory::GetInstance());
   DependsOn(ThemeServiceFactory::GetInstance());

@@ -25,7 +25,7 @@
 #include "content/public/browser/url_data_source.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/theme_source.h"
 #endif
 
@@ -34,7 +34,7 @@
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
 #endif
 
@@ -53,7 +53,7 @@ RemoteNtpServiceImpl::RemoteNtpServiceImpl(Profile* profile)
   registrar_.Add(this, content::NOTIFICATION_RENDERER_PROCESS_TERMINATED,
                  content::NotificationService::AllSources());
 
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // Themes are only available for desktop devices.
   remote_ntp_theme_provider_ =
       std::make_unique<rebel::RemoteNtpThemeProvider>(this, profile);
@@ -69,7 +69,7 @@ RemoteNtpServiceImpl::RemoteNtpServiceImpl(Profile* profile)
   content::URLDataSource::Add(
       profile_, std::make_unique<FaviconSource>(
                     profile_, chrome::FaviconUrlFormat::kFavicon2));
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   content::URLDataSource::Add(profile_,
                               std::make_unique<ThemeSource>(profile_));
 #endif
@@ -177,14 +177,14 @@ void RemoteNtpServiceImpl::Shutdown() {
 }
 
 void RemoteNtpServiceImpl::FetchBackgroundCollections() {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->FetchBackgroundCollections();
 #endif
 }
 
 void RemoteNtpServiceImpl::FetchBackgroundImages(
     const std::string& collection_id) {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->FetchBackgroundImages(collection_id);
 #endif
 }
@@ -192,14 +192,14 @@ void RemoteNtpServiceImpl::FetchBackgroundImages(
 void RemoteNtpServiceImpl::StoreBackgroundImage(
     const std::string& collection_id,
     rebel::mojom::BackgroundImagePtr image) {
-#if !defined(OS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   remote_ntp_theme_provider_->StoreBackgroundImage(collection_id,
                                                    std::move(image));
 #endif
 }
 
 rebel::mojom::RemoteNtpThemePtr RemoteNtpServiceImpl::CreateTheme() {
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return RemoteNtpService::CreateTheme();
 #else
   return remote_ntp_theme_provider_->CreateTheme();

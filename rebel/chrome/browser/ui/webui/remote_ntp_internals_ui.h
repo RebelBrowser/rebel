@@ -12,7 +12,7 @@
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
 
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
 #include "ios/chrome/grit/ios_chromium_strings.h"
 #include "ios/rebel/grit/ios_rebel_resources.h"
 #include "ios/web/public/webui/web_ui_ios_controller.h"
@@ -29,13 +29,13 @@ class RemoteNtpIconStorage;
 extern const char kRemoteNtpInternalsHost[];
 
 // The WebUI for chrome://remote-ntp-internals.
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
 class RemoteNtpInternalsUI : public web::WebUIIOSController {
 #else
 class RemoteNtpInternalsUI : public content::WebUIController {
 #endif
  public:
-#if defined(OS_IOS)
+#if BUILDFLAG(IS_IOS)
   explicit RemoteNtpInternalsUI(web::WebUIIOS* web_ui, const std::string& host);
 #else
   explicit RemoteNtpInternalsUI(content::WebUI* web_ui);
