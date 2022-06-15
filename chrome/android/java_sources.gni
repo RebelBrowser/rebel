@@ -24,6 +24,8 @@ import("//components/feed/features.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
 
+import("//rebel/sources.gni")
+
 chrome_java_sources += public_autofill_assistant_java_sources
 
 if (enable_vr) {
@@ -38,6 +40,10 @@ if (enable_offline_pages_harness) {
 
 if (enable_supervised_users) {
   chrome_java_sources += [ "java/src/org/chromium/chrome/browser/supervised_user/ChildAccountService.java" ]
+}
+
+if (is_rebel_based) {
+  chrome_java_sources += rebase_path(rebel_chrome_android_java_sources, ".", "//rebel")
 }
 
 chrome_junit_test_java_sources += feed_junit_test_java_sources
