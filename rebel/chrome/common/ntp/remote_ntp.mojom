@@ -77,19 +77,19 @@ struct RemoteNtpTheme {
   uint32 color_light;
 };
 
-// Interface used to connect to the remote NTP interface. This is a separate
+// Interface used to connect to the RemoteNTP interface. This is a separate
 // interface such that a reverse connection (|client| below) can be passed when
 // connecting.
 interface RemoteNtpConnector {
   // Connect to the interface. |remote_ntp| is the connection which the client
-  // will use to query the remote NTP interface. |client| is the connection
-  // used by the remote NTP interface implementation to push browser state
-  // updates to the client.
+  // will use to query the RemoteNTP interface. |client| is the connection used
+  // by the RemoteNTP interface implementation to push browser state updates to
+  // the client.
   Connect(pending_associated_receiver<RemoteNtp> remote_ntp,
           pending_associated_remote<RemoteNtpClient> client);
 };
 
-// Browser interface to support remote NTP. Render frames connect to this
+// Browser interface to support RemoteNTP. Render frames connect to this
 // interface to query browser data.
 interface RemoteNtp {
   AddCustomTile(url.mojom.Url tile_url, mojo_base.mojom.String16 tile_title);
