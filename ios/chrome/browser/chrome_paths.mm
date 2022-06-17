@@ -14,6 +14,10 @@
 #include "components/gcm_driver/gcm_driver_constants.h"
 #include "ios/chrome/browser/chrome_paths_internal.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -24,6 +28,9 @@ namespace {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 const base::FilePath::CharType kProductDirName[] =
     FILE_PATH_LITERAL("Google/Chrome");
+#elif BUILDFLAG(REBEL_BROWSER)
+const base::FilePath::CharType kProductDirName[] = REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME);
 #else
 const base::FilePath::CharType kProductDirName[] =
     FILE_PATH_LITERAL("Chromium");

@@ -14,5 +14,9 @@ group("rebel") {
     deps = [
       "//chrome/android:chrome_public_apk",
     ]
+  } else if (is_ios) {
+    deps = [
+      "//ios/chrome/app:chrome",
+    ]
   }
 }

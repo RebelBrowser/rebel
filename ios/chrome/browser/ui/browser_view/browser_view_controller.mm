@@ -162,6 +162,11 @@
 #import "ui/base/device_form_factor.h"
 #import "ui/base/l10n/l10n_util.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -2372,6 +2377,9 @@ NSString* const kBrowserViewControllerSnackbarCategory =
     // strip, without the focused omnibox, and for UI Refresh, only when in
     // split toolbar mode.
     hideToolbar = isNTP && !_isOffTheRecord &&
+#if BUILDFLAG(REBEL_BROWSER)
+                  !rebel::IsRemoteNtpEnabled() &&
+#endif
                   ![self.primaryToolbarCoordinator isOmniboxFirstResponder] &&
                   ![self.primaryToolbarCoordinator showingOmniboxPopup] &&
                   ![self canShowTabStrip] && IsSplitToolbarMode(self);

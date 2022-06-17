@@ -85,6 +85,14 @@
 #import "ios/web/public/web_state_observer_bridge.h"
 #import "ui/base/l10n/l10n_util_mac.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ntp/remote_ntp_service.h"
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#import "rebel/ios/chrome/browser/ntp/remote_ntp_service_factory_ios.h"
+#import "rebel/ios/chrome/browser/ui/ntp/remote_ntp_view_controller.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -137,6 +145,11 @@ namespace {
 
 // View controller for the incognito NTP.
 @property(nonatomic, strong) IncognitoViewController* incognitoViewController;
+
+#if BUILDFLAG(REBEL_BROWSER)
+// View controller for the RemoteNTP.
+@property(nonatomic, strong) RemoteNtpViewController* remoteNtpViewController;
+#endif
 
 // The timetick of the last time the NTP was displayed.
 @property(nonatomic, assign) base::TimeTicks didAppearTime;
@@ -247,6 +260,29 @@ namespace {
     self.started = YES;
     return;
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+  auto* remote_ntp_service = rebel::RemoteNtpServiceFactory::GetForBrowserState(
+      self.browser->GetBrowserState());
+
+  if (remote_ntp_service) {
+    DCHECK(!self.remoteNtpViewController);
+
+    UrlLoadingBrowserAgent* URLLoader =
+        UrlLoadingBrowserAgent::FromBrowser(self.browser);
+
+    self.remoteNtpViewController =
+        [[RemoteNtpViewController alloc] initWithUrlLoader:URLLoader
+                                          remoteNtpService:remote_ntp_service];
+    self.remoteNtpViewController.dispatcher =
+        static_cast<id<ApplicationCommands, BrowserCommands>>(
+            self.browser->GetCommandDispatcher());
+    self.remoteNtpViewController.browserState = self.browser->GetBrowserState();
+
+    self.started = YES;
+    return;
+  }
+#endif
 
   // Gets services.
   self.authService = AuthenticationServiceFactory::GetForBrowserState(
@@ -375,6 +411,9 @@ namespace {
   self.headerSynchronizer = nil;
   self.headerController = nil;
   self.incognitoViewController = nil;
+#if BUILDFLAG(REBEL_BROWSER)
+  self.remoteNtpViewController = nil;
+#endif
   // Remove before nil to ensure View Hierarchy doesn't hold last strong
   // reference.
   [self.containedViewController willMoveToParentViewController:nil];
@@ -519,6 +558,11 @@ namespace {
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     return self.incognitoViewController;
   } else {
+#if BUILDFLAG(REBEL_BROWSER)
+    if (self.remoteNtpViewController) {
+      return self.remoteNtpViewController;
+    }
+#endif
     return self.containerViewController;
   }
 }
@@ -571,6 +615,11 @@ namespace {
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     return;
   }
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::IsRemoteNtpEnabled()) {
+    return;
+  }
+#endif
   self.discoverFeedService->RefreshFeed();
   [self reloadContentSuggestions];
 }
@@ -587,6 +636,11 @@ namespace {
   if (self.browser->GetBrowserState()->IsOffTheRecord()) {
     return;
   }
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::IsRemoteNtpEnabled()) {
+    return;
+  }
+#endif
   NamedGuide* menuButtonGuide =
       [NamedGuide guideWithName:kDiscoverFeedHeaderMenuGuide
                            view:self.feedHeaderViewController.menuButton];
