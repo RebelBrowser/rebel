@@ -786,18 +786,18 @@
   # Chromium strings and Google Chrome strings must start at the same id.
   # We only use one file depending on whether we're building Chromium or
   # Google Chrome.
-  "ios/chrome/app/strings/ios_chromium_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_chromium_strings/ios_chromium_strings.grd": { # MODIFIED FOR REBEL BRANDING.
     # Big alignment to make start IDs look nicer.
-    "META": {"align": 100},
+    "META": {"align": 100, "sizes": {"messages": [1000]}},
     "messages": [500],
   },
   "ios/chrome/app/strings/ios_google_chrome_strings.grd": {
     "messages": [500],
   },
 
-  "ios/chrome/app/strings/ios_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_strings/ios_strings.grd": { # MODIFIED FOR REBEL BRANDING.
     # Big alignment since strings (previous item) are frequently added.
-    "META": {"join": 2, "align": 200},
+    "META": {"join": 2, "align": 200, "sizes": {"messages": [10000]}},
     "messages": [600],
   },
   "ios/chrome/app/theme/ios_theme_resources.grd": {
@@ -805,33 +805,36 @@
     "META": {"align": 100},
     "structures": [700],
   },
-  "ios/chrome/share_extension/strings/ios_share_extension_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_share_extension_strings/ios_share_extension_strings.grd": {
+    "META": {"sizes": {"messages": [100]}},
     "messages": [720],
   },
   "ios/chrome/search_widget_extension/strings/ios_search_widget_extension_strings.grd": {
     "messages": [740],
   },
-  "ios/chrome/search_widget_extension/strings/ios_search_widget_extension_chromium_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_search_widget_extension_chromium_strings/ios_search_widget_extension_chromium_strings.grd": {
+    "META": {"sizes": {"messages": [100]}},
     "messages": [760],
   },
   "ios/chrome/search_widget_extension/strings/ios_search_widget_extension_google_chrome_strings.grd": {
     "messages": [760],
   },
-  "ios/chrome/content_widget_extension/strings/ios_content_widget_extension_chromium_strings.grd": {
-    "META": {"join": 2},
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_content_widget_extension_chromium_strings/ios_content_widget_extension_chromium_strings.grd": {
+    "META": {"join": 2, "sizes": {"messages": [100]}},
     "messages": [780],
   },
   "ios/chrome/content_widget_extension/strings/ios_content_widget_extension_google_chrome_strings.grd": {
     "messages": [780],
   },
-  "ios/chrome/credential_provider_extension/strings/ios_credential_provider_extension_strings.grd": {
-    "META": {"join": 2},
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_credential_provider_extension_strings/ios_credential_provider_extension_strings.grd": {
+    "META": {"join": 2, "sizes": {"messages": [100]}},
     "messages": [800],
   },
   # END ios/ section.
 
   # START ios_internal/ section.
-  "ios/chrome/widget_kit_extension/strings/ios_widget_kit_extension_strings.grd": {
+  "<(SHARED_INTERMEDIATE_DIR)/rebel/ios_widget_kit_extension_strings/ios_widget_kit_extension_strings.grd": {
+    "META": {"sizes": {"messages": [100]}},
     "messages": [820],
   },
   "ios_internal/chrome/app/ios_internal_strings.grd": {

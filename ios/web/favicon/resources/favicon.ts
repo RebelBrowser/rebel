@@ -10,3 +10,8 @@
 import { sendFaviconUrls } from "//ios/web/favicon/resources/favicon_utils.js";
 
 sendFaviconUrls();
+
+// REBEL
+import { sendTouchIconUrls } from "//rebel/ios/web/favicon/resources/touch_icon_utils.js";
+sendTouchIconUrls();
+// REBEL

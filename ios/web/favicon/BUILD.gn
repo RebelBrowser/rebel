@@ -6,6 +6,8 @@ import("//ios/build/config.gni")
 import("//ios/web/public/js_messaging/compile_ts.gni")
 import("//ios/web/public/js_messaging/optimize_js.gni")
 
+import("//rebel/sources.gni")
+
 source_set("favicon") {
   configs += [ "//build/config/compiler:enable_arc" ]
   deps = [
@@ -31,6 +33,10 @@ compile_ts("compile_typescript") {
     "resources/favicon_event_listeners.ts",
     "resources/favicon_utils.ts",
   ]
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_ios_web_favicon_sources, ".", "//rebel")
+  }
 }
 
 optimize_js("favicon_js") {

@@ -13,9 +13,7 @@ rebel_chrome_app_sources = [
   "chrome/app/rebel_main_delegate.h",
 ]
 
-rebel_chrome_browser_sources = [
-  "chrome/browser/ntp/remote_ntp_icon_receiver.cc",
-  "chrome/browser/ntp/remote_ntp_icon_receiver.h",
+_rebel_remote_ntp_common_sources = [
   "chrome/browser/ntp/remote_ntp_icon_storage.cc",
   "chrome/browser/ntp/remote_ntp_icon_storage.h",
   "chrome/browser/ntp/remote_ntp_offline_resources.cc",
@@ -24,39 +22,81 @@ rebel_chrome_browser_sources = [
   "chrome/browser/ntp/remote_ntp_search_provider.h",
   "chrome/browser/ntp/remote_ntp_service.cc",
   "chrome/browser/ntp/remote_ntp_service.h",
-  "chrome/browser/ntp/remote_ntp_service_factory.cc",
-  "chrome/browser/ntp/remote_ntp_service_factory.h",
-  "chrome/browser/ntp/remote_ntp_service_impl.cc",
-  "chrome/browser/ntp/remote_ntp_service_impl.h",
-  "chrome/browser/ntp/remote_ntp_source.cc",
-  "chrome/browser/ntp/remote_ntp_source.h",
   "chrome/browser/ntp/remote_ntp_theme_delegate.h",
-  "chrome/browser/rebel_content_browser_client.cc",
-  "chrome/browser/rebel_content_browser_client.h",
 ]
 
-if (is_android) {
-  rebel_chrome_browser_sources += [
-    "chrome/browser/android/ntp/remote_ntp_bridge.cc",
-    "chrome/browser/android/ntp/remote_ntp_bridge.h",
+if (is_ios) {
+  rebel_ios_chrome_browser_ntp_sources = _rebel_remote_ntp_common_sources
+
+  rebel_ios_chrome_browser_ntp_sources += [
+    "ios/chrome/browser/ntp/remote_ntp_icon_parser.h",
+    "ios/chrome/browser/ntp/remote_ntp_icon_parser.mm",
+    "ios/chrome/browser/ntp/remote_ntp_service_factory_ios.h",
+    "ios/chrome/browser/ntp/remote_ntp_service_factory_ios.mm",
+    "ios/chrome/browser/ntp/remote_ntp_service_ios.h",
+    "ios/chrome/browser/ntp/remote_ntp_service_ios.mm",
   ]
 } else {
+  rebel_chrome_browser_sources = _rebel_remote_ntp_common_sources
+
   rebel_chrome_browser_sources += [
-    "chrome/browser/ntp/remote_ntp_theme_provider.cc",
-    "chrome/browser/ntp/remote_ntp_theme_provider.h",
+    "chrome/browser/ntp/remote_ntp_icon_receiver.cc",
+    "chrome/browser/ntp/remote_ntp_icon_receiver.h",
+    "chrome/browser/ntp/remote_ntp_service_factory.cc",
+    "chrome/browser/ntp/remote_ntp_service_factory.h",
+    "chrome/browser/ntp/remote_ntp_service_impl.cc",
+    "chrome/browser/ntp/remote_ntp_service_impl.h",
+    "chrome/browser/ntp/remote_ntp_source.cc",
+    "chrome/browser/ntp/remote_ntp_source.h",
+    "chrome/browser/rebel_content_browser_client.cc",
+    "chrome/browser/rebel_content_browser_client.h",
   ]
+
+  if (is_android) {
+    rebel_chrome_browser_sources += [
+      "chrome/browser/android/ntp/remote_ntp_bridge.cc",
+      "chrome/browser/android/ntp/remote_ntp_bridge.h",
+    ]
+  } else {
+    rebel_chrome_browser_sources += [
+      "chrome/browser/ntp/remote_ntp_theme_provider.cc",
+      "chrome/browser/ntp/remote_ntp_theme_provider.h",
+    ]
+  }
 }
 
 rebel_chrome_browser_ui_sources = [
-  "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.cc",
-  "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.h",
-  "chrome/browser/ui/ntp/remote_ntp_router.cc",
-  "chrome/browser/ui/ntp/remote_ntp_router.h",
-  "chrome/browser/ui/ntp/remote_ntp_tab_helper.cc",
-  "chrome/browser/ui/ntp/remote_ntp_tab_helper.h",
   "chrome/browser/ui/webui/remote_ntp_internals_ui.cc",
   "chrome/browser/ui/webui/remote_ntp_internals_ui.h",
 ]
+
+if (is_ios) {
+  rebel_ios_chrome_browser_ui_ntp_sources = rebel_chrome_browser_ui_sources
+
+  rebel_ios_chrome_browser_ui_ntp_sources += [
+    "ios/chrome/browser/ui/ntp/remote_ntp_api_provider.h",
+    "ios/chrome/browser/ui/ntp/remote_ntp_api_provider.mm",
+    "ios/chrome/browser/ui/ntp/remote_ntp_scheme_handler.h",
+    "ios/chrome/browser/ui/ntp/remote_ntp_scheme_handler.mm",
+    "ios/chrome/browser/ui/ntp/remote_ntp_tile_view.h",
+    "ios/chrome/browser/ui/ntp/remote_ntp_tile_view.mm",
+    "ios/chrome/browser/ui/ntp/remote_ntp_view.h",
+    "ios/chrome/browser/ui/ntp/remote_ntp_view.mm",
+    "ios/chrome/browser/ui/ntp/remote_ntp_view_controller.h",
+    "ios/chrome/browser/ui/ntp/remote_ntp_view_controller.mm",
+    "ios/chrome/browser/ui/ntp/remote_ntp_view_script_message_handler.h",
+    "ios/chrome/browser/ui/ntp/remote_ntp_view_script_message_handler.mm",
+  ]
+} else {
+  rebel_chrome_browser_ui_sources += [
+    "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.cc",
+    "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.h",
+    "chrome/browser/ui/ntp/remote_ntp_router.cc",
+    "chrome/browser/ui/ntp/remote_ntp_router.h",
+    "chrome/browser/ui/ntp/remote_ntp_tab_helper.cc",
+    "chrome/browser/ui/ntp/remote_ntp_tab_helper.h",
+  ]
+}
 
 if (is_android) {
   # These files are not built on Android by upstream, but are used by RemoteNTP.
@@ -92,4 +132,8 @@ rebel_chrome_android_java_sources = [
 
 rebel_chrome_android_jni_sources = [
   "chrome/android/java/src/org/chromium/chrome/browser/ntp/RemoteNtpBridge.java",
+]
+
+rebel_ios_web_favicon_sources = [
+  "ios/web/favicon/resources/touch_icon_utils.ts",
 ]

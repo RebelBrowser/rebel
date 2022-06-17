@@ -8,11 +8,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_IOS)
-#include "ios/rebel/grit/ios_rebel_resources.h"
-#else
 #include "rebel/grit/rebel_resources.h"
-#endif
 
 // Note: This header file is generated during runhooks. It contains definitions
 // of |kRemoteNtpOfflineResources| and |kRemoteNtpOfflineResourcesSize|.
