@@ -20,7 +20,7 @@
 #include "ios/web/public/webui/web_ui_ios_data_source.h"
 #include "ios/web/public/webui/web_ui_ios_message_handler.h"
 
-#include "rebel/chrome/ios/chrome/browser/ntp/remote_ntp_service_factory_ios.h"
+#include "rebel/ios/chrome/browser/ntp/remote_ntp_service_factory_ios.h"
 #else
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/web_ui.h"
@@ -54,10 +54,10 @@ static std::string GetPNGDataUrl(const SkBitmap& bitmap) {
   return url;
 }
 
-#if !BUILDFLAG(IS_IOS)
-class RemoteNtpHandler : public content::WebUIMessageHandler {
-#else
+#if BUILDFLAG(IS_IOS)
 class RemoteNtpHandler : public web::WebUIIOSMessageHandler {
+#else
+class RemoteNtpHandler : public content::WebUIMessageHandler {
 #endif
  public:
   RemoteNtpHandler(rebel::RemoteNtpIconStorage* remote_ntp_icon_storage)

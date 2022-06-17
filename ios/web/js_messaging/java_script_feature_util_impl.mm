@@ -23,6 +23,16 @@
 #import "ios/web/public/web_client.h"
 #import "ios/web/text_fragments/text_fragments_java_script_feature.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#import "rebel/ios/chrome/browser/ntp/remote_ntp_icon_parser.h"
+
+static rebel::RemoteNtpIconParser* GetRemoteNtpIconParserFeature() {
+  static base::NoDestructor<rebel::RemoteNtpIconParser> remote_ntp_icon_parser;
+  return remote_ntp_icon_parser.get();
+}
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -126,6 +136,9 @@ std::vector<JavaScriptFeature*> GetBuiltInJavaScriptFeatures(
       ContextMenuJavaScriptFeature::FromBrowserState(browser_state),
       FindInPageJavaScriptFeature::GetInstance(),
       GetFaviconJavaScriptFeature(),
+#if BUILDFLAG(REBEL_BROWSER)
+      GetRemoteNtpIconParserFeature(),
+#endif
       GetScrollHelperJavaScriptFeature(),
       GetShareWorkaroundJavaScriptFeature(),
       GetWindowErrorJavaScriptFeature(),

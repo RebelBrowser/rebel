@@ -5,12 +5,20 @@
 #ifndef IOS_CHROME_BROWSER_UI_CONTENT_SUGGESTIONS_CELLS_CONTENT_SUGGESTIONS_TILE_CONSTANTS_H_
 #define IOS_CHROME_BROWSER_UI_CONTENT_SUGGESTIONS_CELLS_CONTENT_SUGGESTIONS_TILE_CONSTANTS_H_
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 #import <UIKit/UIKit.h>
 
 // The minimum index value of the Bookmarks Shortcut content in the order behind
 // the four Most Visited tiles. NTPCollectionShortcutType is used as a proxy for
 // index value of the Shortcuts content.
+#if BUILDFLAG(REBEL_BROWSER)
+// The original value of 4 is much too small. Even the built-in set of NTP tiles
+// (components/ntp_tiles/resources/default_popular_sites.json) has 8 tiles.
+const int kShortcutMinimumIndex = 8;
+#else
 const int kShortcutMinimumIndex = 4;
+#endif
 
 // Enum listing the collection shortcuts on NTP and similar surfaces.
 typedef NS_ENUM(NSInteger, NTPCollectionShortcutType) {

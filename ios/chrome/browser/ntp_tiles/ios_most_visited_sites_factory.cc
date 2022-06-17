@@ -18,6 +18,29 @@
 #include "services/data_decoder/public/cpp/data_decoder.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "components/ntp_tiles/custom_links_manager_impl.h"
+#include "ios/chrome/browser/history/history_service_factory.h"
+
+namespace {
+
+class IOSCustomLinksManagerFactory {
+ public:
+  static std::unique_ptr<ntp_tiles::CustomLinksManager> NewForBrowserState(
+      ChromeBrowserState* browser_state) {
+    history::HistoryService* history_service =
+        ios::HistoryServiceFactory::GetForBrowserState(
+            browser_state, ServiceAccessType::EXPLICIT_ACCESS);
+
+    return std::make_unique<ntp_tiles::CustomLinksManagerImpl>(
+        browser_state->GetPrefs(), history_service);
+  }
+};
+
+}  // namespace
+#endif
+
 std::unique_ptr<ntp_tiles::MostVisitedSites>
 IOSMostVisitedSitesFactory::NewForBrowserState(
     ChromeBrowserState* browser_state) {
@@ -25,7 +48,11 @@ IOSMostVisitedSitesFactory::NewForBrowserState(
       browser_state->GetPrefs(),
       ios::TopSitesFactory::GetForBrowserState(browser_state),
       IOSPopularSitesFactory::NewForBrowserState(browser_state),
+#if BUILDFLAG(REBEL_BROWSER)
+      IOSCustomLinksManagerFactory::NewForBrowserState(browser_state),
+#else
       /*custom_links=*/nullptr,
+#endif
       std::make_unique<ntp_tiles::IconCacherImpl>(
           ios::FaviconServiceFactory::GetForBrowserState(
               browser_state, ServiceAccessType::IMPLICIT_ACCESS),

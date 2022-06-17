@@ -4,6 +4,8 @@
 
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/rebel.gni")
+
 # This file defines a template to invoke grit repack in a consistent manner.
 #
 # Parameters:
@@ -139,6 +141,31 @@ template("repack_locales") {
     _output_dir = "$target_gen_dir"
   } else {
     _output_dir = "$target_gen_dir/$target_name"
+  }
+
+  if (is_rebel_based && is_ios) {
+    # iOS resource string rules are defined using ${branding_path_component}.
+    # For Rebel branding, we hook into Chromium-branding rules rather than
+    # define new rules for each Rebel brand. Replace ${branding_path_component}
+    # from the invoker here to restore Chromium paths.
+    _source_patterns = invoker.source_patterns
+    invoker.source_patterns = []
+
+    foreach(_source_pattern, _source_patterns) {
+      _source_pattern = string_replace(
+        _source_pattern, "${branding_path_component}", "chromium")
+      invoker.source_patterns += [ _source_pattern ]
+    }
+
+    if (defined(invoker.deps)) {
+      _deps = invoker.deps
+      invoker.deps = []
+
+      foreach(_dep, _deps) {
+        _dep = string_replace(_dep, "${branding_path_component}", "chromium")
+        invoker.deps += [ _dep ]
+      }
+    }
   }
 
   # GN can't handle invoker.output_locales[foo] (http://crbug.com/614747).
