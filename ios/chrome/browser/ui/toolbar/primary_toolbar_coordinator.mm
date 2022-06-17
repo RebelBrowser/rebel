@@ -38,6 +38,11 @@
 #import "ios/components/webui/web_ui_url_constants.h"
 #import "ios/web/public/navigation/referrer.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -210,6 +215,10 @@
   BOOL isNTP = NTPHelper && NTPHelper->IsActive();
   BOOL isOffTheRecord = self.browser->GetBrowserState()->IsOffTheRecord();
   BOOL canShowTabStrip = IsRegularXRegularSizeClass(self.viewController);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  isNTP &= !rebel::IsRemoteNtpEnabled();
+#endif
 
   // Hide the toolbar when displaying content suggestions without the tab
   // strip, without the focused omnibox, and for UI Refresh, only when in
