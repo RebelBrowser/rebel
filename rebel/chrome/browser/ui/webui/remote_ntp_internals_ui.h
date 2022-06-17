@@ -14,13 +14,13 @@
 
 #if BUILDFLAG(IS_IOS)
 #include "ios/chrome/grit/ios_chromium_strings.h"
-#include "ios/rebel/grit/ios_rebel_resources.h"
 #include "ios/web/public/webui/web_ui_ios_controller.h"
 #else
 #include "chrome/grit/generated_resources.h"
 #include "content/public/browser/web_ui_controller.h"
-#include "rebel/grit/rebel_resources.h"
 #endif
+
+#include "rebel/grit/rebel_resources.h"
 
 namespace rebel {
 

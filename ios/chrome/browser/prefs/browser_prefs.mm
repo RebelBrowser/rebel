@@ -87,6 +87,12 @@
 #import "ios/web/common/features.h"
 #import "ui/base/l10n/l10n_util.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "components/ntp_tiles/custom_links_manager_impl.h"
+
+#include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -251,6 +257,11 @@ void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {
   unified_consent::UnifiedConsentService::RegisterPrefs(registry);
   variations::VariationsService::RegisterProfilePrefs(registry);
   ZeroSuggestProvider::RegisterProfilePrefs(registry);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  ntp_tiles::CustomLinksManagerImpl::RegisterProfilePrefs(registry);
+  rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
+#endif
 
   [BookmarkMediator registerBrowserStatePrefs:registry];
   [BookmarkPathCache registerBrowserStatePrefs:registry];

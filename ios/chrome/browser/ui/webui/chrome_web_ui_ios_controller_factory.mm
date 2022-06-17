@@ -39,6 +39,11 @@
 #import "ios/components/webui/web_ui_url_constants.h"
 #import "url/gurl.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/ui/webui/remote_ntp_internals_ui.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -122,6 +127,12 @@ WebUIIOSFactoryFunction GetWebUIIOSFactoryFunction(const GURL& url) {
     return &NewWebUIIOS<VersionUI>;
   if (url_host == kChromeUIPolicyHost)
     return &NewWebUIIOS<PolicyUI>;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (url_host == rebel::kRemoteNtpInternalsHost) {
+    return &NewWebUIIOS<rebel::RemoteNtpInternalsUI>;
+  }
+#endif
 
   return nullptr;
 }
