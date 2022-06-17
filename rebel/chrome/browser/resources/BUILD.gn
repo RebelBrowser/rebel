@@ -2,15 +2,22 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//chrome/common/features.gni")
 import("//tools/grit/grit_rule.gni")
+
+if (!is_ios) {
+  import("//chrome/common/features.gni")
+}
 
 grit("rebel_resources") {
   source = "rebel_resources.grd"
-  defines = chrome_grit_defines
+  output_dir = "$root_gen_dir/rebel"
+
+  if (!is_ios) {
+    defines = chrome_grit_defines
+  }
+
   outputs = [
     "grit/rebel_resources.h",
     "rebel_resources.pak",
   ]
-  output_dir = "$root_gen_dir/rebel"
 }

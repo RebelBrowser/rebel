@@ -5,11 +5,18 @@
 import("//build/config/locales.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/rebel.gni")
+
 grit("strings") {
   source = "ios_widget_kit_extension_strings.grd"
   output_dir = "$root_gen_dir/ios/widget_kit_extension"
   outputs = [ "grit/ios_widget_kit_extension_strings.h" ]
   foreach(locale, all_chrome_locales) {
     outputs += [ "ios_widget_kit_extension_strings_$locale.pak" ]
+  }
+
+  if (is_rebel_based) {
+    source = "$root_gen_dir/rebel/ios_widget_kit_extension_strings/ios_widget_kit_extension_strings.grd"
+    deps = [ "//rebel/branding:ios_widget_kit_extension_strings" ]
   }
 }
