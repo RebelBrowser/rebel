@@ -52,7 +52,6 @@ public abstract class RebelActivity extends AsyncInitializationActivity {
         }
 
         String host = uri.getHost();
-        String path = uri.getPath();
 
         if (TextUtils.equals(host, "settings")) {
             activity.onOptionsItemSelected(R.id.preferences_id, null);
