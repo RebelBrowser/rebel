@@ -79,6 +79,7 @@ class RemoteNtp : public content::RenderFrameObserver,
   RemoteNtp& operator=(const RemoteNtp&) = delete;
 
   // Overridden from content::RenderFrameObserver:
+  void DidClearWindowObject() override;
   void DidCommitProvisionalLoad(ui::PageTransition transition) override;
   void OnDestruct() override;
 

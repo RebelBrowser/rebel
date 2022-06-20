@@ -8,6 +8,11 @@ rebel_build_sources = [
   "build/buildflag.h",
 ]
 
+rebel_chrome_app_sources = [
+  "chrome/app/rebel_main_delegate.cc",
+  "chrome/app/rebel_main_delegate.h",
+]
+
 _rebel_remote_ntp_common_sources = [
   "chrome/browser/ntp/remote_ntp_icon_storage.cc",
   "chrome/browser/ntp/remote_ntp_icon_storage.h",
@@ -43,6 +48,8 @@ if (is_ios) {
     "chrome/browser/ntp/remote_ntp_service_impl.h",
     "chrome/browser/ntp/remote_ntp_source.cc",
     "chrome/browser/ntp/remote_ntp_source.h",
+    "chrome/browser/rebel_content_browser_client.cc",
+    "chrome/browser/rebel_content_browser_client.h",
   ]
 
   if (is_android) {
@@ -114,6 +121,8 @@ rebel_chrome_renderer_sources = [
   "chrome/renderer/ntp/remote_ntp_extension.h",
   "chrome/renderer/ntp/remote_ntp_icon_parser.cc",
   "chrome/renderer/ntp/remote_ntp_icon_parser.h",
+  "chrome/renderer/rebel_content_renderer_client.cc",
+  "chrome/renderer/rebel_content_renderer_client.h",
 ]
 
 rebel_chrome_android_java_sources = [

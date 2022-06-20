@@ -68,6 +68,10 @@ RemoteNtp::RemoteNtp(content::RenderFrame* render_frame)
 
 RemoteNtp::~RemoteNtp() = default;
 
+void RemoteNtp::DidClearWindowObject() {
+  rebel::RemoteNtpExtension::Install(render_frame()->GetWebFrame());
+}
+
 void RemoteNtp::DidCommitProvisionalLoad(ui::PageTransition transition) {
   can_run_js_in_renderframe_ = true;
 }

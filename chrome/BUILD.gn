@@ -31,8 +31,6 @@ import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
 import("//ui/gl/features.gni")
 import("//v8/gni/v8.gni")
 
-import("//rebel/rebel.gni")
-
 if (is_android) {
   import("//build/config/android/rules.gni")
 } else if (is_linux || is_chromeos) {
@@ -54,6 +52,9 @@ if (is_android) {
   import("//media/cdm/library_cdm/cdm_paths.gni")
   import("//third_party/icu/config.gni")
 }
+
+import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 declare_args() {
   # Indicates whether keystone registration framework should be enabled (see
@@ -286,6 +287,10 @@ if (!is_android && !is_mac) {
         "app/chrome_main_delegate.h",
       ]
 
+      if (is_rebel_based) {
+        sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
+      }
+
       deps += [
         # On Linux, link the dependencies (libraries) that make up actual
         # Chromium functionality directly into the executable.
@@ -436,6 +441,10 @@ if (is_win) {
 
     if (use_aura) {
       deps += [ "//ui/compositor" ]
+    }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
     }
   }
 
@@ -1181,6 +1190,10 @@ if (is_win) {
     ]
 
     configs += [ "//build/config/compiler:wexit_time_destructors" ]
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
+    }
   }
 
   mac_framework_bundle("chrome_framework") {
@@ -1749,6 +1762,10 @@ if (is_android) {
 
     if (enable_gwp_asan) {
       deps += [ "//components/gwp_asan/client" ]
+    }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
     }
   }
 }
