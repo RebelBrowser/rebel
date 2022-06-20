@@ -23,7 +23,7 @@ namespace rebel {
 
 // static
 RemoteNtpService* RemoteNtpServiceFactory::GetForProfile(Profile* profile) {
-  if (profile->IsOffTheRecord()) {
+  if (!profile || profile->IsOffTheRecord()) {
     return nullptr;
   }
 
