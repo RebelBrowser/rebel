@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "chrome/browser/chrome_content_browser_client.h"
+#include "mojo/public/cpp/bindings/binder_map.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 #include "url/gurl.h"
 
@@ -16,10 +17,15 @@ namespace base {
 class CommandLine;
 }  // namespace base
 
+namespace blink {
+class AssociatedInterfaceRegistry;
+}  // namespace blink
+
 namespace content {
 class BrowserContext;
 class NavigationHandle;
 class NavigationThrottle;
+class RenderFrameHost;
 class RenderProcessHost;
 class SiteInstance;
 }  // namespace content
@@ -49,6 +55,12 @@ class RebelContentBrowserClient : public ChromeContentBrowserClient {
                                       int child_process_id) override;
   std::vector<std::unique_ptr<content::NavigationThrottle>>
   CreateThrottlesForNavigation(content::NavigationHandle* handle) override;
+  void RegisterAssociatedInterfaceBindersForRenderFrameHost(
+      content::RenderFrameHost& render_frame_host,
+      blink::AssociatedInterfaceRegistry& associated_registry) override;
+  void RegisterBrowserInterfaceBindersForFrame(
+      content::RenderFrameHost* render_frame_host,
+      mojo::BinderMapWithContext<content::RenderFrameHost*>* map) override;
   void RegisterNonNetworkSubresourceURLLoaderFactories(
       int render_process_id,
       int render_frame_id,

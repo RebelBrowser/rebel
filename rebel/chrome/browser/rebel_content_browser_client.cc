@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include "base/bind.h"
 #include "base/command_line.h"
 #include "base/containers/flat_set.h"
 #include "chrome/browser/profiles/profile.h"
@@ -19,12 +20,18 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui_url_loader_factory.h"
 #include "content/public/common/content_switches.h"
+#include "mojo/public/cpp/bindings/pending_associated_receiver.h"
+#include "rebel/chrome/browser/ntp/remote_ntp_icon_receiver.h"
+#include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
+#include "third_party/blink/public/common/associated_interfaces/associated_interface_registry.h"
 #include "url/origin.h"
 
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_navigation_throttle.h"
+#include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
+#include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 
 namespace rebel {
@@ -162,6 +169,34 @@ RebelContentBrowserClient::CreateThrottlesForNavigation(
   }
 
   return throttles;
+}
+
+void RebelContentBrowserClient::
+    RegisterAssociatedInterfaceBindersForRenderFrameHost(
+        content::RenderFrameHost& render_frame_host,
+        blink::AssociatedInterfaceRegistry& associated_registry) {
+  associated_registry.AddInterface(base::BindRepeating(
+      [](content::RenderFrameHost* render_frame_host,
+         mojo::PendingAssociatedReceiver<rebel::mojom::RemoteNtpConnector>
+             receiver) {
+        rebel::RemoteNtpTabHelper::BindRemoteNtpConnector(std::move(receiver),
+                                                          render_frame_host);
+      },
+      &render_frame_host));
+
+  ChromeContentBrowserClient::
+      RegisterAssociatedInterfaceBindersForRenderFrameHost(render_frame_host,
+                                                           associated_registry);
+}
+
+void RebelContentBrowserClient::RegisterBrowserInterfaceBindersForFrame(
+    content::RenderFrameHost* render_frame_host,
+    mojo::BinderMapWithContext<content::RenderFrameHost*>* map) {
+  map->Add<rebel::mojom::RemoteNtpIconReceiver>(
+      base::BindRepeating(&rebel::RemoteNtpIconReceiver::Create));
+
+  ChromeContentBrowserClient::RegisterBrowserInterfaceBindersForFrame(
+      render_frame_host, map);
 }
 
 void RebelContentBrowserClient::RegisterNonNetworkSubresourceURLLoaderFactories(
