@@ -5175,7 +5175,7 @@ void ChromeContentBrowserClient::
         int render_frame_id,
         const absl::optional<url::Origin>& request_initiator_origin,
         NonNetworkURLLoaderFactoryMap* factories) {
-#if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(ENABLE_EXTENSIONS) || BUILDFLAG(REBEL_BROWSER)
   content::RenderFrameHost* frame_host =
       RenderFrameHost::FromID(render_process_id, render_frame_id);
   WebContents* web_contents = WebContents::FromRenderFrameHost(frame_host);
@@ -5190,6 +5190,24 @@ void ChromeContentBrowserClient::
                            profile, render_process_id));
   }
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (web_contents) {
+    Profile* profile =
+        Profile::FromBrowserContext(web_contents->GetBrowserContext());
+    rebel::RemoteNtpService* remote_ntp_service =
+        rebel::RemoteNtpServiceFactory::GetForProfile(profile);
+
+    if (remote_ntp_service &&
+        remote_ntp_service->IsRemoteNtpProcess(render_process_id)) {
+      factories->emplace(
+          chrome::kChromeSearchScheme,
+          content::CreateWebUIURLLoaderFactory(
+              frame_host, chrome::kChromeSearchScheme,
+              /*allowed_webui_hosts=*/base::flat_set<std::string>()));
+    }
+  }
+#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
   factories->emplace(extensions::kExtensionScheme,
