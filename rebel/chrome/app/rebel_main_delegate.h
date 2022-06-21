@@ -14,8 +14,11 @@
 #include "chrome/app/chrome_main_delegate.h"
 #endif
 
+#include "rebel/chrome/common/rebel_content_client.h"
+
 namespace content {
 class ContentBrowserClient;
+class ContentClient;
 class ContentRendererClient;
 }  // namespace content
 
@@ -43,8 +46,12 @@ class RebelMainDelegate : public RebelMainDelegateBase {
   RebelMainDelegate& operator=(const RebelMainDelegate&) = delete;
 
   // content::ContentMainDelegate:
+  content::ContentClient* CreateContentClient() override;
   content::ContentBrowserClient* CreateContentBrowserClient() override;
   content::ContentRendererClient* CreateContentRendererClient() override;
+
+ private:
+  RebelContentClient rebel_content_client_;
 };
 
 }  // namespace rebel

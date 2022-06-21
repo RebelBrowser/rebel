@@ -4,6 +4,8 @@
 
 import("//ios/web/public/js_messaging/optimize_js.gni")
 
+import("//rebel/sources.gni")
+
 source_set("web") {
   configs += [ "//build/config/compiler:enable_arc" ]
   sources = [
@@ -274,6 +276,10 @@ source_set("web_internal") {
     "UIKit.framework",
     "Foundation.framework",
   ]
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_ios_chrome_browser_web_internal_sources, ".", "//rebel")
+  }
 }
 
 source_set("unit_tests_internal") {
