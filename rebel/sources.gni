@@ -114,6 +114,13 @@ rebel_chrome_common_sources = [
   "chrome/common/ntp/remote_ntp_types.h",
 ]
 
+if (!is_ios) {
+  rebel_chrome_common_sources += [
+    "chrome/common/rebel_content_client.cc",
+    "chrome/common/rebel_content_client.h",
+  ]
+}
+
 rebel_chrome_renderer_sources = [
   "chrome/renderer/ntp/remote_ntp.cc",
   "chrome/renderer/ntp/remote_ntp.h",
@@ -132,6 +139,16 @@ rebel_chrome_android_java_sources = [
 
 rebel_chrome_android_jni_sources = [
   "chrome/android/java/src/org/chromium/chrome/browser/ntp/RemoteNtpBridge.java",
+]
+
+rebel_components_url_formatter_sources = [
+  "components/url_formatter/rebel_constants.cc",
+  "components/url_formatter/rebel_constants.h",
+]
+
+rebel_ios_chrome_browser_web_internal_sources = [
+  "ios/chrome/browser/web/rebel_web_client.h",
+  "ios/chrome/browser/web/rebel_web_client.mm",
 ]
 
 rebel_ios_web_favicon_sources = [

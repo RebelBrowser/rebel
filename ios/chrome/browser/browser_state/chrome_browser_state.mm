@@ -21,6 +21,11 @@
 #import "net/url_request/url_request_context_getter.h"
 #import "net/url_request/url_request_interceptor.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -85,6 +90,10 @@ net::URLRequestContextGetter* ChromeBrowserState::GetRequestContext() {
     ProtocolHandlerMap protocol_handlers;
     protocol_handlers[kChromeUIScheme] =
         web::URLDataManagerIOSBackend::CreateProtocolHandler(this);
+#if BUILDFLAG(REBEL_BROWSER)
+    protocol_handlers[rebel::kRebelScheme] =
+        web::URLDataManagerIOSBackend::CreateProtocolHandler(this);
+#endif
     request_context_getter_ =
         base::WrapRefCounted(CreateRequestContext(&protocol_handlers));
   }
