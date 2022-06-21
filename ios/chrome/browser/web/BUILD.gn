@@ -6,6 +6,8 @@ import("//base/allocator/allocator.gni")
 import("//ios/web/public/js_messaging/optimize_js.gni")
 import("//rlz/buildflags/buildflags.gni")
 
+import("//rebel/sources.gni")
+
 source_set("web") {
   sources = [
     "blocked_popup_tab_helper.h",
@@ -338,6 +340,10 @@ source_set("web_internal") {
 
   if (enable_rlz) {
     deps += [ "//ios/chrome/browser/rlz" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_ios_chrome_browser_web_internal_sources, ".", "//rebel")
   }
 }
 

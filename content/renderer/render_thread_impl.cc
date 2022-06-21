@@ -223,6 +223,11 @@
 #include "base/test/clang_profiling.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace content {
 
 namespace {
@@ -942,6 +947,13 @@ void RenderThreadImpl::RegisterSchemes() {
     WebSecurityPolicy::RegisterURLSchemeAsCodeCacheWithHashing(
         chrome_untrusted_scheme);
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+  // rebel:
+  WebString rebel_scheme(WebString::FromASCII(rebel::kRebelScheme));
+  WebSecurityPolicy::RegisterURLSchemeAsDisplayIsolated(rebel_scheme);
+  WebSecurityPolicy::RegisterURLSchemeAsNotAllowingJavascriptURLs(rebel_scheme);
+#endif
 
   // devtools:
   WebString devtools_scheme(WebString::FromASCII(kChromeDevToolsScheme));
