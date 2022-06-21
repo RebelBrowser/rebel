@@ -19,6 +19,10 @@ RebelMainDelegate::RebelMainDelegate(base::TimeTicks exe_entry_point_ticks)
     : RebelMainDelegateBase(exe_entry_point_ticks) {}
 #endif
 
+content::ContentClient* RebelMainDelegate::CreateContentClient() {
+  return &rebel_content_client_;
+}
+
 content::ContentBrowserClient* RebelMainDelegate::CreateContentBrowserClient() {
   if (!chrome_content_browser_client_) {
     chrome_content_browser_client_ =

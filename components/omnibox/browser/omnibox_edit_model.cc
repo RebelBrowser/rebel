@@ -73,6 +73,11 @@
 #include "ui/gfx/vector_icon_types.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 using bookmarks::BookmarkModel;
 using metrics::OmniboxEventProto;
 
@@ -451,6 +456,10 @@ void OmniboxEditModel::AdjustTextForCopy(int sel_min,
       (*text == display_text_ || *text == url_for_editing_)) {
     *url_from_text = controller()->GetLocationBarModel()->GetURL();
     *write_url = true;
+
+#if BUILDFLAG(REBEL_BROWSER)
+    rebel::ReplaceChromeSchemeWithRebelScheme(*url_from_text);
+#endif
 
     // Don't let users copy Reader Mode page URLs.
     // We display the original article's URL in the omnibox, so users will
