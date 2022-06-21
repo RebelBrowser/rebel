@@ -16,6 +16,11 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 #if !defined(__has_feature) || !__has_feature(objc_arc)
 #error "This file requires ARC support."
 #endif
@@ -42,6 +47,9 @@ bool IsHandledProtocol(const std::string& scheme) {
   DCHECK_EQ(scheme, base::ToLowerASCII(scheme));
   return (scheme == url::kHttpScheme || scheme == url::kHttpsScheme ||
           scheme == url::kAboutScheme || scheme == url::kDataScheme ||
+#if BUILDFLAG(REBEL_BROWSER)
+          scheme == rebel::kRebelScheme ||
+#endif
           scheme == kChromeUIScheme);
 }
 
