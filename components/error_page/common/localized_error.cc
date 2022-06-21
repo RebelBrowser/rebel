@@ -40,6 +40,11 @@
 #include "base/win/windows_version.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace error_page {
 
 namespace {
@@ -967,6 +972,10 @@ LocalizedError::PageState LocalizedError::GetPageState(
   // URLs are always LTR.
   if (base::i18n::IsRTL())
     base::i18n::WrapStringWithLTRFormatting(&failed_url_string);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceChromeSchemeWithRebelScheme(failed_url_string);
+#endif
 
   std::u16string host_name(url_formatter::IDNToUnicode(failed_url.host()));
   if (failed_url.SchemeIsHTTPOrHTTPS()) {

@@ -78,6 +78,10 @@
 #include "components/captive_portal/content/captive_portal_tab_helper.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 using content::GlobalRequestID;
 using content::NavigationController;
 using content::WebContents;
@@ -596,6 +600,10 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
     // Block any navigation requests in locked fullscreen mode.
     return nullptr;
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceRebelSchemeWithChromeScheme(params->url);
+#endif
 
   // Open System Apps in their standalone window if necessary.
   // TODO(crbug.com/1096345): Remove this code after we integrate with intent

@@ -14,6 +14,11 @@
 #include "ios/components/webui/web_ui_url_constants.h"
 #include "url/url_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace {
 
 const struct HostReplacement {
@@ -27,6 +32,9 @@ const struct HostReplacement {
 }  // namespace
 
 bool WillHandleWebBrowserAboutURL(GURL* url, web::BrowserState* browser_state) {
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceRebelSchemeWithChromeScheme(*url);
+#endif
   GURL original_url = *url;
 
   // Ensure that any cleanup done by FixupURL happens before the rewriting

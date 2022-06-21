@@ -33,6 +33,11 @@
 #include "chromeos/crosapi/cpp/gurl_os_handler_utils.h"  // nogncheck
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace {
 
 // Hardcode constant to avoid any dependencies on content/.
@@ -693,6 +698,10 @@ std::u16string AutocompleteInput::FormattedStringWithEquivalentMeaning(
     const std::u16string& formatted_url,
     const AutocompleteSchemeClassifier& scheme_classifier,
     size_t* offset) {
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceChromeSchemeWithRebelScheme(
+      const_cast<std::u16string&>(formatted_url));
+#endif
   if (!url_formatter::CanStripTrailingSlash(url))
     return formatted_url;
   const std::u16string url_with_path(formatted_url + u'/');

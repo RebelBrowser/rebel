@@ -20,6 +20,10 @@
 #include "extensions/common/constants.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 // static
 bool ProfileIOData::IsHandledProtocol(const std::string& scheme) {
   DCHECK_EQ(scheme, base::ToLowerASCII(scheme));
@@ -49,6 +53,9 @@ bool ProfileIOData::IsHandledProtocol(const std::string& scheme) {
     url::kBlobScheme,
     url::kFileSystemScheme,
     chrome::kChromeSearchScheme,
+#if BUILDFLAG(REBEL_BROWSER)
+    rebel::kRebelScheme,
+#endif
   };
   for (const char* supported_protocol : kProtocolList) {
     if (scheme == supported_protocol)
