@@ -27,6 +27,11 @@
 #include "ui/base/resource/resource_bundle.h"
 #include "url/gurl.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace {
 
 const char kCreditsJsPath[] = "credits.js";
@@ -97,6 +102,14 @@ std::string ChromeURLs() {
     html += "<li><a href='chrome://" + *i + "/' id='" + *i + "'>chrome://" +
             *i + "</a></li>\n";
   html += "</ul>\n";
+#if BUILDFLAG(REBEL_BROWSER)
+  base::ReplaceSubstringsAfterOffset(
+      &html, 0, "Chrome URLs",
+      REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) " URLs");
+  base::ReplaceSubstringsAfterOffset(
+      &html, 0, ">chrome://",
+      ">" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_SCHEMA) "://");
+#endif
   AppendFooter(&html);
   return html;
 }

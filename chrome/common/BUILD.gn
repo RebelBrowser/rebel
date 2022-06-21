@@ -22,6 +22,8 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/sources.gni")
+
 assert(enable_supervised_users)
 assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
 
@@ -35,6 +37,7 @@ fuzzer_test("ini_parser_fuzzer") {
   # Large ini files can cause test cases to timeout
   libfuzzer_options = [ "max_len=100000" ]
 }
+
 grit("resources") {
   source = "common_resources.grd"
   defines = chrome_grit_defines
@@ -494,6 +497,10 @@ static_library("common_lib") {
 
   if (enable_bound_session_credentials) {
     sources += [ "bound_session_request_throttled_handler.h" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_common_sources, ".", "//rebel")
   }
 }
 

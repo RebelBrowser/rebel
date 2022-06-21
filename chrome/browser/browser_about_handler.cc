@@ -19,9 +19,16 @@
 #include "content/public/common/content_features.h"
 #include "extensions/buildflags/buildflags.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 bool HandleChromeAboutAndChromeSyncRewrite(
     GURL* url,
     content::BrowserContext* browser_context) {
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceRebelSchemeWithChromeScheme(*url);
+#endif
   // Check that about: URLs are either
   // 1) fixed up to chrome: (by url_formatter::FixupURL applied to
   //    browser-initiated navigations)
