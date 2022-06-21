@@ -36,6 +36,11 @@
 #import "net/base/apple/url_conversions.h"
 #import "ui/base/page_transition_types.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace {
 
 void SetNavigationItemInWKItem(WKBackForwardListItem* wk_item,
@@ -1338,6 +1343,9 @@ NavigationManagerImpl::CreateNavigationItemWithRewriters(
     const GURL& previous_url,
     const std::vector<BrowserURLRewriter::URLRewriter>* additional_rewriters)
     const {
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceRebelSchemeWithChromeScheme(const_cast<GURL&>(url));
+#endif
   GURL loaded_url(url);
 
   // Navigation code relies on this special URL to implement native view and

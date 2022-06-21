@@ -90,6 +90,10 @@
 #include "chrome/common/webui_url_constants.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 using content::BrowserThread;
 
 namespace {
@@ -587,6 +591,18 @@ std::string ChromeURLs(content::BrowserContext* browser_context) {
       html += "<li>" + std::string(chrome::kChromeDebugURLs[i]) + "</li>\n";
   }
   html += "</ul>\n";
+
+#if BUILDFLAG(REBEL_BROWSER)
+  base::ReplaceSubstringsAfterOffset(
+      &html, 0, "Chrome URLs",
+      REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) " URLs");
+  base::ReplaceSubstringsAfterOffset(
+      &html, 0, "List of chrome://",
+      "List of " REBEL_STRING_BUILDFLAG(REBEL_BROWSER_SCHEMA) "://");
+  base::ReplaceSubstringsAfterOffset(
+      &html, 0, ">chrome://",
+      ">" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_SCHEMA) "://");
+#endif
 
   AppendFooter(&html);
   return html;

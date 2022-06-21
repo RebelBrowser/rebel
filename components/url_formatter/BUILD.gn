@@ -8,6 +8,8 @@ if (is_android) {
   import("//build/config/android/rules.gni")
 }
 
+import("//rebel/sources.gni")
+
 static_library("skeleton_generator") {
   sources = [
     "spoof_checks/skeleton_generator.cc",
@@ -58,6 +60,11 @@ static_library("url_formatter") {
   } else {
     # Used in elide_url.cc
     deps += [ "//ui/gfx" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_components_url_formatter_sources, ".", "//rebel")
+    deps += [ "//build:branding_buildflags" ]
   }
 }
 

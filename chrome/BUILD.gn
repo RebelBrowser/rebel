@@ -58,6 +58,7 @@ if (is_android) {
 }
 
 import("//rebel/rebel.gni")
+import("//rebel/sources.gni")
 
 declare_args() {
   # On macOS, `is_chrome_branded` builds that have been signed locally will not
@@ -299,6 +300,10 @@ if (!is_android && !is_mac) {
           "app/chrome_main_delegate.h",
         ]
 
+        if (is_rebel_based) {
+          sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
+        }
+
         deps += [
           # On Linux, link the dependencies (libraries) that make up actual
           # Chromium functionality directly into the executable.
@@ -471,6 +476,10 @@ if (is_win) {
 
     if (use_aura) {
       deps += [ "//ui/compositor" ]
+    }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
     }
   }
 
@@ -1215,6 +1224,10 @@ if (is_win) {
     if (!is_component_build && !using_sanitizer) {
       configs += [ ":chrome_dll_symbol_exports" ]
     }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
+    }
   }
 
   mac_framework_bundle("chrome_framework") {
@@ -1750,6 +1763,10 @@ if (is_android) {
 
     if (is_chromeos_ash) {
       public_deps += [ "//ui/lottie" ]
+    }
+
+    if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_app_sources, ".", "//rebel")
     }
   }
 }
