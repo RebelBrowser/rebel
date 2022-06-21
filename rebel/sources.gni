@@ -5,3 +5,23 @@
 import("//rebel/rebel.gni")
 
 rebel_build_sources = [ "build/buildflag.h" ]
+
+rebel_chrome_app_sources = [
+  "chrome/app/rebel_main_delegate.cc",
+  "chrome/app/rebel_main_delegate.h",
+]
+
+rebel_chrome_common_sources = [
+  "chrome/common/rebel_content_client.cc",
+  "chrome/common/rebel_content_client.h",
+]
+
+rebel_components_url_formatter_sources = [
+  "components/url_formatter/rebel_constants.cc",
+  "components/url_formatter/rebel_constants.h",
+]
+
+rebel_ios_chrome_browser_web_internal_sources = [
+  "ios/chrome/browser/web/rebel_web_client.h",
+  "ios/chrome/browser/web/rebel_web_client.mm",
+]
