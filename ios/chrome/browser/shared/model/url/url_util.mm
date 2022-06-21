@@ -19,6 +19,11 @@
 #import "url/gurl.h"
 #import "url/url_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 bool UrlIsExternalFileReference(const GURL& url) {
   return url.SchemeIs(kChromeUIScheme) &&
          base::EqualsCaseInsensitiveASCII(url.host(),
@@ -50,6 +55,9 @@ bool IsHandledProtocol(const std::string& scheme) {
   DCHECK_EQ(scheme, base::ToLowerASCII(scheme));
   return (scheme == url::kHttpScheme || scheme == url::kHttpsScheme ||
           scheme == url::kAboutScheme || scheme == url::kDataScheme ||
+#if BUILDFLAG(REBEL_BROWSER)
+          scheme == rebel::kRebelScheme ||
+#endif
           scheme == kChromeUIScheme || SchemeIsAppStoreScheme(scheme));
 }
 

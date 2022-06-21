@@ -24,6 +24,10 @@
 #include "headless/public/headless_shell.h"
 #include "headless/public/switches.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/app/rebel_main_delegate.h"
+#endif
+
 #if BUILDFLAG(IS_MAC)
 #include "chrome/app/chrome_main_mac.h"
 #include "chrome/app/notification_metrics.h"
@@ -94,8 +98,13 @@ int ChromeMain(int argc, const char** argv) {
 #endif  // !defined(COMPONENT_BUILD) && DCHECK_IS_ON()
 #endif  // BUILDFLAG(IS_WIN)
 
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RebelMainDelegate chrome_main_delegate(
+      base::TimeTicks::FromInternalValue(exe_entry_point_ticks));
+#else
   ChromeMainDelegate chrome_main_delegate(
       base::TimeTicks::FromInternalValue(exe_entry_point_ticks));
+#endif
   content::ContentMainParams params(&chrome_main_delegate);
 
 #if BUILDFLAG(IS_WIN)

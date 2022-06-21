@@ -57,6 +57,11 @@
 #include "ui/aura/window.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace {
 
 // The roundedness of the edges of our bubble.
@@ -833,6 +838,9 @@ void StatusBubbleViews::SetStatus(const std::u16string& status_text) {
 }
 
 void StatusBubbleViews::SetURL(const GURL& url) {
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::ReplaceChromeSchemeWithRebelScheme(const_cast<GURL&>(url));
+#endif
   url_ = url;
   if (size_.IsEmpty())
     return;  // We have no bounds, don't attempt to show the popup.

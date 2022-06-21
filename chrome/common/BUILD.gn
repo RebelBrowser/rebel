@@ -22,6 +22,8 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/widevine/cdm/widevine.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/sources.gni")
+
 fuzzer_test("ini_parser_fuzzer") {
   sources = [ "ini_parser_fuzzer.cc" ]
   deps = [
@@ -29,6 +31,7 @@ fuzzer_test("ini_parser_fuzzer") {
     "//chrome/common:ini_parser",
   ]
 }
+
 grit("resources") {
   source = "common_resources.grd"
   defines = chrome_grit_defines
@@ -498,6 +501,10 @@ static_library("common_lib") {
 
   if (enable_bound_session_credentials) {
     sources += [ "bound_session_request_throttled_listener.h" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_common_sources, ".", "//rebel")
   }
 }
 
