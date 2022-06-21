@@ -79,7 +79,7 @@ class Browser(object):
         self.messages_to_brand = [
             (['Chromium', 'Google Chrome', 'Chrome'], self.name),
             (['Google LLC'], self.company),
-            (['chrome://'], self.schema),
+            (['chrome://'], self.schema + '://'),
         ]
 
         self.messages_to_unbrand = [
