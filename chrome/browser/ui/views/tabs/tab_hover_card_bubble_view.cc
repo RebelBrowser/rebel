@@ -68,6 +68,10 @@
 #include "ui/base/win/shell.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace {
 
 // Maximum number of lines that a title label occupies.
@@ -912,6 +916,10 @@ void TabHoverCardBubbleView::UpdateCardContent(const Tab* tab) {
                 url_formatter::kFormatUrlTrimAfterHost,
             base::UnescapeRule::NORMAL, nullptr, nullptr, nullptr);
       }
+
+#if BUILDFLAG(REBEL_BROWSER)
+      rebel::ReplaceChromeSchemeWithRebelScheme(domain);
+#endif
 
       // Most of the time we want our standard (tail-elided) formatting for web
       // pages, but when viewing an image in the browser, many users want to

@@ -28,6 +28,11 @@
 #include "base/path_service.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/url_formatter/rebel_constants.h"
+#endif
+
 namespace url_formatter {
 
 const char* home_directory_override = nullptr;
@@ -696,6 +701,14 @@ void OffsetComponent(int offset, url::Component* part) {
 
 bool IsEquivalentScheme(const std::string& scheme1,
                         const std::string& scheme2) {
+#if BUILDFLAG(REBEL_BROWSER)
+  if (scheme1 == rebel::kRebelScheme) {
+    return IsEquivalentScheme(kChromeUIScheme, scheme2);
+  }
+  if (scheme2 == rebel::kRebelScheme) {
+    return IsEquivalentScheme(scheme1, kChromeUIScheme);
+  }
+#endif
   return scheme1 == scheme2 ||
          (scheme1 == url::kAboutScheme && scheme2 == kChromeUIScheme) ||
          (scheme1 == kChromeUIScheme && scheme2 == url::kAboutScheme);
