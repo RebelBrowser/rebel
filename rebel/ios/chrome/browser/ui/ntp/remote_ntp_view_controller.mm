@@ -37,7 +37,7 @@
   self = [super init];
 
   if (self) {
-    _ntpUrl = net::NSURLWithGURL(GURL(rebel::GetRemoteNtpUrl()));
+    _ntpUrl = net::NSURLWithGURL(rebel::GetRemoteNtpUrl());
     _ntpOfflineUrl = net::NSURLWithGURL(GURL(rebel::kRemoteNtpOfflineUrl));
 
     _urlLoader = urlLoader;

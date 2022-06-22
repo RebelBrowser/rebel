@@ -10,6 +10,7 @@ import org.chromium.base.annotations.NativeMethods;
 import org.chromium.chrome.browser.app.RebelActivity;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.base.PageTransition;
+import org.chromium.url.GURL;
 
 /**
  * Provides functionality when the user interacts with the RemoteNTP.
@@ -45,7 +46,7 @@ public class RemoteNtpBridge {
     /**
      * Gets the current RemoteNTP URL.
      */
-    public static String GetRemoteNtpUrl() {
+    public static GURL GetRemoteNtpUrl() {
         return RemoteNtpBridgeJni.get().getRemoteNtpUrl();
     }
 
@@ -96,6 +97,6 @@ public class RemoteNtpBridge {
 
         boolean isRemoteNtpEnabled();
         boolean isRemoteNtpUrl(String url);
-        String getRemoteNtpUrl();
+        GURL getRemoteNtpUrl();
     }
 }

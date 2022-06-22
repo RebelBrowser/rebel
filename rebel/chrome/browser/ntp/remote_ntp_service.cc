@@ -41,8 +41,8 @@ RemoteNtpService::~RemoteNtpService() = default;
 
 // static
 bool RemoteNtpService::IsRemoteNtpUrl(const GURL& url) {
-  const std::string remote_ntp_url = rebel::GetRemoteNtpUrl();
-  if (remote_ntp_url.empty() || !url.is_valid()) {
+  const GURL& remote_ntp_url = rebel::GetRemoteNtpUrl();
+  if (!remote_ntp_url.is_valid() || !url.is_valid()) {
     return false;
   }
 
@@ -52,7 +52,7 @@ bool RemoteNtpService::IsRemoteNtpUrl(const GURL& url) {
   }
 #endif
 
-  return MatchesOriginAndPath(url, GURL(remote_ntp_url)) ||
+  return MatchesOriginAndPath(url, remote_ntp_url) ||
          (url.host_piece() == rebel::kRemoteNtpOfflineHost);
 }
 

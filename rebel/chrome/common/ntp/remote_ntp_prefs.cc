@@ -5,7 +5,9 @@
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 
 #include "base/command_line.h"
+#include "base/no_destructor.h"
 
+#include "rebel/build/buildflag.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 
 namespace rebel {
@@ -21,40 +23,34 @@ const char kRemoteNtpLocalBackgroundPath[] = "local_background.jpg";
 const char kRemoteNtpLocalBackgroundUrl[] =
     "chrome-search://remote-ntp-offline/local_background.jpg";
 
-const char kRemoteNtpDefaultVariant[] = "Rebel NTP";
-const char kRemoteNtpDefaultUrl[] =
-    "https://browser.viasat.com/rebel_ntp/index.html";
-
-const char kRemoteNtpDevelopmentVariant[] = "Rebel NTP (Development version)";
-const char kRemoteNtpDevelopmentUrl[] =
-    "https://browser.viasat.com/rebel_ntp_dev/index.html";
-
-const char kRemoteNtpVariantFlagName[] = "Rebel NTP Variant";
-const char kRemoteNtpVariantFlagDescription[] =
-    "Choose the variant of the remote New Tab Page to load.";
-
 bool IsRemoteNtpEnabled() {
   // TODO(tflynn): Add a command line / pref to disable.
   return true;
 }
 
-std::string GetRemoteNtpUrl() {
+const GURL& GetRemoteNtpUrl() {
   bool from_command_line = false;
   return GetRemoteNtpUrl(from_command_line);
 }
 
-std::string GetRemoteNtpUrl(bool& from_command_line) {
-  auto* command_line = base::CommandLine::ForCurrentProcess();
-  from_command_line = command_line->HasSwitch(rebel::kRemoteNtpUrl);
+const GURL& GetRemoteNtpUrl(bool& from_command_line) {
+  static bool url_was_from_command_line = false;
 
-  if (from_command_line) {
-    return command_line->GetSwitchValueASCII(rebel::kRemoteNtpUrl);
-  } else if (IsRemoteNtpEnabled()) {
-    return rebel::kRemoteNtpDefaultUrl;
-  }
+  static base::NoDestructor<GURL> remote_ntp_url([]() -> GURL {
+    auto* command_line = base::CommandLine::ForCurrentProcess();
+    url_was_from_command_line = command_line->HasSwitch(rebel::kRemoteNtpUrl);
 
-  // Empty string informs callers to use Chrome's default NTP.
-  return {};
+    if (url_was_from_command_line) {
+      return GURL(command_line->GetSwitchValueASCII(rebel::kRemoteNtpUrl));
+    } else if (IsRemoteNtpEnabled()) {
+      return GURL(REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NEW_TAB_PAGE));
+    }
+
+    return {};
+  }());
+
+  from_command_line = url_was_from_command_line;
+  return *remote_ntp_url;
 }
 
 }  // namespace rebel
