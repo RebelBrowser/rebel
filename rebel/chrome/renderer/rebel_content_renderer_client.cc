@@ -5,6 +5,7 @@
 #include "rebel/chrome/renderer/rebel_content_renderer_client.h"
 
 #include "base/command_line.h"
+#include "base/no_destructor.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
 #include "content/public/renderer/render_frame.h"
@@ -33,8 +34,8 @@ void RebelContentRendererClient::RenderThreadStarted() {
     return;
   }
 
-  blink::WebURL url((GURL(rebel::GetRemoteNtpUrl())));
-  if (!url.IsValid())
+  static base::NoDestructor<blink::WebURL> url(rebel::GetRemoteNtpUrl());
+  if (!url->IsValid())
     return;
 
   auto chrome_search_scheme =
@@ -46,13 +47,13 @@ void RebelContentRendererClient::RenderThreadStarted() {
   int destination_port = 0;
 
   blink::WebSecurityPolicy::AddOriginAccessAllowListEntry(
-      url, chrome_search_scheme, chrome_favicon_host, destination_port,
+      *url, chrome_search_scheme, chrome_favicon_host, destination_port,
       network::mojom::CorsDomainMatchMode::kAllowSubdomains,
       network::mojom::CorsPortMatchMode::kAllowAnyPort,
       network::mojom::CorsOriginAccessMatchPriority::kDefaultPriority);
 
   blink::WebSecurityPolicy::AddOriginAccessAllowListEntry(
-      url, chrome_search_scheme, remote_ntp_offline_host, destination_port,
+      *url, chrome_search_scheme, remote_ntp_offline_host, destination_port,
       network::mojom::CorsDomainMatchMode::kAllowSubdomains,
       network::mojom::CorsPortMatchMode::kAllowAnyPort,
       network::mojom::CorsOriginAccessMatchPriority::kDefaultPriority);

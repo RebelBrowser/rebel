@@ -9,6 +9,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
+#include "url/android/gurl_android.h"
 #include "url/gurl.h"
 
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
@@ -19,17 +20,13 @@
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
 
-using base::android::AttachCurrentThread;
-using base::android::JavaParamRef;
-using base::android::JavaRef;
-using base::android::ScopedJavaLocalRef;
-
 namespace rebel {
 
-RemoteNtpBridge::RemoteNtpBridge(JNIEnv* env,
-                                 const JavaRef<jobject>& obj,
-                                 const JavaRef<jobject>& j_web_contents,
-                                 jboolean j_dark_mode_enabled)
+RemoteNtpBridge::RemoteNtpBridge(
+    JNIEnv* env,
+    const base::android::JavaRef<jobject>& obj,
+    const base::android::JavaRef<jobject>& j_web_contents,
+    jboolean j_dark_mode_enabled)
     : weak_java_ref_(env, obj), weak_ptr_factory_(this) {
   web_contents_ = content::WebContents::FromJavaWebContents(j_web_contents);
 
@@ -49,7 +46,8 @@ RemoteNtpBridge::RemoteNtpBridge(JNIEnv* env,
 
 RemoteNtpBridge::~RemoteNtpBridge() = default;
 
-void RemoteNtpBridge::Destroy(JNIEnv*, const JavaParamRef<jobject>&) {
+void RemoteNtpBridge::Destroy(JNIEnv*,
+                              const base::android::JavaParamRef<jobject>&) {
   rebel::RemoteNtpTabHelper* remote_ntp_tab_helper =
       rebel::RemoteNtpTabHelper::FromWebContents(web_contents_);
 
@@ -61,8 +59,8 @@ void RemoteNtpBridge::Destroy(JNIEnv*, const JavaParamRef<jobject>&) {
 }
 
 void RemoteNtpBridge::LoadInternalUrl(const GURL& url) {
-  JNIEnv* env = AttachCurrentThread();
-  ScopedJavaLocalRef<jobject> obj = weak_java_ref_.get(env);
+  JNIEnv* env = base::android::AttachCurrentThread();
+  base::android::ScopedJavaLocalRef<jobject> obj = weak_java_ref_.get(env);
   if (obj.is_null()) {
     return;
   }
@@ -74,8 +72,8 @@ void RemoteNtpBridge::LoadInternalUrl(const GURL& url) {
 void RemoteNtpBridge::LoadAutocompleteMatchUrl(
     const GURL& url,
     ui::PageTransition transition_type) {
-  JNIEnv* env = AttachCurrentThread();
-  ScopedJavaLocalRef<jobject> obj = weak_java_ref_.get(env);
+  JNIEnv* env = base::android::AttachCurrentThread();
+  base::android::ScopedJavaLocalRef<jobject> obj = weak_java_ref_.get(env);
   if (obj.is_null()) {
     return;
   }
@@ -87,8 +85,8 @@ void RemoteNtpBridge::LoadAutocompleteMatchUrl(
 
 static jlong JNI_RemoteNtpBridge_Init(
     JNIEnv* env,
-    const JavaParamRef<jobject>& obj,
-    const JavaParamRef<jobject>& j_web_contents,
+    const base::android::JavaParamRef<jobject>& obj,
+    const base::android::JavaParamRef<jobject>& j_web_contents,
     jboolean j_dark_mode_enabled) {
   RemoteNtpBridge* bridge =
       new RemoteNtpBridge(env, obj, j_web_contents, j_dark_mode_enabled);
@@ -109,9 +107,9 @@ static jboolean JNI_RemoteNtpBridge_IsRemoteNtpUrl(
   return static_cast<jboolean>(is_remote_ntp_url);
 }
 
-static base::android::ScopedJavaLocalRef<jstring>
+static base::android::ScopedJavaLocalRef<jobject>
 JNI_RemoteNtpBridge_GetRemoteNtpUrl(JNIEnv* env) {
-  return base::android::ConvertUTF8ToJavaString(env, rebel::GetRemoteNtpUrl());
+  return url::GURLAndroid::FromNativeGURL(env, rebel::GetRemoteNtpUrl());
 }
 
 }  // namespace rebel

@@ -5,9 +5,7 @@
 #ifndef REBEL_CHROME_COMMON_NTP_REMOTE_NTP_PREFS_H_
 #define REBEL_CHROME_COMMON_NTP_REMOTE_NTP_PREFS_H_
 
-#include <string>
-
-#include "base/feature_list.h"
+class GURL;
 
 namespace rebel {
 
@@ -20,19 +18,10 @@ extern const char kRemoteNtpOfflineUrl[];
 extern const char kRemoteNtpLocalBackgroundPath[];
 extern const char kRemoteNtpLocalBackgroundUrl[];
 
-extern const char kRemoteNtpDefaultVariant[];
-extern const char kRemoteNtpDefaultUrl[];
-
-extern const char kRemoteNtpDevelopmentVariant[];
-extern const char kRemoteNtpDevelopmentUrl[];
-
-extern const char kRemoteNtpVariantFlagName[];
-extern const char kRemoteNtpVariantFlagDescription[];
-
 bool IsRemoteNtpEnabled();
 
-std::string GetRemoteNtpUrl();
-std::string GetRemoteNtpUrl(bool& from_command_line);
+const GURL& GetRemoteNtpUrl();
+const GURL& GetRemoteNtpUrl(bool& from_command_line);
 
 }  // namespace rebel
 
