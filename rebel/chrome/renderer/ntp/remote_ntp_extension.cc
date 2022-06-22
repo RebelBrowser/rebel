@@ -10,7 +10,6 @@
 #include "base/system/sys_info.h"
 #include "build/build_config.h"
 #include "components/version_info/version_info.h"
-#include "content/public/common/url_constants.h"
 #include "content/public/common/url_utils.h"
 #include "content/public/renderer/render_frame.h"
 #include "gin/converter.h"
@@ -35,6 +34,7 @@
 
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
 #include "rebel/chrome/renderer/ntp/remote_ntp.h"
+#include "rebel/components/url_formatter/rebel_constants.h"
 
 namespace rebel {
 
@@ -474,22 +474,22 @@ class RemoteNtpBindings : public gin::Wrappable<RemoteNtpBindings> {
                                new_tile_title);
   }
 
-  static void LoadInternalUrl(const std::string& url) {
+  static bool LoadInternalUrl(const std::string& url) {
     const RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
     if (!remote_ntp) {
-      return;
+      return false;
     }
 
     const GURL validated_url(url);
 
-    // Only allow chrome:// URLs that won't crash the browser. We could return
-    // a boolean, but let's not let third-party websites probe for "safe" URLs.
+    // Only allow chrome:// URLs that won't crash the browser.
     if (!IsUrlValid(validated_url) ||
-        !validated_url.SchemeIs(content::kChromeUIScheme)) {
-      return;
+        !rebel::SchemeIsRebelOrChrome(validated_url)) {
+      return false;
     }
 
     remote_ntp->LoadInternalUrl(validated_url);
+    return true;
   }
 };
 

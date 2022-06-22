@@ -19,6 +19,7 @@
 #include "ios/components/webui/web_ui_url_constants.h"
 
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
+#include "rebel/components/url_formatter/rebel_constants.h"
 #import "rebel/ios/chrome/browser/ntp/remote_ntp_service_ios.h"
 #import "rebel/ios/chrome/browser/ui/ntp/remote_ntp_view_controller.h"
 #import "rebel/ios/chrome/browser/ui/ntp/remote_ntp_view_script_message_handler.h"
@@ -332,7 +333,7 @@ const char kRemoteNtpCallbackTemplate[] = R"js(
   // rebel/chrome/android/java/src/org/chromium/chrome/browser/app/RebelActivity.java
   const GURL validatedUrl(url);
 
-  if (!validatedUrl.is_valid() || !validatedUrl.SchemeIs(kChromeUIScheme)) {
+  if (!validatedUrl.is_valid() || !rebel::SchemeIsRebelOrChrome(validatedUrl)) {
     return;
   }
 
