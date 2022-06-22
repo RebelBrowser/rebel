@@ -4,19 +4,12 @@
 
 #include "rebel/chrome/app/rebel_main_delegate.h"
 
-#include "base/lazy_instance.h"
+#include "base/no_destructor.h"
 
 #include "rebel/chrome/browser/rebel_content_browser_client.h"
 #include "rebel/chrome/renderer/rebel_content_renderer_client.h"
 
 namespace rebel {
-
-namespace {
-
-base::LazyInstance<RebelContentRendererClient>::DestructorAtExit
-    g_rebel_content_renderer_client = LAZY_INSTANCE_INITIALIZER;
-
-}  // namespace
 
 RebelMainDelegate::RebelMainDelegate() : RebelMainDelegateBase() {}
 RebelMainDelegate::~RebelMainDelegate() {}
@@ -41,7 +34,8 @@ content::ContentBrowserClient* RebelMainDelegate::CreateContentBrowserClient() {
 
 content::ContentRendererClient*
 RebelMainDelegate::CreateContentRendererClient() {
-  return g_rebel_content_renderer_client.Pointer();
+  static base::NoDestructor<RebelContentRendererClient> client;
+  return client.get();
 }
 
 }  // namespace rebel
