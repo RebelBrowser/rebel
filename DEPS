@@ -574,7 +574,7 @@ deps = {
 
   # Rebel deps:
   'src/rebel/third_party/remote_ntp': {
-    'url': 'https://github.com/RebelBrowser/remote_ntp.git@593adff428f58b645834a3f2de59b591cb5c0b92',
+    'url': 'https://github.com/RebelBrowser/remote_ntp.git@6b3046cb85c42216d53b0e2018a7685c69f86dd9',
   },
 
   # We don't know target_cpu at deps time. At least until there's a universal
