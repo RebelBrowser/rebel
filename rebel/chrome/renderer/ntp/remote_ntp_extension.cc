@@ -97,6 +97,15 @@ constexpr const char kDispatchThemeChangedScript[] =
     "  true;"
     "}";
 
+constexpr const char kDispatchWiFiStatusChangedScript[] =
+    "if (window.rebel &&"
+    "    window.rebel.network &&"
+    "    window.rebel.network.onWiFiStatusChanged &&"
+    "    (typeof window.rebel.network.onWiFiStatusChanged === 'function')) {"
+    "  window.rebel.network.onWiFiStatusChanged();"
+    "  true;"
+    "}";
+
 void Dispatch(blink::WebLocalFrame* frame, const blink::WebString& script) {
   if (frame) {
     frame->ExecuteScript(blink::WebScriptSource(script));
@@ -276,6 +285,41 @@ v8::Local<v8::Object> GenerateTheme(
       .Set("background", background)
       .Set("colors", colors)
       .Build();
+}
+
+// Populates a Javascript theme object for returning from
+// rebel.network.wiFiStatus.
+v8::Local<v8::Object> GenerateWiFiStatus(
+    v8::Isolate* isolate,
+    const rebel::RemoteNtpWiFiStatusList& wifi_status) {
+  v8::Local<v8::Object> v8_wifi_status =
+      v8::Array::New(isolate, wifi_status.size());
+  v8::Local<v8::Context> context = isolate->GetCurrentContext();
+
+  for (size_t i = 0; i < wifi_status.size(); ++i) {
+    const auto& status = wifi_status[i];
+
+    v8::Local<v8::Object> v8_status =
+        gin::DataObjectBuilder(isolate)
+            .Set("ssid", status->ssid)
+            .Set("bssid", status->bssid)
+            .Set("connectionState", status->connection_state)
+            .Set("rssi", status->rssi)
+            .Set("signalLevel", status->signal_level)
+            .Set("maxSignalLevel", status->max_signal_level)
+            .Set("frequency", status->frequency)
+            .Set("linkSpeed", status->link_speed)
+            .Set("rxMbps", status->rx_mbps)
+            .Set("txMbps", status->tx_mbps)
+            .Set("maxRxMbps", status->max_rx_mbps)
+            .Set("maxTxMbps", status->max_tx_mbps)
+            .Set("noiseMeasurement", status->noise_measurement)
+            .Build();
+
+    v8_wifi_status->CreateDataProperty(context, i, v8_status).Check();
+  }
+
+  return v8_wifi_status;
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -796,9 +840,53 @@ class ThemeBindings : public gin::Wrappable<ThemeBindings> {
   }
 };
 
+// Javascript to C++ bindings for window.rebel.network.
+class NetworkBindings : public gin::Wrappable<NetworkBindings> {
+ public:
+  static gin::WrapperInfo kWrapperInfo;
+
+  NetworkBindings() {}
+  ~NetworkBindings() override {}
+
+ private:
+  NetworkBindings(const NetworkBindings&) = delete;
+  NetworkBindings& operator=(const NetworkBindings&) = delete;
+
+  gin::ObjectTemplateBuilder GetObjectTemplateBuilder(
+      v8::Isolate* isolate) final {
+    return gin::Wrappable<NetworkBindings>::GetObjectTemplateBuilder(isolate)
+        .SetProperty("wiFiStatus", &NetworkBindings::GetWiFiStatus)
+        .SetMethod("updateWiFiStatus", &NetworkBindings::UpdateWiFiStatus);
+  }
+
+  static v8::Local<v8::Value> GetWiFiStatus(v8::Isolate* isolate) {
+    const RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
+    if (!remote_ntp) {
+      return v8::Null(isolate);
+    }
+
+    const rebel::RemoteNtpWiFiStatusList& status = remote_ntp->GetWiFiStatus();
+    if (status.empty()) {
+      return v8::Null(isolate);
+    }
+
+    return GenerateWiFiStatus(isolate, status);
+  }
+
+  static void UpdateWiFiStatus() {
+    RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
+    if (!remote_ntp) {
+      return;
+    }
+
+    remote_ntp->UpdateWiFiStatus();
+  }
+};
+
 gin::WrapperInfo RemoteNtpBindings::kWrapperInfo = {gin::kEmbedderNativeGin};
 gin::WrapperInfo SearchBindings::kWrapperInfo = {gin::kEmbedderNativeGin};
 gin::WrapperInfo ThemeBindings::kWrapperInfo = {gin::kEmbedderNativeGin};
+gin::WrapperInfo NetworkBindings::kWrapperInfo = {gin::kEmbedderNativeGin};
 
 }  // namespace
 
@@ -831,6 +919,12 @@ void RemoteNtpExtension::Install(blink::WebLocalFrame* frame) {
     return;
   }
 
+  gin::Handle<NetworkBindings> network_controller =
+      gin::CreateHandle(isolate, new NetworkBindings());
+  if (network_controller.IsEmpty()) {
+    return;
+  }
+
   v8::Local<v8::Object> remote_ntp =
       remote_ntp_controller.ToV8()->ToObject(context).ToLocalChecked();
   remote_ntp
@@ -839,6 +933,10 @@ void RemoteNtpExtension::Install(blink::WebLocalFrame* frame) {
       .ToChecked();
   remote_ntp
       ->Set(context, gin::StringToV8(isolate, "theme"), theme_controller.ToV8())
+      .ToChecked();
+  remote_ntp
+      ->Set(context, gin::StringToV8(isolate, "network"),
+            network_controller.ToV8())
       .ToChecked();
 
   v8::Local<v8::Object> global = context->Global();
@@ -878,6 +976,12 @@ void RemoteNtpExtension::DispatchLocalBackgroundImageSelected(
 // static
 void RemoteNtpExtension::DispatchThemeChanged(blink::WebLocalFrame* frame) {
   Dispatch(frame, kDispatchThemeChangedScript);
+}
+
+// static
+void RemoteNtpExtension::DispatchWiFiStatusChanged(
+    blink::WebLocalFrame* frame) {
+  Dispatch(frame, kDispatchWiFiStatusChangedScript);
 }
 
 }  // namespace rebel

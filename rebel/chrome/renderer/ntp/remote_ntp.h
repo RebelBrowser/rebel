@@ -74,6 +74,9 @@ class RemoteNtp : public content::RenderFrameObserver,
   void RevertColor();
   void CommitColor();
 
+  const rebel::RemoteNtpWiFiStatusList& GetWiFiStatus() const;
+  void UpdateWiFiStatus();
+
  private:
   RemoteNtp(const RemoteNtp&) = delete;
   RemoteNtp& operator=(const RemoteNtp&) = delete;
@@ -93,6 +96,7 @@ class RemoteNtp : public content::RenderFrameObserver,
       rebel::RemoteNtpBackgroundImageMap images) override;
   void LocalBackgroundImageSelected() override;
   void ThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) override;
+  void WiFiStatusChanged(rebel::RemoteNtpWiFiStatusList status) override;
 
   // The connection to the RemoteNTP service in the browser process.
   mojo::AssociatedRemote<rebel::mojom::RemoteNtp> remote_ntp_router_;
@@ -118,6 +122,8 @@ class RemoteNtp : public content::RenderFrameObserver,
   rebel::RemoteNtpBackgroundCollectionList background_collections_;
   rebel::RemoteNtpBackgroundImageMap background_images_;
   rebel::mojom::RemoteNtpThemePtr theme_;
+
+  rebel::RemoteNtpWiFiStatusList wifi_status_;
 
   base::WeakPtrFactory<RemoteNtp> weak_ptr_factory_;
 };
