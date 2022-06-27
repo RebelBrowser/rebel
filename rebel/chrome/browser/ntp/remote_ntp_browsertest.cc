@@ -59,8 +59,8 @@ constexpr base::FilePath::CharType kRemoteNtpTestFallbackRoot[] =
 
 constexpr size_t kIconCacheSizeForTesting = 2;
 
-// Chromium initially shows just a tile for the Chrome Web Store.
-constexpr size_t kInitialNtpTilesSize = 1;
+// Number of URLs in //rebel/third_party/remote_ntp/build/default_sites.json.
+constexpr size_t kInitialNtpTilesSize = 3;
 
 GURL UrlWithoutQuery(const GURL& url) {
   GURL::Replacements replacements;
