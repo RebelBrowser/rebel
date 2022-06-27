@@ -5,39 +5,18 @@
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_router.h"
 
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/profiles/profile.h"
-#include "content/public/browser/navigation_details.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_frame_host_receiver_set.h"
-#include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_contents.h"
-#include "content/public/common/child_process_host.h"
 #include "mojo/public/cpp/bindings/associated_remote.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 #include "url/gurl.h"
 
-#include "rebel/chrome/browser/ntp/remote_ntp_service.h"
-#include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
-
 namespace rebel {
 
 namespace {
-
-bool IsInRemoteNtpProcess(content::RenderFrameHost* render_frame) {
-  content::RenderProcessHost* process_host = render_frame->GetProcess();
-
-  const RemoteNtpService* remote_ntp_service =
-      RemoteNtpServiceFactory::GetForProfile(
-          Profile::FromBrowserContext(process_host->GetBrowserContext()));
-  if (!remote_ntp_service) {
-    return false;
-  }
-
-  int process_id = process_host->GetID();
-  return remote_ntp_service->IsRemoteNtpProcess(process_id);
-}
 
 class RemoteNtpClientFactoryImpl
     : public RemoteNtpRouter::RemoteNtpClientFactory,
@@ -79,9 +58,8 @@ class RemoteNtpClientFactoryImpl
         factory_receivers_.GetCurrentTargetFrame();
 
     const bool is_main_frame = render_frame_host->GetParent() == nullptr;
-    const bool is_remote_ntp_process = IsInRemoteNtpProcess(render_frame_host);
 
-    if (is_main_frame && is_remote_ntp_process) {
+    if (is_main_frame) {
       client_receiver_->reset();
       client_receiver_->Bind(std::move(receiver));
 
