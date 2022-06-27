@@ -83,6 +83,44 @@ void RemoteNtpBridge::LoadAutocompleteMatchUrl(
                                                 transition_type);
 }
 
+void RemoteNtpBridge::UpdateWiFiStatus() {
+  JNIEnv* env = base::android::AttachCurrentThread();
+  base::android::ScopedJavaLocalRef<jobject> obj = weak_java_ref_.get(env);
+  if (obj.is_null()) {
+    return;
+  }
+
+  Java_RemoteNtpBridge_updateWiFiStatus(env, obj);
+}
+
+void RemoteNtpBridge::OnWiFiStatusChanged(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>&,
+    const base::android::JavaParamRef<jobjectArray>& j_wifi_status) {
+  auto* remote_ntp_service = rebel::RemoteNtpServiceFactory::GetForProfile(
+      Profile::FromBrowserContext(web_contents_->GetBrowserContext()));
+  if (!j_wifi_status || !remote_ntp_service) {
+    return;
+  }
+
+  rebel::RemoteNtpWiFiStatusList wifi_status;
+
+  for (auto j_status : j_wifi_status.ReadElements<jbyteArray>()) {
+    auto* data =
+        static_cast<jbyte*>(env->GetDirectBufferAddress(j_status.obj()));
+    auto size = env->GetDirectBufferCapacity(j_status.obj());
+
+    rebel::mojom::WiFiStatusPtr status;
+    if (rebel::mojom::WiFiStatus::Deserialize(data, size, &status)) {
+      wifi_status.push_back(std::move(status));
+    }
+  }
+
+  if (!wifi_status.empty()) {
+    remote_ntp_service->OnWiFiStatusChanged(std::move(wifi_status));
+  }
+}
+
 static jlong JNI_RemoteNtpBridge_Init(
     JNIEnv* env,
     const base::android::JavaParamRef<jobject>& obj,

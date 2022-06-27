@@ -176,6 +176,14 @@ void RemoteNtp::CommitColor() {
   remote_ntp_router_->CommitColor();
 }
 
+const rebel::RemoteNtpWiFiStatusList& RemoteNtp::GetWiFiStatus() const {
+  return wifi_status_;
+}
+
+void RemoteNtp::UpdateWiFiStatus() {
+  remote_ntp_router_->UpdateWiFiStatus();
+}
+
 void RemoteNtp::NtpTilesChanged(rebel::RemoteNtpTileList tiles) {
   has_received_ntp_tiles_ = true;
 
@@ -240,6 +248,15 @@ void RemoteNtp::ThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
 
   if (can_run_js_in_renderframe_) {
     RemoteNtpExtension::DispatchThemeChanged(render_frame()->GetWebFrame());
+  }
+}
+
+void RemoteNtp::WiFiStatusChanged(rebel::RemoteNtpWiFiStatusList wifi_status) {
+  wifi_status_ = std::move(wifi_status);
+
+  if (can_run_js_in_renderframe_) {
+    RemoteNtpExtension::DispatchWiFiStatusChanged(
+        render_frame()->GetWebFrame());
   }
 }
 

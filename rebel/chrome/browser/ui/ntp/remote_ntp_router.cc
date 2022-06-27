@@ -178,6 +178,22 @@ void RemoteNtpRouter::SendThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
   remote_ntp_client()->ThemeChanged(std::move(theme));
 }
 
+void RemoteNtpRouter::SendWiFiStatusChanged(
+    const rebel::RemoteNtpWiFiStatusList& wifi_status) {
+  if (!remote_ntp_client()) {
+    return;
+  }
+
+  rebel::RemoteNtpWiFiStatusList status;
+  status.reserve(wifi_status.size());
+
+  for (const auto& wifi : wifi_status) {
+    status.push_back(wifi->Clone());
+  }
+
+  remote_ntp_client()->WiFiStatusChanged(std::move(status));
+}
+
 void RemoteNtpRouter::AddCustomTile(const GURL& tile_url,
                                     const std::u16string& tile_title) {
   delegate_->OnAddCustomTile(tile_url, tile_title);
@@ -245,6 +261,10 @@ void RemoteNtpRouter::RevertColor() {
 
 void RemoteNtpRouter::CommitColor() {
   delegate_->OnCommitColor();
+}
+
+void RemoteNtpRouter::UpdateWiFiStatus() {
+  delegate_->OnUpdateWiFiStatus();
 }
 
 }  // namespace rebel

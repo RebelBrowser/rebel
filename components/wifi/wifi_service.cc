@@ -16,4 +16,12 @@ const char WiFiService::kErrorScanForNetworksWithName[] =
     "Error.ScanForNetworksWithName";
 const char WiFiService::kErrorWiFiService[] = "Error.WiFiService";
 
+#if BUILDFLAG(REBEL_BROWSER)
+void WiFiService::GetNetworkProperties(const std::string& network_guid,
+                                       NetworkProperties* properties,
+                                       std::string* error) {
+  *error = kErrorNotImplemented;
+}
+#endif
+
 }  // namespace wifi
