@@ -667,6 +667,10 @@ android_library("chrome_java") {
     "//url/mojom:url_mojom_gurl_java",
   ]
 
+  if (is_rebel_based) {
+    deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom_java" ]
+  }
+
   deps += feed_deps
 
   srcjar_deps = [
