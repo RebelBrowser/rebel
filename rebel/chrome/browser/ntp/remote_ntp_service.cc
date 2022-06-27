@@ -210,6 +210,12 @@ void RemoteNtpService::SetDarkModeEnabled(bool dark_mode_enabled) {
   }
 }
 
+void RemoteNtpService::OnWiFiStatusChanged(
+    rebel::RemoteNtpWiFiStatusList wifi_status) {
+  wifi_status_ = std::move(wifi_status);
+  NotifyAboutWiFiStatus();
+}
+
 void RemoteNtpService::OnURLsAvailable(
     const std::map<ntp_tiles::SectionType, ntp_tiles::NTPTilesVector>&
         sections) {
@@ -298,6 +304,12 @@ void RemoteNtpService::NotifyAboutBackgroundImages() {
 void RemoteNtpService::NotifyAboutTheme() {
   for (Observer& observer : observers_) {
     observer.OnThemeChanged(theme_->Clone());
+  }
+}
+
+void RemoteNtpService::NotifyAboutWiFiStatus() {
+  for (Observer& observer : observers_) {
+    observer.OnWiFiStatusChanged(wifi_status_);
   }
 }
 

@@ -26,6 +26,8 @@ using RemoteNtpBackgroundImageList =
 using RemoteNtpBackgroundImageMap =
     base::flat_map<std::string, RemoteNtpBackgroundImageList>;
 
+using RemoteNtpWiFiStatusList = std::vector<rebel::mojom::WiFiStatusPtr>;
+
 }  // namespace rebel
 
 #endif  // REBEL_CHROME_COMMON_NTP_REMOTE_NTP_TYPES_H_

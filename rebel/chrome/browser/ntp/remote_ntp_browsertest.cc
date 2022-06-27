@@ -43,6 +43,12 @@
 #include "ui/native_theme/test_native_theme.h"
 #include "url/gurl.h"
 
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "components/onc/onc_constants.h"
+#include "components/wifi/fake_wifi_service.h"
+#include "components/wifi/network_properties.h"
+#endif
+
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
@@ -1829,3 +1835,131 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest,
   ValidateBackground(active_tab, "", thid_party_image_url, "center center",
                      "no-repeat", "", "", GURL(), GURL());
 }
+
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+
+class TestWifiService : public wifi::FakeWiFiService {
+ public:
+  void GetNetworkProperties(const std::string& network_guid,
+                            wifi::NetworkProperties* properties,
+                            std::string* error) override {
+    if (network_guid == "stub_wifi1_guid") {
+      properties->ssid = "wifi1";
+      properties->bssid = "01:00:00:00:00:00";
+      properties->connection_state = onc::connection_state::kConnected;
+      properties->signal_strength = -40;
+      properties->frequency = 2400;
+      properties->link_speed = 512;
+      properties->rx_mbps = 1024;
+      properties->tx_mbps = 2048;
+      properties->noise_measurement = -100;
+    } else if (network_guid == "stub_wifi2_guid") {
+      properties->ssid = "wifi2";
+      properties->bssid = "02:00:00:00:00:00";
+      properties->connection_state = onc::connection_state::kNotConnected;
+      properties->signal_strength = -80;
+      properties->frequency = 5000;
+      properties->link_speed = 4096;
+      properties->rx_mbps = 8192;
+      properties->tx_mbps = 16384;
+      properties->noise_measurement = -50;
+    } else {
+      NOTREACHED() << "Check wifi::FakeWiFiService::FakeWiFiService() for "
+                      "updated mock WiFi network GUIDs";
+    }
+  }
+};
+
+// Test fixture to allow setup of fake WiFi networks.
+class RemoteNtpWiFiTest : public RemoteNtpTest {
+ protected:
+  void SetWiFiService() {
+    rebel::RemoteNtpService* remote_ntp_service =
+        rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
+
+    // N.B. can't use dynamic_cast because Chromium disables RTTI
+    rebel::RemoteNtpServiceImpl* remote_ntp_service_impl =
+        reinterpret_cast<rebel::RemoteNtpServiceImpl*>(remote_ntp_service);
+
+    remote_ntp_service_impl->SetWiFiService(
+        std::make_unique<TestWifiService>());
+  }
+
+  base::Value WaitForWiFiStatus(content::WebContents* active_tab) {
+    // Script to check every 100ms for the NTP to have received an updated WiFi
+    // status. Returns that status.
+    static const char kWaitForWiFiStatus[] = R"js(
+        (async function() {
+          function WaitForWiFiStatus() {
+            if (ntpWiFiStatus !== null) {
+              return ntpWiFiStatus;
+            } else {
+              return new Promise((resolve) => {
+                window.setTimeout(function() {
+                  resolve(WaitForWiFiStatus());
+                }, 100);
+              });
+            }
+          }
+
+          return await WaitForWiFiStatus();
+        })();
+      )js";
+
+    auto result = content::EvalJs(active_tab, kWaitForWiFiStatus);
+    return result.ExtractList();
+  }
+
+  void ValidateWiFiStatus(const base::Value::Dict& wifi_status,
+                          base::StringPiece expected_ssid,
+                          base::StringPiece expected_bssid,
+                          base::StringPiece expected_connection_state,
+                          int expected_rssi,
+                          int expected_frequency,
+                          double expected_link_speed,
+                          int expected_rx_mbps,
+                          int expected_tx_mbps,
+                          int expected_noise_measurement) {
+    auto validate_string = [&wifi_status](auto key, auto expectation) {
+      const std::string* result = wifi_status.FindString(key);
+      ASSERT_NE(result, nullptr);
+      EXPECT_EQ(*result, expectation);
+    };
+
+    auto validate_int = [&wifi_status](auto key, auto expectation) {
+      const absl::optional<int> result = wifi_status.FindInt(key);
+      ASSERT_TRUE(result.has_value());
+      EXPECT_EQ(*result, expectation);
+    };
+
+    validate_string("ssid", expected_ssid);
+    validate_string("bssid", expected_bssid);
+    validate_string("connectionState", expected_connection_state);
+    validate_int("rssi", expected_rssi);
+    validate_int("frequency", expected_frequency);
+    validate_int("linkSpeed", expected_link_speed);
+    validate_int("rxMbps", expected_rx_mbps);
+    validate_int("txMbps", expected_tx_mbps);
+    validate_int("noiseMeasurement", expected_noise_measurement);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(RemoteNtpWiFiTest, WiFiNetworks) {
+  content::WebContents* active_tab = OpenNewTab();
+  SetWiFiService();
+
+  EXPECT_TRUE(content::ExecJs(active_tab, "rebel.network.updateWiFiStatus()"));
+  auto wifi_status = WaitForWiFiStatus(active_tab);
+
+  const auto& wifi_list = wifi_status.GetList();
+  ASSERT_EQ(wifi_list.size(), 2u);
+
+  ValidateWiFiStatus(wifi_list[0].GetDict(), "wifi1", "01:00:00:00:00:00",
+                     onc::connection_state::kConnected, -40, 2400, 512, 1024,
+                     2048, -100);
+  ValidateWiFiStatus(wifi_list[1].GetDict(), "wifi2", "02:00:00:00:00:00",
+                     onc::connection_state::kNotConnected, -80, 5000, 4096,
+                     8192, 16384, -50);
+}
+
+#endif

@@ -4,8 +4,16 @@
 
 package org.chromium.chrome.browser.app;
 
+import android.content.Context;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.text.TextUtils;
 
+import org.rebel.mojom.WiFiStatus;
+
+import org.chromium.base.ContextUtils;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.bookmarks.BookmarkUtils;
 import org.chromium.chrome.browser.download.DownloadOpenSource;
@@ -24,6 +32,8 @@ import org.chromium.ui.base.PageTransition;
 import org.chromium.url.GURL;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Rebel-specific actions for a ChromeActivity.
@@ -73,6 +83,81 @@ public abstract class RebelActivity extends AsyncInitializationActivity {
 
         ChromeActivity activity = (ChromeActivity) this;
         activity.getActivityTab().loadUrl(params);
+    }
+
+    public void updateWiFiStatus() {
+        WifiManager wifiManager =
+                (WifiManager) ContextUtils.getApplicationContext().getSystemService(
+                        Context.WIFI_SERVICE);
+
+        List<WiFiStatus> wifiStatus = new ArrayList<WiFiStatus>();
+        WiFiStatus connected = null;
+
+        // https://developer.android.com/reference/android/net/wifi/WifiInfo
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+        if (wifiInfo != null) {
+            connected = new WiFiStatus();
+            connected.ssid = wifiInfo.getSSID();
+            connected.bssid = wifiInfo.getBSSID();
+            connected.connectionState = "Connected"; // onc::connection_state::kConnected
+            connected.rssi = wifiInfo.getRssi();
+            connected.linkSpeed = wifiInfo.getLinkSpeed();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                connected.maxRxMbps = wifiInfo.getMaxSupportedRxLinkSpeedMbps();
+                connected.maxTxMbps = wifiInfo.getMaxSupportedTxLinkSpeedMbps();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                connected.rxMbps = wifiInfo.getRxLinkSpeedMbps();
+                connected.txMbps = wifiInfo.getTxLinkSpeedMbps();
+            }
+
+            normalizeWiFiStatus(wifiManager, connected);
+            wifiStatus.add(connected);
+        }
+
+        // https://developer.android.com/reference/android/net/wifi/ScanResult
+        List<ScanResult> results = wifiManager.getScanResults();
+
+        for (ScanResult result : results) {
+            if ((connected != null) && result.SSID.equals(connected.ssid)) {
+                connected.frequency = result.frequency;
+                continue;
+            }
+
+            WiFiStatus status = new WiFiStatus();
+            status.ssid = result.SSID;
+            status.bssid = result.BSSID;
+            status.connectionState = "NotConnected"; // onc::connection_state::kNotConnected
+            status.rssi = result.level;
+            status.frequency = result.frequency;
+
+            normalizeWiFiStatus(wifiManager, status);
+            wifiStatus.add(status);
+        }
+
+        if (mRemoteNtpBridge != null) {
+            mRemoteNtpBridge.setWiFiStatus(wifiStatus);
+        }
+    }
+
+    private void normalizeWiFiStatus(WifiManager wifiManager, WiFiStatus status) {
+        // The SSID returned by |WifiManager.getConnectionInfo.getSSID| may be surrounded by
+        // quotes, whereas the SSID from ScanResult.SSID wil not be.
+        int ssidLength = status.ssid.length();
+        if (ssidLength > 1) {
+            if ((status.ssid.charAt(0) == '"') && (status.ssid.charAt(ssidLength - 1) == '"')) {
+                status.ssid = status.ssid.substring(1, ssidLength - 1);
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            status.signalLevel = wifiManager.calculateSignalLevel(status.rssi);
+            status.maxSignalLevel = wifiManager.getMaxSignalLevel();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            status.signalLevel = WifiManager.calculateSignalLevel(status.rssi, 5);
+        }
     }
 
     /**
