@@ -23,14 +23,20 @@ class AutocompleteControllerDelegate;
 class Profile;
 
 class RemoteNtpThemeTest;
+class RemoteNtpWiFiTest;
 
 namespace content {
 class BrowserContext;
 }  // namespace content
 
+namespace wifi {
+class WiFiService;
+}  // namespace wifi
+
 namespace rebel {
 
 class RemoteNtpThemeProvider;
+class RemoteNtpWifiService;
 
 // Implementation of RemoteNtpService for desktop and Android devices. Tracks
 // render process host IDs that are associated with RemoteNTP.
@@ -66,6 +72,7 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
   RemoteNtpServiceImpl& operator=(const RemoteNtpServiceImpl&) = delete;
 
   friend class ::RemoteNtpThemeTest;
+  friend class ::RemoteNtpWiFiTest;
 
   // Overridden from RemoteNtpService:
   void Shutdown() final;
@@ -74,6 +81,7 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
   void StoreBackgroundImage(const std::string& collection_id,
                             rebel::mojom::BackgroundImagePtr image) override;
   rebel::mojom::RemoteNtpThemePtr CreateTheme() override;
+  void UpdateWiFiStatus() override;
 
   // Overridden from content::NotificationObserver:
   void Observe(int type,
@@ -88,6 +96,11 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
 
 #if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<RemoteNtpThemeProvider> remote_ntp_theme_provider_;
+#endif
+
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+  void SetWiFiService(std::unique_ptr<wifi::WiFiService> wifi_service);
+  std::unique_ptr<RemoteNtpWifiService> remote_ntp_wifi_service_;
 #endif
 
   // The process ids associated with RemoteNTP processes.

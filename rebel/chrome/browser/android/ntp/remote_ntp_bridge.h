@@ -35,6 +35,12 @@ class RemoteNtpBridge {
   void LoadAutocompleteMatchUrl(const GURL& url,
                                 ui::PageTransition transition_type);
 
+  void UpdateWiFiStatus();
+  void OnWiFiStatusChanged(
+      JNIEnv*,
+      const base::android::JavaParamRef<jobject>&,
+      const base::android::JavaParamRef<jobjectArray>& j_wifi_status);
+
  private:
   ~RemoteNtpBridge();
 

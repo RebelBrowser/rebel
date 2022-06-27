@@ -77,6 +77,22 @@ struct RemoteNtpTheme {
   uint32 color_light;
 };
 
+struct WiFiStatus {
+  string ssid;
+  string bssid;
+  string connection_state;
+  int32 rssi = -1;
+  int32 signal_level = -1;
+  int32 max_signal_level = -1;
+  int32 frequency = -1;
+  double link_speed = -1;
+  int32 rx_mbps = -1;
+  int32 tx_mbps = -1;
+  int32 max_rx_mbps = -1;
+  int32 max_tx_mbps = -1;
+  int32 noise_measurement = -1;
+};
+
 // Interface used to connect to the RemoteNTP interface. This is a separate
 // interface such that a reverse connection (|client| below) can be passed when
 // connecting.
@@ -118,6 +134,8 @@ interface RemoteNtp {
   PreviewColor(uint32 color);
   RevertColor();
   CommitColor();
+
+  UpdateWiFiStatus();
 };
 
 // Renderer interface used by the browser to push updates to the client.
@@ -132,6 +150,8 @@ interface RemoteNtpClient {
   BackgroundImagesChanged(
       map<string, array<BackgroundImage>> background_images);
   LocalBackgroundImageSelected();
+
+  WiFiStatusChanged(array<WiFiStatus> status);
 };
 
 // List of possible icon types parsed from <link> tags on the DOM.
