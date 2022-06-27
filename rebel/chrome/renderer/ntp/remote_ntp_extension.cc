@@ -474,10 +474,10 @@ class RemoteNtpBindings : public gin::Wrappable<RemoteNtpBindings> {
                                new_tile_title);
   }
 
-  static void LoadInternalUrl(const std::string& url) {
+  static bool LoadInternalUrl(const std::string& url) {
     const RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
     if (!remote_ntp) {
-      return;
+      return false;
     }
 
     const GURL validated_url(url);
@@ -485,10 +485,11 @@ class RemoteNtpBindings : public gin::Wrappable<RemoteNtpBindings> {
     // Only allow chrome:// URLs that won't crash the browser.
     if (!IsUrlValid(validated_url) ||
         !rebel::SchemeIsRebelOrChrome(validated_url)) {
-      return;
+      return false;
     }
 
     remote_ntp->LoadInternalUrl(validated_url);
+    return true;
   }
 };
 
