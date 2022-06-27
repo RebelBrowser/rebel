@@ -81,6 +81,9 @@ class RemoteNtpRouter : public content::WebContentsObserver,
 
     // Called when the RemoteNTP wants to commit a color theme.
     virtual void OnCommitColor() = 0;
+
+    // Called when the RemoteNTP wants to retrieve the device's WiFi status.
+    virtual void OnUpdateWiFiStatus() = 0;
   };
 
   // Creates rebel::mojom::RemoteNtpClient connections on request.
@@ -117,6 +120,7 @@ class RemoteNtpRouter : public content::WebContentsObserver,
       const rebel::RemoteNtpBackgroundImageMap& images);
   void SendLocalBackgroundImageSelected();
   void SendThemeChanged(rebel::mojom::RemoteNtpThemePtr theme);
+  void SendWiFiStatusChanged(const rebel::RemoteNtpWiFiStatusList& status);
 
  private:
   RemoteNtpRouter(const RemoteNtpRouter&) = delete;
@@ -148,6 +152,7 @@ class RemoteNtpRouter : public content::WebContentsObserver,
   void PreviewColor(SkColor color) override;
   void RevertColor() override;
   void CommitColor() override;
+  void UpdateWiFiStatus() override;
 
   rebel::mojom::RemoteNtpClient* remote_ntp_client() const {
     return remote_ntp_client_factory_->GetRemoteNtpClient();

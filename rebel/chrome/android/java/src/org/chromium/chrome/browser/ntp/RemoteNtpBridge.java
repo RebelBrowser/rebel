@@ -4,13 +4,21 @@
 
 package org.chromium.chrome.browser.ntp;
 
+import org.rebel.mojom.WiFiStatus;
+
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
+import org.chromium.build.BuildConfig;
 import org.chromium.chrome.browser.app.RebelActivity;
 import org.chromium.content_public.browser.WebContents;
+import org.chromium.mojo.bindings.SerializationException;
 import org.chromium.ui.base.PageTransition;
 import org.chromium.url.GURL;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides functionality when the user interacts with the RemoteNTP.
@@ -90,6 +98,32 @@ public class RemoteNtpBridge {
         mActivity.loadUrl(url, transition | PageTransition.FROM_ADDRESS_BAR);
     }
 
+    /**
+     * Callback invoked by native when the RemoteNTP has requested information
+     * about the device's network status.
+     */
+    @CalledByNative
+    private void updateWiFiStatus() {
+        mActivity.updateWiFiStatus();
+    }
+
+    public void setWiFiStatus(List<WiFiStatus> wifiStatus) {
+        List<ByteBuffer> wifiStatusBuffer = new ArrayList<ByteBuffer>();
+
+        for (WiFiStatus status : wifiStatus) {
+            try {
+                wifiStatusBuffer.add(status.serialize());
+            } catch (SerializationException | UnsupportedOperationException e) {
+                if (BuildConfig.ENABLE_ASSERTS) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        RemoteNtpBridgeJni.get().onWiFiStatusChanged(mNativeRemoteNtpBridge, RemoteNtpBridge.this,
+                wifiStatusBuffer.toArray(new ByteBuffer[wifiStatusBuffer.size()]));
+    }
+
     @NativeMethods
     interface Natives {
         long init(RemoteNtpBridge caller, WebContents webContents, boolean darkModeEnabled);
@@ -98,5 +132,8 @@ public class RemoteNtpBridge {
         boolean isRemoteNtpEnabled();
         boolean isRemoteNtpUrl(String url);
         GURL getRemoteNtpUrl();
+
+        void onWiFiStatusChanged(
+                long nativeRemoteNtpBridge, RemoteNtpBridge caller, ByteBuffer[] wifiStatus);
     }
 }

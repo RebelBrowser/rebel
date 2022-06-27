@@ -41,6 +41,12 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
 #endif
 
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "components/wifi/wifi_service.h"
+
+#include "rebel/chrome/browser/ntp/remote_ntp_wifi_service.h"
+#endif
+
 namespace rebel {
 
 RemoteNtpServiceImpl::RemoteNtpServiceImpl(Profile* profile)
@@ -229,6 +235,12 @@ RemoteNtpServiceImpl::CreateAutocompleteController() const {
 void RemoteNtpServiceImpl::Shutdown() {
   process_ids_.clear();
 
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+  if (remote_ntp_wifi_service_) {
+    remote_ntp_wifi_service_->Shutdown();
+  }
+#endif
+
   RemoteNtpService::Shutdown();
 }
 
@@ -261,6 +273,29 @@ rebel::mojom::RemoteNtpThemePtr RemoteNtpServiceImpl::CreateTheme() {
   return remote_ntp_theme_provider_->CreateTheme();
 #endif
 }
+
+void RemoteNtpServiceImpl::UpdateWiFiStatus() {
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+  if (!remote_ntp_wifi_service_) {
+    SetWiFiService(
+        std::unique_ptr<wifi::WiFiService>(wifi::WiFiService::Create()));
+  }
+
+  remote_ntp_wifi_service_->Update();
+#endif
+}
+
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+void RemoteNtpServiceImpl::SetWiFiService(
+    std::unique_ptr<wifi::WiFiService> wifi_service) {
+  DCHECK(!remote_ntp_wifi_service_) << "WiFi service may only be created once";
+
+  remote_ntp_wifi_service_ = std::make_unique<rebel::RemoteNtpWifiService>(
+      std::move(wifi_service),
+      base::BindRepeating(&RemoteNtpServiceImpl::OnWiFiStatusChanged,
+                          weak_factory_.GetWeakPtr()));
+}
+#endif
 
 void RemoteNtpServiceImpl::Observe(
     int type,
