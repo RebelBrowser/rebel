@@ -9,6 +9,7 @@
   let ntpBackground = {};
   let ntpColors = {};
   let ntpDarkMode = false;
+  let ntpWiFiStatus = null;
 
   if (rebel) {
     rebel.onNtpTilesChanged = function() {
@@ -31,6 +32,12 @@
       ntpBackground = rebel.theme.theme.background;
       ntpColors = rebel.theme.theme.colors;
       ntpDarkMode = rebel.theme.theme.darkModeEnabled;
+    }
+
+    if (rebel.network) {
+      rebel.network.onWiFiStatusChanged = function() {
+        ntpWiFiStatus = rebel.network.wiFiStatus;
+      }
     }
 
     ntpTilesLoaded = rebel.ntpTilesAvailable;
