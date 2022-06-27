@@ -67,6 +67,10 @@ class RemoteNtpService : public KeyedService,
     // Indicates that a touch icon load request has succeeded or failed.
     virtual void OnTouchIconLoadComplete(const GURL& origin, bool successful) {}
 
+    // Indicates that the device's WiFi status has been updated.
+    virtual void OnWiFiStatusChanged(
+        const rebel::RemoteNtpWiFiStatusList& status) {}
+
    protected:
     virtual ~Observer() = default;
   };
@@ -123,6 +127,12 @@ class RemoteNtpService : public KeyedService,
   // Retrieve the icon cache storage.
   RemoteNtpIconStorage* icon_storage() const { return icon_storage_.get(); }
 
+  // Invoked when the NTP wants to retrieve the device's WiFi status.
+  virtual void UpdateWiFiStatus() {}
+
+  // Invoked when the device's WiFi status has been updated.
+  void OnWiFiStatusChanged(rebel::RemoteNtpWiFiStatusList wifi_status);
+
  protected:
   // Initialize the RemoteNtpService and set up observers needed to run the
   // service. Should be invoked by platform implementations once they determine
@@ -170,6 +180,7 @@ class RemoteNtpService : public KeyedService,
   void NotifyAboutBackgroundCollections();
   void NotifyAboutBackgroundImages();
   void NotifyAboutTheme();
+  void NotifyAboutWiFiStatus();
 
   const base::FilePath profile_path_;
   PrefService* pref_service_;
@@ -184,6 +195,8 @@ class RemoteNtpService : public KeyedService,
   rebel::mojom::RemoteNtpThemePtr theme_;
 
   std::unique_ptr<rebel::RemoteNtpIconStorage> icon_storage_;
+
+  rebel::RemoteNtpWiFiStatusList wifi_status_;
 
   base::WeakPtrFactory<RemoteNtpService> weak_factory_;
 };

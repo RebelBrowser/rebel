@@ -17,7 +17,13 @@
 #include "base/values.h"
 #include "components/wifi/wifi_export.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 namespace wifi {
+
+#if BUILDFLAG(REBEL_BROWSER)
+struct NetworkProperties;
+#endif
 
 // WiFiService interface used by implementation of chrome.networkingPrivate
 // JavaScript extension API. All methods should be called on worker thread.
@@ -58,6 +64,14 @@ class WIFI_EXPORT WiFiService {
   virtual void GetManagedProperties(const std::string& network_guid,
                                     base::Value::Dict* managed_properties,
                                     std::string* error) = 0;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  // Get the raw, unserialized network properties of the network identified by
+  // |network_guid|. Populates |properties| on success, |error| on failure.
+  virtual void GetNetworkProperties(const std::string& network_guid,
+                                    NetworkProperties* properties,
+                                    std::string* error);
+#endif
 
   // Get the cached read-only properties of the network with id |network_guid|.
   // This is meant to be a higher performance function than |GetProperties|,

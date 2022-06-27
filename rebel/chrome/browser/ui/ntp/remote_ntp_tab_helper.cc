@@ -247,6 +247,18 @@ void RemoteNtpTabHelper::OnCommitColor() {
 #endif
 }
 
+void RemoteNtpTabHelper::OnUpdateWiFiStatus() {
+#if BUILDFLAG(IS_ANDROID)
+  if (remote_ntp_bridge_) {
+    remote_ntp_bridge_->UpdateWiFiStatus();
+  }
+#else
+  if (remote_ntp_service_) {
+    remote_ntp_service_->UpdateWiFiStatus();
+  }
+#endif
+}
+
 void RemoteNtpTabHelper::OnAutocompleteResultChanged(
     rebel::mojom::AutocompleteResultPtr result) {
   remote_ntp_router_.SendAutocompleteResultChanged(std::move(result));
@@ -273,6 +285,11 @@ void RemoteNtpTabHelper::OnBackgroundImagesChanged(
 
 void RemoteNtpTabHelper::OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
   remote_ntp_router_.SendThemeChanged(std::move(theme));
+}
+
+void RemoteNtpTabHelper::OnWiFiStatusChanged(
+    const rebel::RemoteNtpWiFiStatusList& status) {
+  remote_ntp_router_.SendWiFiStatusChanged(std::move(status));
 }
 
 Profile* RemoteNtpTabHelper::profile() const {

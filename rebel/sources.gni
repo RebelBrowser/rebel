@@ -63,6 +63,13 @@ if (is_ios) {
       "chrome/browser/ntp/remote_ntp_theme_provider.h",
     ]
   }
+
+  if (is_mac || is_win) {
+    rebel_chrome_browser_sources += [
+      "chrome/browser/ntp/remote_ntp_wifi_service.cc",
+      "chrome/browser/ntp/remote_ntp_wifi_service.h",
+    ]
+  }
 }
 
 rebel_chrome_browser_ui_sources = [
