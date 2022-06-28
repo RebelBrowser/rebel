@@ -165,17 +165,15 @@ const char kRemoteNtpCallbackTemplate[] = R"js(
 }
 
 - (void)setPlatformInfo {
-  base::Value platformInfoJson(base::Value::Type::DICTIONARY);
-
   // This is how chrome://version determines browser architecture.
   int browserArch = (sizeof(void*) == 8) ? 64 : 32;
-
   int systemArch = [RemoteNtpApiProvider is64BitDevice] ? 64 : 32;
 
-  platformInfoJson.SetStringKey("platform", version_info::GetOSType());
-  platformInfoJson.SetStringKey("version", version_info::GetVersionNumber());
-  platformInfoJson.SetIntKey("browserArch", browserArch);
-  platformInfoJson.SetIntKey("systemArch", systemArch);
+  base::Value::Dict platformInfoJson;
+  platformInfoJson.Set("platform", version_info::GetOSType());
+  platformInfoJson.Set("version", version_info::GetVersionNumber());
+  platformInfoJson.Set("browserArch", browserArch);
+  platformInfoJson.Set("systemArch", systemArch);
 
   JSONStringValueSerializer(&_platformInfoJson).Serialize(platformInfoJson);
 }
@@ -380,14 +378,13 @@ const char kRemoteNtpCallbackTemplate[] = R"js(
 #pragma mark - RemoteNtpServiceObserving
 
 - (void)onNtpTilesChanged:(const rebel::RemoteNtpTileList&)ntpTiles {
-  base::Value tilesJson(base::Value::Type::LIST);
+  base::Value::List tilesJson;
 
   for (const auto& tile : ntpTiles) {
-    base::Value tileJson(base::Value::Type::DICTIONARY);
-
-    tileJson.SetStringKey("url", tile->url);
-    tileJson.SetStringKey("favicon_url", tile->favicon_url);
-    tileJson.SetStringKey("title", tile->title);
+    base::Value::Dict tileJson;
+    tileJson.Set("url", tile->url);
+    tileJson.Set("favicon_url", tile->favicon_url);
+    tileJson.Set("title", tile->title);
 
     tilesJson.Append(std::move(tileJson));
   }
@@ -402,15 +399,13 @@ const char kRemoteNtpCallbackTemplate[] = R"js(
 - (void)onAutocompleteResultChanged:
     (rebel::mojom::AutocompleteResultPtr)result {
   // Helper to convert a list of match classifications to JSON.
-  auto class_value =
-      [](const std::vector<rebel::mojom::ACMatchClassificationPtr>& classes)
-      -> base::Value {
-    base::Value classesJson(base::Value::Type::LIST);
+  auto class_value = [](const auto& classes) {
+    base::Value::List classesJson;
 
     for (const auto& clss : classes) {
-      base::Value classJson(base::Value::Type::DICTIONARY);
-      classJson.SetIntKey("offset", clss->offset);
-      classJson.SetIntKey("style", clss->style);
+      base::Value::Dict classJson;
+      classJson.Set("offset", static_cast<int>(clss->offset));
+      classJson.Set("style", clss->style);
 
       classesJson.Append(std::move(classJson));
     }
@@ -418,34 +413,33 @@ const char kRemoteNtpCallbackTemplate[] = R"js(
     return classesJson;
   };
 
-  base::Value matchesJson(base::Value::Type::LIST);
+  base::Value::List matchesJson;
 
   for (const rebel::mojom::AutocompleteMatchPtr& match : result->matches) {
-    base::Value matchJson(base::Value::Type::DICTIONARY);
+    base::Value::Dict matchJson;
 
-    matchJson.SetStringKey("contents", match->contents);
-    matchJson.SetKey("contentsClass", class_value(match->contents_class));
+    matchJson.Set("contents", match->contents);
+    matchJson.Set("contentsClass", class_value(match->contents_class));
 
-    matchJson.SetStringKey("description", match->description);
-    matchJson.SetKey("descriptionClass", class_value(match->description_class));
+    matchJson.Set("description", match->description);
+    matchJson.Set("descriptionClass", class_value(match->description_class));
 
-    matchJson.SetStringKey("destinationUrl", match->destination_url);
+    matchJson.Set("destinationUrl", match->destination_url);
 
-    matchJson.SetStringKey("type", match->type);
-    matchJson.SetBoolKey("isSearchType", match->is_search_type);
+    matchJson.Set("type", match->type);
+    matchJson.Set("isSearchType", match->is_search_type);
 
-    matchJson.SetStringKey("fillIntoEdit", match->fill_into_edit);
-    matchJson.SetStringKey("inlineAutocompletion",
-                           match->inline_autocompletion);
-    matchJson.SetBoolKey("allowedToBeDefaultMatch",
-                         match->allowed_to_be_default_match);
+    matchJson.Set("fillIntoEdit", match->fill_into_edit);
+    matchJson.Set("inlineAutocompletion", match->inline_autocompletion);
+    matchJson.Set("allowedToBeDefaultMatch",
+                  match->allowed_to_be_default_match);
 
     matchesJson.Append(std::move(matchJson));
   }
 
-  base::Value resultJson(base::Value::Type::DICTIONARY);
-  resultJson.SetStringKey("input", result->input);
-  resultJson.SetKey("matches", std::move(matchesJson));
+  base::Value::Dict resultJson;
+  resultJson.Set("input", result->input);
+  resultJson.Set("matches", std::move(matchesJson));
 
   JSONStringValueSerializer(&_autocompleteResult).Serialize(resultJson);
 
