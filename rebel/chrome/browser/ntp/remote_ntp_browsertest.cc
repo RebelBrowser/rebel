@@ -303,7 +303,7 @@ class RemoteNtpTest : virtual public InProcessBrowserTest {
   RemoteNtpTest() : http_server_(embedded_test_server()) {}
 
   static void SetUpTestCase() {
-    rebel::RemoteNtpIconStorage::set_cache_size_limit_for_testing(
+    rebel::RemoteNtpIconStorage::SetCacheSizeLimitForTesting(
         kIconCacheSizeForTesting);
   }
 

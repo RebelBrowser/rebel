@@ -25,6 +25,8 @@ class PrefService;
 class Profile;
 class ThemeService;
 
+class RemoteNtpThemeTest;
+
 namespace base {
 class FilePath;
 }  // namespace base
@@ -67,13 +69,11 @@ class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
 
   rebel::mojom::RemoteNtpThemePtr CreateTheme();
 
-  // Used only for testing.
-  void AddBackgroundImageForTesting(const GURL& image_url);
-  void SetNativeThemeForTesting(ui::NativeTheme* theme);
-
  private:
   RemoteNtpThemeProvider(const RemoteNtpThemeProvider&) = delete;
   RemoteNtpThemeProvider& operator=(const RemoteNtpThemeProvider&) = delete;
+
+  friend class ::RemoteNtpThemeTest;
 
   void SetExtensionThemeDetails(const std::string& theme_id,
                                 const ui::ThemeProvider& theme_provider,
@@ -97,6 +97,8 @@ class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
 
   // Overridden from ThemeServiceObserver:
   void OnThemeChanged() override;
+
+  void SetNativeThemeForTesting(ui::NativeTheme* theme);
 
   RemoteNtpThemeDelegate* delegate_;
 

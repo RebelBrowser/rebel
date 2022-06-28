@@ -22,6 +22,8 @@ class AutocompleteController;
 class AutocompleteControllerDelegate;
 class Profile;
 
+class RemoteNtpThemeTest;
+
 namespace content {
 class BrowserContext;
 }  // namespace content
@@ -59,16 +61,11 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
   std::unique_ptr<AutocompleteController> CreateAutocompleteController()
       const override;
 
-#if !BUILDFLAG(IS_ANDROID)
-  // Used only for testing.
-  RemoteNtpThemeProvider* GetThemeProviderForTesting() const {
-    return remote_ntp_theme_provider_.get();
-  }
-#endif
-
  private:
   RemoteNtpServiceImpl(const RemoteNtpServiceImpl&) = delete;
   RemoteNtpServiceImpl& operator=(const RemoteNtpServiceImpl&) = delete;
+
+  friend class ::RemoteNtpThemeTest;
 
   // Overridden from RemoteNtpService:
   void Shutdown() final;
@@ -82,6 +79,12 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
   void Observe(int type,
                const content::NotificationSource& source,
                const content::NotificationDetails& details) override;
+
+#if !BUILDFLAG(IS_ANDROID)
+  RemoteNtpThemeProvider* GetThemeProviderForTesting() const {
+    return remote_ntp_theme_provider_.get();
+  }
+#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<RemoteNtpThemeProvider> remote_ntp_theme_provider_;
