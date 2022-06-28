@@ -15,6 +15,7 @@
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
 #include "base/time/time.h"
+#include "base/values.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 #include "url/gurl.h"
 
@@ -28,7 +29,6 @@ class RemoteNtpTest;
 
 namespace base {
 class SequencedTaskRunner;
-class Value;
 }  // namespace base
 
 namespace gfx {
@@ -107,7 +107,7 @@ class RemoteNtpIconStorage {
   ~RemoteNtpIconStorage();
 
   static void RegisterProfilePrefs(PrefRegistrySimple* registry);
-  void SerializeCachedIcons(base::Value& into_value) const;
+  void SerializeCachedIcons(base::Value::List& into_value) const;
 
   // When an icon is parsed by the renderer, decide if that icon should be
   // fetched or ignored as a duplicate. If it is a duplicate, update its
@@ -125,9 +125,6 @@ class RemoteNtpIconStorage {
 
   // Remove an icon from the cache for the requested origin.
   bool DeleteIconForOrigin(const GURL& origin);
-
-  // Serialize only the metadata of the cached icon for the requested origin.
-  absl::optional<base::Value> SerializeIconDataForOrigin(const GURL& origin);
 
  private:
   RemoteNtpIconStorage(const RemoteNtpIconStorage&) = delete;

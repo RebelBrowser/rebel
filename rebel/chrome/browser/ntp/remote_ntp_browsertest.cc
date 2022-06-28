@@ -1120,7 +1120,8 @@ class RemoteNtpSearchTest : public RemoteNtpTest {
         TemplateURLServiceFactory::GetForProfile(browser()->profile()));
   }
 
-  base::Value WaitForAutocompleteResult(content::WebContents* active_tab) {
+  base::Value::Dict WaitForAutocompleteResult(
+      content::WebContents* active_tab) {
     // Script to check every 100ms for the NTP to have received a search query's
     // autocomplete result. Returns that result.
     static const char kWaitForAutocompleteResult[] = R"js(
@@ -1142,7 +1143,7 @@ class RemoteNtpSearchTest : public RemoteNtpTest {
       )js";
 
     auto result = content::EvalJs(active_tab, kWaitForAutocompleteResult);
-    return result.value.Clone();
+    return result.value.GetDict().Clone();
   }
 };
 
@@ -1158,73 +1159,71 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpSearchTest, SimpleSearchAllFields) {
 
   auto result = WaitForAutocompleteResult(active_tab);
 
-  const std::string* input = result.FindStringKey("input");
+  const std::string* input = result.FindString("input");
   ASSERT_NE(input, nullptr);
   EXPECT_EQ(*input, query);
 
-  const base::Value* matches = result.FindListKey("matches");
+  const base::Value::List* matches = result.FindList("matches");
   ASSERT_NE(matches, nullptr);
 
-  const auto& matchesStorage = matches->GetList();
-  ASSERT_FALSE(matchesStorage.empty());
+  for (const base::Value& match_value : *matches) {
+    SCOPED_TRACE(match_value);
+    const auto& match = match_value.GetDict();
 
-  for (const base::Value& match : matchesStorage) {
-    SCOPED_TRACE(match);
-
-    ASSERT_EQ(match.DictSize(), 10U)
+    ASSERT_EQ(match.size(), 10U)
         << "Was a field added or removed from rebel.search.autocompleteResult? "
            "Be sure to update RemoteNtpSearchTest.SimpleSearchAllFields in: "
         << __FILE__;
 
-    const std::string* contents = match.FindStringKey("contents");
+    const std::string* contents = match.FindString("contents");
     ASSERT_NE(contents, nullptr);
     EXPECT_FALSE(contents->empty());
 
-    const base::Value* contentsClass = match.FindListKey("contentsClass");
-    ASSERT_NE(contentsClass, nullptr);
+    const base::Value::List* contents_class = match.FindList("contentsClass");
+    ASSERT_NE(contents_class, nullptr);
 
-    const auto& contentsClassStorage = contentsClass->GetList();
-    EXPECT_FALSE(contentsClassStorage.empty());
+    for (const base::Value& classification_value : *contents_class) {
+      const auto& classification = classification_value.GetDict();
 
-    for (const base::Value& classification : contentsClassStorage) {
-      absl::optional<int> offset = classification.FindIntKey("offset");
+      absl::optional<int> offset = classification.FindInt("offset");
       EXPECT_TRUE(offset.has_value());
 
-      absl::optional<int> style = classification.FindIntKey("style");
+      absl::optional<int> style = classification.FindInt("style");
       EXPECT_TRUE(style.has_value());
     }
 
-    const std::string* description = match.FindStringKey("description");
+    const std::string* description = match.FindString("description");
     ASSERT_NE(description, nullptr);
     // |description| is optional: don't verify it is non-empty
 
-    const base::Value* descriptionClass = match.FindListKey("descriptionClass");
-    ASSERT_NE(descriptionClass, nullptr);
+    const base::Value::List* description_class =
+        match.FindList("descriptionClass");
+    ASSERT_NE(description_class, nullptr);
 
-    const std::string* destinationUrl = match.FindStringKey("destinationUrl");
-    ASSERT_NE(destinationUrl, nullptr);
-    EXPECT_FALSE(destinationUrl->empty());
-    EXPECT_TRUE(GURL(*destinationUrl).is_valid());
+    const std::string* destination_url = match.FindString("destinationUrl");
+    ASSERT_NE(destination_url, nullptr);
+    EXPECT_FALSE(destination_url->empty());
+    EXPECT_TRUE(GURL(*destination_url).is_valid());
 
-    const std::string* type = match.FindStringKey("type");
+    const std::string* type = match.FindString("type");
     ASSERT_NE(type, nullptr);
     EXPECT_FALSE(type->empty());
 
-    absl::optional<bool> isSearchType = match.FindBoolKey("isSearchType");
-    EXPECT_TRUE(isSearchType.has_value());
+    absl::optional<bool> is_search_type = match.FindBool("isSearchType");
+    EXPECT_TRUE(is_search_type.has_value());
 
-    const std::string* fillIntoEdit = match.FindStringKey("fillIntoEdit");
-    ASSERT_NE(fillIntoEdit, nullptr);
-    EXPECT_FALSE(fillIntoEdit->empty());
+    const std::string* fill_into_edit = match.FindString("fillIntoEdit");
+    ASSERT_NE(fill_into_edit, nullptr);
+    EXPECT_FALSE(fill_into_edit->empty());
 
-    const std::string* inlineAutocompletion =
-        match.FindStringKey("inlineAutocompletion");
-    ASSERT_NE(inlineAutocompletion, nullptr);
+    const std::string* inline_autocompletion =
+        match.FindString("inlineAutocompletion");
+    ASSERT_NE(inline_autocompletion, nullptr);
     // |inlineAutocompletion| is optional: don't verify it is non-empty
 
-    absl::optional<bool> allowedToBeDefaultMatch =
-        match.FindBoolKey("allowedToBeDefaultMatch");
-    EXPECT_TRUE(allowedToBeDefaultMatch.has_value());
+    absl::optional<bool> allowed_to_be_default_match =
+        match.FindBool("allowedToBeDefaultMatch");
+    EXPECT_TRUE(allowed_to_be_default_match.has_value());
   }
 }
 
@@ -1257,16 +1256,13 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpSearchTest, DoNotLoadBadMatch) {
 
   auto result = WaitForAutocompleteResult(active_tab);
 
-  const base::Value* matches = result.FindListKey("matches");
+  const base::Value::List* matches = result.FindList("matches");
   ASSERT_NE(matches, nullptr);
 
-  const auto& matchesStorage = matches->GetList();
-  ASSERT_FALSE(matchesStorage.empty());
-
-  const base::Value& match = matchesStorage[0];
+  const auto& match = (*matches)[0].GetDict();
 
   // Sanity check that the match's URL is not the URL we are attempting to load.
-  const std::string* destinationUrl = match.FindStringKey("destinationUrl");
+  const std::string* destinationUrl = match.FindString("destinationUrl");
   ASSERT_NE(destinationUrl, nullptr);
   EXPECT_NE(*destinationUrl, bad_url.spec())
       << "Somehow the test query matched with our bad URL";
@@ -1294,15 +1290,12 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpSearchTest, LoadGoodMatch) {
 
   auto result = WaitForAutocompleteResult(active_tab);
 
-  const base::Value* matches = result.FindListKey("matches");
+  const base::Value::List* matches = result.FindList("matches");
   ASSERT_NE(matches, nullptr);
 
-  const auto& matchesStorage = matches->GetList();
-  ASSERT_FALSE(matchesStorage.empty());
+  const auto& match = (*matches)[0].GetDict();
 
-  const base::Value& match = matchesStorage[0];
-
-  const std::string* destinationUrl = match.FindStringKey("destinationUrl");
+  const std::string* destinationUrl = match.FindString("destinationUrl");
   ASSERT_NE(destinationUrl, nullptr);
 
   // Loading a match's URL should result in the tab navigating to that URL.

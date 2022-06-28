@@ -17,7 +17,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
-#include "base/values.h"
 #include "build/build_config.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -197,8 +196,7 @@ RemoteNtpIconStorage::~RemoteNtpIconStorage() = default;
 
 // static
 void RemoteNtpIconStorage::RegisterProfilePrefs(PrefRegistrySimple* registry) {
-  registry->RegisterDictionaryPref(kRemoteNtpIconsPref,
-                                   base::Value(base::Value::Type::LIST));
+  registry->RegisterListPref(kRemoteNtpIconsPref);
 }
 
 void RemoteNtpIconStorage::FetchIconIfNeeded(
@@ -263,38 +261,6 @@ bool RemoteNtpIconStorage::DeleteIconForOrigin(const GURL& origin) {
                      weak_ptr_factory_.GetWeakPtr(), std::move(origin)));
 
   return true;
-}
-
-absl::optional<base::Value> RemoteNtpIconStorage::SerializeIconDataForOrigin(
-    const GURL& origin) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  auto it = FindCachedIconDataForOrigin(origin);
-
-  if (it == cached_icons_.end()) {
-    return absl::nullopt;
-  }
-
-  base::Value icon_info(base::Value::Type::DICTIONARY);
-
-  icon_info.SetStringKey("iconUrl", it->second.icon_url.spec());
-  icon_info.SetIntKey("iconSize", it->second.icon_size);
-
-  switch (it->second.icon_type) {
-    case rebel::mojom::RemoteNtpIconType::Unknown:
-      icon_info.SetStringKey("iconType", "unknown");
-      break;
-    case rebel::mojom::RemoteNtpIconType::Favicon:
-      icon_info.SetStringKey("iconType", "favicon");
-      break;
-    case rebel::mojom::RemoteNtpIconType::Fluid:
-      icon_info.SetStringKey("iconType", "fluid");
-      break;
-    case rebel::mojom::RemoteNtpIconType::Touch:
-      icon_info.SetStringKey("iconType", "touch");
-      break;
-  }
-
-  return icon_info;
 }
 
 CachedIconMap::iterator RemoteNtpIconStorage::FindCachedIconDataForOrigin(
@@ -562,13 +528,19 @@ rebel::CachedIconMap::value_type RemoteNtpIconStorage::FindIconToEvict() {
 void RemoteNtpIconStorage::InitializeFromPrefs() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-  const base::Value* prefs = pref_service_->Get(kRemoteNtpIconsPref);
+  const base::Value::List* prefs =
+      pref_service_->GetValueList(kRemoteNtpIconsPref);
   DCHECK(prefs) << "|RegisterProfilePrefs| must set |kRemoteNtpIconsPref|";
 
-  for (const base::Value& icon : prefs->GetList()) {
-    const std::string* host_origin = icon.FindStringKey(kHostOriginPref);
-    const std::string* icon_url = icon.FindStringKey(kIconUrlPref);
-    auto icon_file = base::ValueToFilePath(icon.FindKey(kIconFilePref));
+  for (const base::Value& icon_value : *prefs) {
+    if (!icon_value.is_dict()) {
+      continue;
+    }
+
+    const auto& icon = icon_value.GetDict();
+    const std::string* host_origin = icon.FindString(kHostOriginPref);
+    const std::string* icon_url = icon.FindString(kIconUrlPref);
+    auto icon_file = base::ValueToFilePath(icon.Find(kIconFilePref));
 
     if (!host_origin || !icon_url || !icon_file) {
       continue;
@@ -580,12 +552,11 @@ void RemoteNtpIconStorage::InitializeFromPrefs() {
     icon_file = storage_path_.Append(icon_file->BaseName());
 #endif
 
-    auto icon_type = icon.FindIntKey(kIconTypePref);
-    auto icon_size = icon.FindIntKey(kIconSizePref);
-    auto icon_fetch_time = base::ValueToTime(icon.FindKey(kIconFetchTime));
-    auto last_visit_time = base::ValueToTime(icon.FindKey(kLastVisitTimePref));
-    auto last_request_time =
-        base::ValueToTime(icon.FindKey(kLastRequestTimePref));
+    auto icon_type = icon.FindInt(kIconTypePref);
+    auto icon_size = icon.FindInt(kIconSizePref);
+    auto icon_fetch_time = base::ValueToTime(icon.Find(kIconFetchTime));
+    auto last_visit_time = base::ValueToTime(icon.Find(kLastVisitTimePref));
+    auto last_request_time = base::ValueToTime(icon.Find(kLastRequestTimePref));
 
     CachedIcon cached_icon;
     cached_icon.icon_url = GURL(*icon_url);
@@ -605,23 +576,22 @@ void RemoteNtpIconStorage::InitializeFromPrefs() {
 #endif
 }
 
-void RemoteNtpIconStorage::SerializeCachedIcons(base::Value& into_value) const {
-  DCHECK(into_value.is_list()) << "Can only serialize icons to a list";
+void RemoteNtpIconStorage::SerializeCachedIcons(
+    base::Value::List& into_value) const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
   for (const auto& it : cached_icons_) {
-    base::Value icon(base::Value::Type::DICTIONARY);
+    base::Value::Dict icon;
 
-    icon.SetStringKey(kHostOriginPref, it.first.spec());
-    icon.SetStringKey(kIconUrlPref, it.second.icon_url.spec());
-    icon.SetKey(kIconFilePref, base::FilePathToValue(it.second.icon_file));
-    icon.SetIntKey(kIconTypePref, static_cast<int>(it.second.icon_type));
-    icon.SetIntKey(kIconSizePref, it.second.icon_size);
-    icon.SetKey(kIconFetchTime, base::TimeToValue(it.second.icon_fetch_time));
-    icon.SetKey(kLastVisitTimePref,
-                base::TimeToValue(it.second.last_visit_time));
-    icon.SetKey(kLastRequestTimePref,
-                base::TimeToValue(it.second.last_request_time));
+    icon.Set(kHostOriginPref, it.first.spec());
+    icon.Set(kIconUrlPref, it.second.icon_url.spec());
+    icon.Set(kIconFilePref, base::FilePathToValue(it.second.icon_file));
+    icon.Set(kIconTypePref, static_cast<int>(it.second.icon_type));
+    icon.Set(kIconSizePref, it.second.icon_size);
+    icon.Set(kIconFetchTime, base::TimeToValue(it.second.icon_fetch_time));
+    icon.Set(kLastVisitTimePref, base::TimeToValue(it.second.last_visit_time));
+    icon.Set(kLastRequestTimePref,
+             base::TimeToValue(it.second.last_request_time));
 
     into_value.Append(std::move(icon));
   }
@@ -630,10 +600,10 @@ void RemoteNtpIconStorage::SerializeCachedIcons(base::Value& into_value) const {
 void RemoteNtpIconStorage::SerializeToPrefs() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-  base::Value prefs(base::Value::Type::LIST);
+  base::Value::List prefs;
   SerializeCachedIcons(prefs);
 
-  pref_service_->Set(kRemoteNtpIconsPref, std::move(prefs));
+  pref_service_->SetList(kRemoteNtpIconsPref, std::move(prefs));
 }
 
 }  // namespace rebel

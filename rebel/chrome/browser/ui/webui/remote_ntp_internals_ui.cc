@@ -109,10 +109,11 @@ class RemoteNtpHandler : public content::WebUIMessageHandler {
 
   void SendCachedIcons() {
     base::Value icons(base::Value::Type::LIST);
-    remote_ntp_icon_storage_->SerializeCachedIcons(icons);
+    remote_ntp_icon_storage_->SerializeCachedIcons(icons.GetList());
 
     for (const base::Value& icon : icons.GetList()) {
-      const std::string* host_origin = icon.FindStringKey(kHostOriginPref);
+      const std::string* host_origin =
+          icon.GetDict().FindString(kHostOriginPref);
       DCHECK(host_origin);
 
       const GURL origin(*host_origin);
@@ -133,8 +134,8 @@ class RemoteNtpHandler : public content::WebUIMessageHandler {
 
   void SendIconImage(const GURL& origin, SkBitmap bitmap) {
     base::Value icon(base::Value::Type::DICTIONARY);
-    icon.SetStringKey("origin", origin.spec());
-    icon.SetStringKey("icon", GetPNGDataUrl(bitmap));
+    icon.GetDict().Set("origin", origin.spec());
+    icon.GetDict().Set("icon", GetPNGDataUrl(bitmap));
 
 #if BUILDFLAG(IS_IOS)
     web_ui()->CallJavascriptFunction("iconImageAvailable", {&icon});

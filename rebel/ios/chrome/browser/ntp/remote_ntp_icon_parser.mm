@@ -33,15 +33,19 @@ constexpr const char kScriptName[] = "favicon";
 const char kScriptHandlerName[] = "TouchIconUrlsHandler";
 
 std::vector<rebel::mojom::RemoteNtpIconPtr> ParseIconsFromMessage(
-    const base::Value* favicons,
+    const base::Value::List& favicons,
     const GURL& origin) {
   std::vector<rebel::mojom::RemoteNtpIconPtr> icons;
-  DCHECK(favicons->is_list());
 
-  for (const base::Value& favicon : favicons->GetList()) {
-    const std::string* href = favicon.FindStringKey("href");
-    const std::string* rel = favicon.FindStringKey("rel");
-    const std::string* sizes = favicon.FindStringKey("sizes");
+  for (const base::Value& favicon_value : favicons) {
+    if (!favicon_value.is_dict()) {
+      continue;
+    }
+
+    const auto& favicon = favicon_value.GetDict();
+    const std::string* href = favicon.FindString("href");
+    const std::string* rel = favicon.FindString("rel");
+    const std::string* sizes = favicon.FindString("sizes");
     if (!href || !rel) {
       continue;
     }
@@ -118,11 +122,7 @@ void RemoteNtpIconParser::ScriptMessageReceived(
     return;
   }
 
-  const base::ListValue* favicons;
-  if (!message.body()->GetAsList(&favicons)) {
-    return;
-  }
-
+  const auto& favicons = message.body()->GetList();
   const GURL origin = message.request_url().value().GetWithEmptyPath();
   if (!origin.is_valid() || !origin.SchemeIsHTTPOrHTTPS()) {
     return;

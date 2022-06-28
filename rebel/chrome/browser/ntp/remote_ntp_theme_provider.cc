@@ -53,18 +53,14 @@ const char kThemeImageFormat[] =
 const char kThemeAttributionFormat[] =
     "chrome-search://theme/IDR_THEME_NTP_ATTRIBUTION?%s";
 
-base::Value BackgroundImageDefaults() {
-  base::Value defaults(base::Value::Type::DICTIONARY);
+base::Value::Dict BackgroundImageDefaults() {
+  base::Value::Dict defaults;
 
-  defaults.SetKey(kBackgroundCollectionId,
-                  base::Value(base::Value::Type::STRING));
-  defaults.SetKey(kBackgroundImageURL, base::Value(base::Value::Type::STRING));
-  defaults.SetKey(kBackgroundAttributionLine1,
-                  base::Value(base::Value::Type::STRING));
-  defaults.SetKey(kBackgroundAttributionLine2,
-                  base::Value(base::Value::Type::STRING));
-  defaults.SetKey(kBackgroundAttributionURL,
-                  base::Value(base::Value::Type::STRING));
+  defaults.Set(kBackgroundCollectionId, std::string());
+  defaults.Set(kBackgroundImageURL, std::string());
+  defaults.Set(kBackgroundAttributionLine1, std::string());
+  defaults.Set(kBackgroundAttributionLine2, std::string());
+  defaults.Set(kBackgroundAttributionURL, std::string());
 
   return defaults;
 }
@@ -128,27 +124,25 @@ void RemoteNtpThemeProvider::FetchBackgroundImages(
 void RemoteNtpThemeProvider::StoreBackgroundImage(
     const std::string& collection_id,
     rebel::mojom::BackgroundImagePtr image) {
-  const base::Value* background = pref_service_->Get(kRemoteNtpBackgroundDict);
+  const base::Value::Dict* background =
+      pref_service_->GetValueDict(kRemoteNtpBackgroundDict);
   if (!background_service_ || !background) {
     return;
   }
 
   if (collection_id.empty()) {
-    pref_service_->Set(kRemoteNtpBackgroundDict, BackgroundImageDefaults());
+    pref_service_->SetDict(kRemoteNtpBackgroundDict, BackgroundImageDefaults());
   } else {
-    base::Value new_background = background->Clone();
+    base::Value::Dict new_background = background->Clone();
 
-    new_background.SetKey(kBackgroundCollectionId, base::Value(collection_id));
-    new_background.SetKey(kBackgroundImageURL,
-                          base::Value(image->image_url.spec()));
-    new_background.SetKey(kBackgroundAttributionLine1,
-                          base::Value(image->attribution_line_1));
-    new_background.SetKey(kBackgroundAttributionLine2,
-                          base::Value(image->attribution_line_2));
-    new_background.SetKey(kBackgroundAttributionURL,
-                          base::Value(image->attribution_url.spec()));
+    new_background.Set(kBackgroundCollectionId, collection_id);
+    new_background.Set(kBackgroundImageURL, image->image_url.spec());
+    new_background.Set(kBackgroundAttributionLine1, image->attribution_line_1);
+    new_background.Set(kBackgroundAttributionLine2, image->attribution_line_2);
+    new_background.Set(kBackgroundAttributionURL,
+                       image->attribution_url.spec());
 
-    pref_service_->Set(kRemoteNtpBackgroundDict, std::move(new_background));
+    pref_service_->SetDict(kRemoteNtpBackgroundDict, std::move(new_background));
   }
 
   OnThemeChanged();
@@ -187,8 +181,9 @@ void RemoteNtpThemeProvider::StoreLocalBackgroundImage(bool copy_result) {
     return;
   }
 
-  const base::Value* background = pref_service_->Get(kRemoteNtpBackgroundDict);
-  if (!background_service_) {
+  const base::Value::Dict* background =
+      pref_service_->GetValueDict(kRemoteNtpBackgroundDict);
+  if (!background_service_ || !background) {
     return;
   }
 
@@ -198,19 +193,15 @@ void RemoteNtpThemeProvider::StoreLocalBackgroundImage(bool copy_result) {
   const std::string now(std::to_string(base::Time::Now().ToTimeT()));
   const GURL image_url(image + "?ts=" + now);
 
-  base::Value new_background = background->Clone();
+  base::Value::Dict new_background = background->Clone();
 
-  new_background.SetKey(kBackgroundCollectionId,
-                        base::Value(kLocalBackgroundCollectionId));
-  new_background.SetKey(kBackgroundImageURL, base::Value(image_url.spec()));
-  new_background.SetKey(kBackgroundAttributionLine1,
-                        base::Value(base::Value::Type::STRING));
-  new_background.SetKey(kBackgroundAttributionLine2,
-                        base::Value(base::Value::Type::STRING));
-  new_background.SetKey(kBackgroundAttributionURL,
-                        base::Value(base::Value::Type::STRING));
+  new_background.Set(kBackgroundCollectionId, kLocalBackgroundCollectionId);
+  new_background.Set(kBackgroundImageURL, image_url.spec());
+  new_background.Set(kBackgroundAttributionLine1, std::string());
+  new_background.Set(kBackgroundAttributionLine2, std::string());
+  new_background.Set(kBackgroundAttributionURL, std::string());
 
-  pref_service_->Set(kRemoteNtpBackgroundDict, std::move(new_background));
+  pref_service_->SetDict(kRemoteNtpBackgroundDict, std::move(new_background));
 
   if (delegate_) {
     delegate_->OnLocalBackgroundImageSelected();
@@ -272,23 +263,23 @@ rebel::mojom::RemoteNtpThemePtr RemoteNtpThemeProvider::CreateTheme() {
         theme_provider.GetColor(ThemeProperties::COLOR_NTP_BACKGROUND);
   }
 
-  const base::Value* background = pref_service_->Get(kRemoteNtpBackgroundDict);
+  const base::Value::Dict* background =
+      pref_service_->GetValueDict(kRemoteNtpBackgroundDict);
+
   if (background) {
-    const std::string* image_url =
-        background->FindStringKey(kBackgroundImageURL);
+    const std::string* image_url = background->FindString(kBackgroundImageURL);
 
     if (image_url && !image_url->empty()) {
-      theme->collection_id =
-          *background->FindStringKey(kBackgroundCollectionId);
+      theme->collection_id = *background->FindString(kBackgroundCollectionId);
       theme->image_url = GURL(*image_url);
       theme->image_alignment = ThemeProperties::AlignmentToString(0);
       theme->image_tiling = ThemeProperties::TilingToString(0);
       theme->attribution_line_1 =
-          *background->FindStringKey(kBackgroundAttributionLine1);
+          *background->FindString(kBackgroundAttributionLine1);
       theme->attribution_line_2 =
-          *background->FindStringKey(kBackgroundAttributionLine2);
+          *background->FindString(kBackgroundAttributionLine2);
       theme->attribution_url =
-          GURL(*background->FindStringKey(kBackgroundAttributionURL));
+          GURL(*background->FindString(kBackgroundAttributionURL));
       theme->attribution_image_url = GURL();
     }
   }
