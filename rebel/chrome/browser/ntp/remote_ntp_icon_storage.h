@@ -24,6 +24,8 @@ class PrefRegistrySimple;
 class PrefService;
 class SkBitmap;
 
+class RemoteNtpTest;
+
 namespace base {
 class SequencedTaskRunner;
 class Value;
@@ -131,6 +133,8 @@ class RemoteNtpIconStorage {
   RemoteNtpIconStorage(const RemoteNtpIconStorage&) = delete;
   RemoteNtpIconStorage& operator=(const RemoteNtpIconStorage&) = delete;
 
+  friend class ::RemoteNtpTest;
+
   // Retrieve an iterator to the cached icon metadata for the requested origin.
   CachedIconMap::iterator FindCachedIconDataForOrigin(const GURL& origin);
 
@@ -183,6 +187,12 @@ class RemoteNtpIconStorage {
   void InitializeFromPrefs();
   void SerializeToPrefs() const;
 
+  static void SetCacheSizeLimitForTesting(size_t limit) {
+    cache_size_limit_for_testing_ = limit;
+  }
+
+  static size_t cache_size_limit_for_testing_;
+
   Delegate* delegate_;
 
   const base::FilePath storage_path_;
@@ -199,15 +209,6 @@ class RemoteNtpIconStorage {
   SEQUENCE_CHECKER(sequence_checker_);
 
   base::WeakPtrFactory<RemoteNtpIconStorage> weak_ptr_factory_;
-
-  // Test-only methods/data.
- public:
-  static void set_cache_size_limit_for_testing(size_t limit) {
-    cache_size_limit_for_testing_ = limit;
-  }
-
- private:
-  static size_t cache_size_limit_for_testing_;
 };
 
 }  // namespace rebel

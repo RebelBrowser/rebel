@@ -328,17 +328,6 @@ void RemoteNtpThemeProvider::SetExtensionThemeDetails(
   }
 }
 
-void RemoteNtpThemeProvider::AddBackgroundImageForTesting(
-    const GURL& image_url) {
-  background_service_->AddValidBackdropUrlForTesting(image_url);
-}
-
-void RemoteNtpThemeProvider::SetNativeThemeForTesting(ui::NativeTheme* theme) {
-  theme_observer_.Reset();
-  native_theme_ = theme;
-  theme_observer_.Observe(native_theme_);
-}
-
 void RemoteNtpThemeProvider::OnNativeThemeUpdated(
     ui::NativeTheme* native_theme) {
   dark_mode_enabled_ = native_theme_->ShouldUseDarkColors();
@@ -429,6 +418,12 @@ void RemoteNtpThemeProvider::OnThemeChanged() {
   if (delegate_) {
     delegate_->OnThemeUpdated();
   }
+}
+
+void RemoteNtpThemeProvider::SetNativeThemeForTesting(ui::NativeTheme* theme) {
+  theme_observer_.Reset();
+  native_theme_ = theme;
+  theme_observer_.Observe(native_theme_);
 }
 
 }  // namespace rebel
