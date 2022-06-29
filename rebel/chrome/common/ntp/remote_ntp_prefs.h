@@ -5,9 +5,13 @@
 #ifndef REBEL_CHROME_COMMON_NTP_REMOTE_NTP_PREFS_H_
 #define REBEL_CHROME_COMMON_NTP_REMOTE_NTP_PREFS_H_
 
+#include "base/feature_list.h"
+
 class GURL;
 
 namespace rebel {
+
+extern const base::Feature kRemoteNtpFeature;
 
 extern const char kRemoteNtpUrl[];
 extern const char kRemoteNtpProcess[];

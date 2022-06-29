@@ -12,6 +12,9 @@
 
 namespace rebel {
 
+const base::Feature kRemoteNtpFeature{"RemoteNTP",
+                                      base::FEATURE_ENABLED_BY_DEFAULT};
+
 const char kRemoteNtpUrl[] = "remote-ntp-url";
 const char kRemoteNtpProcess[] = "remote-ntp-process";
 
@@ -24,8 +27,7 @@ const char kRemoteNtpLocalBackgroundUrl[] =
     "chrome-search://remote-ntp-offline/local_background.jpg";
 
 bool IsRemoteNtpEnabled() {
-  // TODO(tflynn): Add a command line / pref to disable.
-  return true;
+  return base::FeatureList::IsEnabled(kRemoteNtpFeature);
 }
 
 const GURL& GetRemoteNtpUrl() {
