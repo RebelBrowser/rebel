@@ -43,5 +43,14 @@ declare_args() {
 # Arguments to help with Chromium integration (i.e. not to be overridden).
 declare_args() {
   is_rebel_based = true
+
   rebel_browser_branding_directory = "//rebel/branding/$rebel_browser_name_path_component"
+
+  # Arguments to be passed to //build/util/version.py to fill in Rebel-branded
+  # values while processing the BRANDING file.
+  rebel_process_version_arguments = [
+    "--eval", "REBEL_BROWSER_NAME=\"${rebel_browser_name}\"",
+    "--eval", "REBEL_BROWSER_COMPANY=\"${rebel_browser_company}\"",
+    "--eval", "REBEL_PACKAGE=\"${rebel_package}\"",
+  ]
 }
