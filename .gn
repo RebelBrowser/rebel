@@ -67,7 +67,7 @@ default_args = {
   # Rebel branding overrides.
   branding_path_component = "$rebel_browser_name_path_component"
   branding_path_product = "$rebel_browser_name_path_component"
-  branding_file_path = "$rebel_browser_branding_directory/BRANDING"
+  branding_file_path = "//rebel/branding/BRANDING"
   chrome_public_manifest_package = "$rebel_package"
 
   # Rebel default configuration overrides.
