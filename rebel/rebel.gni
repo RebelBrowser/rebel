@@ -3,6 +3,9 @@
 # found in the LICENSE file.
 
 # Arguments to be overridden by downstream forks.
+#
+# For more details on these arguments, see:
+# https://github.com/RebelBrowser/rebel/wiki#branding
 declare_args() {
   # The full product name of your browser.
   rebel_browser_name = "Rebel"
@@ -30,13 +33,6 @@ declare_args() {
   # The remote URL of your New Tab Page. The New Tab Page may make use of the
   # Rebel Browser API (https://rebelbrowser.github.io/browser_api/) to render
   # e.g. most-visited tiles, theme settings, autocomplete results, etc.
-  #
-  # To replace the Rebel NTP with your own, you should also replace the DEPS
-  # dependency and runhook for the default NTP. This runhook serves to build an
-  # offline copy of the NTP for when the remote page fails to load. Your NTP
-  # repository should contain a deployment script analogous to the default NTP
-  # (https://github.com/RebelBrowser/remote_ntp/blob/main/deploy.py, see the
-  # |generate_rebel_sources| method).
   rebel_new_tab_page_url = "https://browser.viasat.com/rebel_ntp/index.html"
 
   # The remote URL containing the default set of New Tab Page tiles to display.
