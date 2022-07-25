@@ -42,6 +42,8 @@ import("java_sources.gni")
 import("static_initializers.gni")
 import("trichrome.gni")
 
+import("//rebel/sources.gni")
+
 if (android_64bit_target_cpu && skip_secondary_abi_for_cq) {
   assert(current_toolchain != android_secondary_abi_toolchain)
 }
@@ -239,6 +241,13 @@ if (current_toolchain == default_toolchain) {
       "java/res_chromium_base/mipmap-xxxhdpi/layered_app_icon_background.png",
       "java/res_chromium_base/values/channel_constants.xml",
     ]
+
+    if (is_rebel_based) {
+      # Rebel: An auto-generated channel_constants.xml is added in place of
+      # upstream's version in :chrome_public_apk_resources.
+      sources -= [ "java/res_chromium_base/values/channel_constants.xml" ]
+      allow_missing_resources = true
+    }
   }
 
   android_resources("chrome_app_java_resources") {
@@ -710,6 +719,10 @@ if (current_toolchain == default_toolchain) {
       "//url:origin_java",
       "//url/mojom:url_mojom_gurl_java",
     ]
+
+    if (is_rebel_based) {
+      deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom_java" ]
+    }
 
     deps += feed_deps
 
@@ -2063,6 +2076,11 @@ if (current_toolchain == default_toolchain) {
 
     # Dep needed to ensure override works properly.
     deps = [ ":chrome_app_java_resources" ]
+
+    if (is_rebel_based) {
+      sources += [ "$root_gen_dir/rebel/chrome/android/java/res/values/channel_constants.xml" ]
+      deps += [ "//rebel/branding:channel_constants" ]
+    }
   }
 
   # Overrides icon / name defined in chrome_base_module_resources.
@@ -2548,6 +2566,10 @@ if (current_toolchain == default_toolchain) {
     target_type = "android_apk"
     apk_name = "ChromePublic"
     enable_multidex = is_java_debug
+
+    if (is_rebel_based) {
+      apk_name = "$rebel_browser_name"
+    }
   }
 
   chrome_public_apk_or_module_tmpl("chrome_modern_public_base_bundle_module") {
@@ -4162,6 +4184,10 @@ generate_jni("chrome_jni_headers") {
 
   if (enable_vr) {
     sources += [ "java/src/org/chromium/chrome/browser/component_updater/VrAssetsComponentInstaller.java" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_chrome_android_jni_sources, ".", "//rebel")
   }
 }
 
