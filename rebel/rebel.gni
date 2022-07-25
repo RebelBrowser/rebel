@@ -12,6 +12,8 @@ declare_args() {
 
   rebel_browser_schema = "rebel"
 
+  rebel_package = "com.viasat.rebel"
+
   rebel_new_tab_page_url = "https://browser.viasat.com/rebel_ntp/index.html"
 }
 
