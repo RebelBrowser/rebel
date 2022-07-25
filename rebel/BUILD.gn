@@ -5,8 +5,14 @@
 group("rebel") {
   testonly = true
 
-  deps = [
-    "//chrome",
-    "//rebel/chrome/test:rebel_browser_tests",
-  ]
+  if (is_win || is_mac || is_linux) {
+    deps = [
+      "//chrome",
+      "//rebel/chrome/test:rebel_browser_tests",
+    ]
+  } else if (is_android) {
+    deps = [
+      "//chrome/android:chrome_public_apk",
+    ]
+  }
 }
