@@ -24,7 +24,13 @@ import("//components/feed/features.gni")
 import("//components/offline_pages/buildflags/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
 
+import("//rebel/sources.gni")
+
 chrome_java_sources += public_autofill_assistant_java_sources
+
+if (is_rebel_based) {
+  chrome_java_sources += rebase_path(rebel_chrome_android_java_sources, ".", "//rebel")
+}
 
 if (enable_vr) {
   chrome_java_sources += [ "java/src/org/chromium/chrome/browser/component_updater/VrAssetsComponentInstaller.java" ]

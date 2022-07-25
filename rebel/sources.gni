@@ -31,11 +31,21 @@ rebel_chrome_browser_sources = [
   "chrome/browser/ntp/remote_ntp_source.cc",
   "chrome/browser/ntp/remote_ntp_source.h",
   "chrome/browser/ntp/remote_ntp_theme_delegate.h",
-  "chrome/browser/ntp/remote_ntp_theme_provider.cc",
-  "chrome/browser/ntp/remote_ntp_theme_provider.h",
   "chrome/browser/rebel_content_browser_client.cc",
   "chrome/browser/rebel_content_browser_client.h",
 ]
+
+if (is_android) {
+  rebel_chrome_browser_sources += [
+    "chrome/browser/android/ntp/remote_ntp_bridge.cc",
+    "chrome/browser/android/ntp/remote_ntp_bridge.h",
+  ]
+} else {
+  rebel_chrome_browser_sources += [
+    "chrome/browser/ntp/remote_ntp_theme_provider.cc",
+    "chrome/browser/ntp/remote_ntp_theme_provider.h",
+  ]
+}
 
 rebel_chrome_browser_ui_sources = [
   "chrome/browser/ui/ntp/remote_ntp_navigation_throttle.cc",
@@ -47,6 +57,14 @@ rebel_chrome_browser_ui_sources = [
   "chrome/browser/ui/webui/remote_ntp_internals_ui.cc",
   "chrome/browser/ui/webui/remote_ntp_internals_ui.h",
 ]
+
+if (is_android) {
+  # These files are not built on Android by upstream, but are used by RemoteNTP.
+  rebel_chrome_browser_ui_sources += [
+    "//chrome/browser/ui/webui/favicon_source.cc",
+    "//chrome/browser/ui/webui/favicon_source.h",
+  ]
+}
 
 rebel_chrome_common_sources = [
   "chrome/common/ntp/remote_ntp_icon_util.cc",
@@ -65,4 +83,13 @@ rebel_chrome_renderer_sources = [
   "chrome/renderer/ntp/remote_ntp_icon_parser.h",
   "chrome/renderer/rebel_content_renderer_client.cc",
   "chrome/renderer/rebel_content_renderer_client.h",
+]
+
+rebel_chrome_android_java_sources = [
+  "chrome/android/java/src/org/chromium/chrome/browser/app/RebelActivity.java",
+  "chrome/android/java/src/org/chromium/chrome/browser/ntp/RemoteNtpBridge.java",
+]
+
+rebel_chrome_android_jni_sources = [
+  "chrome/android/java/src/org/chromium/chrome/browser/ntp/RemoteNtpBridge.java",
 ]

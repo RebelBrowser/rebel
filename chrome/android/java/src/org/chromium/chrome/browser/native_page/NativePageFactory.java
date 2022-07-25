@@ -11,6 +11,11 @@ import android.graphics.Rect;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
+// REBEL
+import org.chromium.chrome.browser.ntp.RemoteNtpBridge;
+import org.chromium.ui.base.PageTransition;
+// REBEL
+
 import org.chromium.base.jank_tracker.JankTracker;
 import org.chromium.base.supplier.BooleanSupplier;
 import org.chromium.base.supplier.DestroyableObservableSupplier;
@@ -165,6 +170,17 @@ public class NativePageFactory {
             NativePageHost nativePageHost =
                     new TabShim(tab, mBrowserControlsManager, mTabModelSelector);
             if (tab.isIncognito()) return new IncognitoNewTabPage(mActivity, nativePageHost);
+
+            // REBEL
+            if (RemoteNtpBridge.IsRemoteNtpEnabled()) {
+                LoadUrlParams params = new LoadUrlParams(
+                        RemoteNtpBridge.GetRemoteNtpUrl(), PageTransition.HOME_PAGE);
+                params.setShouldReplaceCurrentEntry(true);
+                tab.loadUrl(params);
+
+                return null;
+            }
+            // REBEL
 
             return new NewTabPage(mActivity, mBrowserControlsManager, mCurrentTabSupplier,
                     mSnackbarManagerSupplier.get(), mLifecycleDispatcher, mTabModelSelector,
