@@ -15,7 +15,7 @@
 #include "base/values.h"
 #include "components/version_info/version_info.h"
 #import "ios/chrome/browser/ui/commands/application_commands.h"
-#import "ios/chrome/browser/ui/commands/browser_commands.h"
+#import "ios/chrome/browser/ui/commands/browser_coordinator_commands.h"
 
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/components/url_formatter/rebel_constants.h"
@@ -98,7 +98,8 @@ const char kRemoteNtpCallbackTemplate[] = R"js(
 
 @property(nonatomic, weak) RemoteNtpViewController* viewController;
 
-@property(nonatomic, weak) id<ApplicationCommands, BrowserCommands> dispatcher;
+@property(nonatomic, weak) id<ApplicationCommands, BrowserCoordinatorCommands>
+    dispatcher;
 
 @property(nonatomic, weak) id<RemoteNtpApiObserving> observer;
 

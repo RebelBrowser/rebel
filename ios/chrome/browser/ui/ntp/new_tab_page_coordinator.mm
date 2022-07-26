@@ -280,7 +280,7 @@ namespace {
         [[RemoteNtpViewController alloc] initWithUrlLoader:URLLoader
                                           remoteNtpService:remote_ntp_service];
     self.remoteNtpViewController.dispatcher =
-        static_cast<id<ApplicationCommands, BrowserCommands>>(
+        static_cast<id<ApplicationCommands, BrowserCoordinatorCommands>>(
             self.browser->GetCommandDispatcher());
     self.remoteNtpViewController.browserState = self.browser->GetBrowserState();
 
