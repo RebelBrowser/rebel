@@ -75,6 +75,9 @@ struct RemoteNtpTheme {
   uint32 color;
   uint32 color_dark;
   uint32 color_light;
+
+  // Internal flags to track the source of color information.
+  bool using_generated_theme;
 };
 
 struct WiFiStatus {
