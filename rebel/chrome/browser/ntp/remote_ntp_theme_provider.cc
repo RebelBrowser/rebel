@@ -124,16 +124,15 @@ void RemoteNtpThemeProvider::FetchBackgroundImages(
 void RemoteNtpThemeProvider::StoreBackgroundImage(
     const std::string& collection_id,
     rebel::mojom::BackgroundImagePtr image) {
-  const base::Value::Dict* background =
-      pref_service_->GetValueDict(kRemoteNtpBackgroundDict);
-  if (!background_service_ || !background) {
+  if (!background_service_) {
     return;
   }
 
   if (collection_id.empty()) {
     pref_service_->SetDict(kRemoteNtpBackgroundDict, BackgroundImageDefaults());
   } else {
-    base::Value::Dict new_background = background->Clone();
+    base::Value::Dict new_background =
+        pref_service_->GetValueDict(kRemoteNtpBackgroundDict).Clone();
 
     new_background.Set(kBackgroundCollectionId, collection_id);
     new_background.Set(kBackgroundImageURL, image->image_url.spec());
@@ -177,13 +176,7 @@ void RemoteNtpThemeProvider::SelectLocalBackgroundImage(
 }
 
 void RemoteNtpThemeProvider::StoreLocalBackgroundImage(bool copy_result) {
-  if (!copy_result) {
-    return;
-  }
-
-  const base::Value::Dict* background =
-      pref_service_->GetValueDict(kRemoteNtpBackgroundDict);
-  if (!background_service_ || !background) {
+  if (!copy_result || !background_service_) {
     return;
   }
 
@@ -193,7 +186,8 @@ void RemoteNtpThemeProvider::StoreLocalBackgroundImage(bool copy_result) {
   const std::string now(std::to_string(base::Time::Now().ToTimeT()));
   const GURL image_url(image + "?ts=" + now);
 
-  base::Value::Dict new_background = background->Clone();
+  base::Value::Dict new_background =
+      pref_service_->GetValueDict(kRemoteNtpBackgroundDict).Clone();
 
   new_background.Set(kBackgroundCollectionId, kLocalBackgroundCollectionId);
   new_background.Set(kBackgroundImageURL, image_url.spec());
@@ -263,25 +257,23 @@ rebel::mojom::RemoteNtpThemePtr RemoteNtpThemeProvider::CreateTheme() {
         theme_provider.GetColor(ThemeProperties::COLOR_NTP_BACKGROUND);
   }
 
-  const base::Value::Dict* background =
+  const base::Value::Dict& background =
       pref_service_->GetValueDict(kRemoteNtpBackgroundDict);
 
-  if (background) {
-    const std::string* image_url = background->FindString(kBackgroundImageURL);
+  const std::string* image_url = background.FindString(kBackgroundImageURL);
 
-    if (image_url && !image_url->empty()) {
-      theme->collection_id = *background->FindString(kBackgroundCollectionId);
-      theme->image_url = GURL(*image_url);
-      theme->image_alignment = ThemeProperties::AlignmentToString(0);
-      theme->image_tiling = ThemeProperties::TilingToString(0);
-      theme->attribution_line_1 =
-          *background->FindString(kBackgroundAttributionLine1);
-      theme->attribution_line_2 =
-          *background->FindString(kBackgroundAttributionLine2);
-      theme->attribution_url =
-          GURL(*background->FindString(kBackgroundAttributionURL));
-      theme->attribution_image_url = GURL();
-    }
+  if (image_url && !image_url->empty()) {
+    theme->collection_id = *background.FindString(kBackgroundCollectionId);
+    theme->image_url = GURL(*image_url);
+    theme->image_alignment = ThemeProperties::AlignmentToString(0);
+    theme->image_tiling = ThemeProperties::TilingToString(0);
+    theme->attribution_line_1 =
+        *background.FindString(kBackgroundAttributionLine1);
+    theme->attribution_line_2 =
+        *background.FindString(kBackgroundAttributionLine2);
+    theme->attribution_url =
+        GURL(*background.FindString(kBackgroundAttributionURL));
+    theme->attribution_image_url = GURL();
   }
 
   return theme;

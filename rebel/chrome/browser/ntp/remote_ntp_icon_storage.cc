@@ -528,11 +528,10 @@ rebel::CachedIconMap::value_type RemoteNtpIconStorage::FindIconToEvict() {
 void RemoteNtpIconStorage::InitializeFromPrefs() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-  const base::Value::List* prefs =
+  const base::Value::List& prefs =
       pref_service_->GetValueList(kRemoteNtpIconsPref);
-  DCHECK(prefs) << "|RegisterProfilePrefs| must set |kRemoteNtpIconsPref|";
 
-  for (const base::Value& icon_value : *prefs) {
+  for (const base::Value& icon_value : prefs) {
     if (!icon_value.is_dict()) {
       continue;
     }
