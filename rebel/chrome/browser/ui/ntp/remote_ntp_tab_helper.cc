@@ -73,7 +73,7 @@ void RemoteNtpTabHelper::BindRemoteNtpConnector(
 void RemoteNtpTabHelper::NavigationEntryCommitted(
     const content::LoadCommittedDetails& load_details) {
   content::RenderProcessHost* process_host =
-      web_contents()->GetMainFrame()->GetProcess();
+      web_contents()->GetPrimaryMainFrame()->GetProcess();
 
   if (process_host && remote_ntp_service_) {
     int process_id = process_host->GetID();
@@ -100,7 +100,7 @@ void RemoteNtpTabHelper::DidStartNavigation(
 
 #if !BUILDFLAG(IS_ANDROID)
   content::RenderProcessHost* process_host =
-      web_contents()->GetMainFrame()->GetProcess();
+      web_contents()->GetPrimaryMainFrame()->GetProcess();
 
   if (process_host && remote_ntp_service_ &&
       remote_ntp_service_->IsRemoteNtpProcess(process_host->GetID())) {
@@ -112,7 +112,7 @@ void RemoteNtpTabHelper::DidStartNavigation(
 void RemoteNtpTabHelper::WebContentsDestroyed() {
 #if !BUILDFLAG(IS_ANDROID)
   content::RenderProcessHost* process_host =
-      web_contents()->GetMainFrame()->GetProcess();
+      web_contents()->GetPrimaryMainFrame()->GetProcess();
 
   if (process_host && remote_ntp_service_ &&
       remote_ntp_service_->IsRemoteNtpProcess(process_host->GetID())) {

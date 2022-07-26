@@ -442,7 +442,7 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpTest,
   const GURL non_ntp_url = http_server_->GetURL("/simple.html");
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), non_ntp_url));
   content::RenderProcessHost* old_process =
-      active_tab->GetMainFrame()->GetProcess();
+      active_tab->GetPrimaryMainFrame()->GetProcess();
 
   // Navigate to an NTP while a spare process is present.
   content::RenderProcessHost::WarmupSpareRenderProcessHost(
@@ -455,7 +455,7 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpTest,
   // assertion is a sanity check of the test setup, rather than verification of
   // the core thing that the test cares about.
   content::RenderProcessHost* new_process =
-      active_tab->GetMainFrame()->GetProcess();
+      active_tab->GetPrimaryMainFrame()->GetProcess();
   ASSERT_NE(new_process, old_process);
 
   // Check that the RemoteNTP API is available - the spare RenderProcessHost
