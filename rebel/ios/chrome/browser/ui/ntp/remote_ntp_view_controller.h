@@ -15,13 +15,15 @@ class RemoteNtpService;
 }  // namespace rebel
 
 @protocol ApplicationCommands;
-@protocol BrowserCommands;
+@protocol BrowserCoordinatorCommands;
 
 @interface RemoteNtpViewController : UIViewController
 
 @property(nonatomic, strong) UIScrollView* remoteNtpView;
 
-@property(nonatomic, weak) id<ApplicationCommands, BrowserCommands> dispatcher;
+@property(nonatomic, weak) id<ApplicationCommands, BrowserCoordinatorCommands>
+    dispatcher;
+
 @property(nonatomic, assign) ChromeBrowserState* browserState;
 
 // Init with the given loader object. |loader| may be nil, but isn't retained so
