@@ -100,6 +100,7 @@ create_branded_grd("components_strings") {
     # TODO(tflynn): The following are included in only a subset of systems, but
     # the branding script doesn't detect that.
     "//components/android_system_error_page_strings.grdp",
+    "//components/external_intents_strings.grdp",
     "//components/history_clusters_strings.grdp",
     "//components/management_ios_strings.grdp",
     "//components/management_strings.grdp",
