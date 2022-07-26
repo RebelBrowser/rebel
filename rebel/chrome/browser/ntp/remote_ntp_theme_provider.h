@@ -39,10 +39,6 @@ namespace content {
 class WebContents;
 }  // namespace content
 
-namespace ui {
-class ThemeProvider;
-}  // namespace ui
-
 namespace rebel {
 
 class RemoteNtpThemeDelegate;
@@ -66,6 +62,8 @@ class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
   void PreviewColor(content::WebContents* tab, SkColor color);
   void RevertColor(content::WebContents* tab);
   void CommitColor();
+  void ApplyColorToTheme(content::WebContents* tab,
+                         rebel::mojom::RemoteNtpTheme* theme);
 
   rebel::mojom::RemoteNtpThemePtr CreateTheme();
 
@@ -76,7 +74,6 @@ class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
   friend class ::RemoteNtpThemeTest;
 
   void SetExtensionThemeDetails(const std::string& theme_id,
-                                const ui::ThemeProvider& theme_provider,
                                 rebel::mojom::RemoteNtpTheme* theme);
   void StoreLocalBackgroundImage(bool copy_result);
 

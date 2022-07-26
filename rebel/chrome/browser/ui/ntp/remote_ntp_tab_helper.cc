@@ -284,6 +284,10 @@ void RemoteNtpTabHelper::OnBackgroundImagesChanged(
 }
 
 void RemoteNtpTabHelper::OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
+#if !BUILDFLAG(IS_ANDROID)
+  remote_ntp_theme_provider_->ApplyColorToTheme(web_contents(), theme.get());
+#endif
+
   remote_ntp_router_.SendThemeChanged(std::move(theme));
 }
 
