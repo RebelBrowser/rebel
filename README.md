@@ -1,21 +1,13 @@
-# ![Logo](chrome/app/theme/chromium/product_logo_64.png) Chromium
+# Welcome to the Rebel browser!
 
-Chromium is an open-source browser project that aims to build a safer, faster,
-and more stable way for all users to experience the web.
+Rebel aims to be an easily brandable fork of Chromium.
 
-The project's web site is https://www.chromium.org.
+To brand Chromium today, there are thousands of source and build configuration changes to be made. Rebel's goal is to serve as an intermediate fork of Chromium, allowing downstream forks to create a fully branded browser with only a handful of build arguments.
 
-To check out the source code locally, don't use `git clone`! Instead,
-follow [the instructions on how to get the code](docs/get_the_code.md).
+# Building Rebel
 
-Documentation in the source is rooted in [docs/README.md](docs/README.md).
+Check out the [Rebel Wiki](https://github.com/RebelBrowser/rebel/wiki) for instructions on building and re-branding Rebel, and for documentation on how we've changed upstream Chromium.
 
-Learn how to [Get Around the Chromium Source Code Directory Structure
-](https://www.chromium.org/developers/how-tos/getting-around-the-chrome-source-code).
+# Discussion
 
-For historical reasons, there are some small top level directories. Now the
-guidance is that new top level directories are for product (e.g. Chrome,
-Android WebView, Ash). Even if these products have multiple executables, the
-code should be in subdirectories of the product.
-
-If you found a bug, please file it at https://crbug.com/new.
+To get involved, ask any question on the [Rebel Discussions](https://github.com/RebelBrowser/rebel/discussions) board!
