@@ -125,8 +125,10 @@ void AddInfoBarsIfNecessary(Browser* browser,
     if (show_bad_flags_security_warnings)
       chrome::ShowBadFlagsPrompt(web_contents);
 
+#if !BUILDFLAG(REBEL_BROWSER)
     if (!google_apis::HasAPIKeyConfigured())
       GoogleApiKeysInfoBarDelegate::Create(infobar_manager);
+#endif
 
     if (ObsoleteSystem::IsObsoleteNowOrSoon()) {
       PrefService* local_state = g_browser_process->local_state();
