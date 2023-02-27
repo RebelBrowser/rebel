@@ -44,7 +44,11 @@
 #include "chrome/installer/util/google_update_settings.h"
 #include "components/enterprise/browser/controller/browser_dm_token_storage.h"
 #elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#else
 #include "chrome/browser/mac/keystone_glue.h"
+#endif  // BUILDFLAG(REBEL_BROWSER)
 #endif
 
 namespace {
@@ -478,8 +482,13 @@ void UpgradeDetectorImpl::Init() {
   // On macOS, only enable upgrade notifications if the updater (Keystone) is
   // present.
 #if BUILDFLAG(IS_MAC)
+#if BUILDFLAG(REBEL_BROWSER)
+  if (!rebel::SparkleEnabled())
+    return;
+#else
   if (!keystone_glue::KeystoneEnabled())
     return;
+#endif  // BUILDFLAG(REBEL_BROWSER)
 #endif
 
   // Start checking for outdated builds sometime after startup completes.
