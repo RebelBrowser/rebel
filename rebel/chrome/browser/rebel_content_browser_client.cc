@@ -9,9 +9,11 @@
 #include "base/command_line.h"
 #include "base/containers/flat_set.h"
 #include "base/functional/bind.h"
+#include "chrome/browser/chrome_browser_main.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/url_constants.h"
 #include "content/public/browser/browser_context.h"
+#include "content/public/browser/browser_main_parts.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/navigation_throttle.h"
 #include "content/public/browser/render_frame_host.h"
@@ -30,6 +32,7 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_factory.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
+#include "rebel/chrome/browser/rebel_main_extra_parts.h"
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_navigation_throttle.h"
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_tab_helper.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
@@ -41,6 +44,17 @@ RebelContentBrowserClient::RebelContentBrowserClient()
     : ChromeContentBrowserClient() {}
 
 RebelContentBrowserClient::~RebelContentBrowserClient() = default;
+
+std::unique_ptr<content::BrowserMainParts>
+RebelContentBrowserClient::CreateBrowserMainParts(bool is_integration_test) {
+  auto main_parts =
+      ChromeContentBrowserClient::CreateBrowserMainParts(is_integration_test);
+
+  auto& chrome_parts = reinterpret_cast<ChromeBrowserMainParts&>(*main_parts);
+  chrome_parts.AddParts(std::make_unique<RebelMainExtraParts>());
+
+  return main_parts;
+}
 
 GURL RebelContentBrowserClient::GetEffectiveURL(
     content::BrowserContext* browser_context,

@@ -1,0 +1,288 @@
+diff --git a/Sparkle/SUBasicUpdateDriver.m b/Sparkle/SUBasicUpdateDriver.m
+index e4e357e1..383590a0 100644
+--- a/Sparkle/SUBasicUpdateDriver.m
++++ b/Sparkle/SUBasicUpdateDriver.m
+@@ -78,6 +78,7 @@
+         return;
+     }
+ 
++    SULog(SULogLevelDefault, @"Requesting appcast...");
+     SUAppcast *appcast = [[SUAppcast alloc] init];
+ 
+     id<SUUpdaterPrivate> updater = self.updater;
+@@ -190,9 +191,11 @@
+     // Check minimum and maximum System Version
+     if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
+         minimumVersionOK = [versionComparator compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
++        SULog(SULogLevelDefault, @"Comparing minimum version: %@ vs %@ = %@", ui.minimumSystemVersion, [SUOperatingSystem systemVersionString], minimumVersionOK ? @"OK" : @"Failed");
+     }
+     if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
+         maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
++        SULog(SULogLevelDefault, @"Comparing maximum version: %@ vs %@ = %@", ui.maximumSystemVersion, [SUOperatingSystem systemVersionString], maximumVersionOK ? @"OK" : @"Failed");
+     }
+ 
+     return minimumVersionOK && maximumVersionOK && osOK;
+@@ -200,7 +203,9 @@
+ 
+ - (BOOL)isItemNewer:(SUAppcastItem *)ui
+ {
+-    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
++    BOOL result = [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
++    SULog(SULogLevelDefault, @"Comparing versions: %@ vs %@ = %@", self.host.version, ui.versionString, result ? @"newer" : @"older or the same");
++    return result;
+ }
+ 
+ - (BOOL)itemPreventsAutoupdate:(SUAppcastItem *)ui
+@@ -212,7 +217,9 @@
+ {
+     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
+     if (skippedVersion == nil) { return NO; }
+-    return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
++    BOOL isSkipped = [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
++    SULog(SULogLevelDefault, @"Comparing skipped version: %@ vs %@ = %@", ui.versionString, skippedVersion, isSkipped ? @"skipped" : @"not skipped");
++    return isSkipped;
+ }
+ 
+ - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
+@@ -222,6 +229,8 @@
+ 
+ - (void)appcastDidFinishLoading:(SUAppcast *)ac
+ {
++    SULog(SULogLevelDefault, @"Appcast loaded, checking...");
++
+     id<SUUpdaterPrivate> updater = self.updater;
+     if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+         [[updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
+@@ -261,9 +270,11 @@
+ 
+ 
+     if ([self itemContainsValidUpdate:item]) {
++        SULog(SULogLevelDefault, @"There are updates, will try to apply...");
+         self.updateItem = item;
+         [self performSelectorOnMainThread:@selector(didFindValidUpdate) withObject:nil waitUntilDone:NO];
+     } else {
++        SULog(SULogLevelDefault, @"No updates found");
+         self.updateItem = nil;
+         [self performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:NO];
+     }
+@@ -376,6 +387,7 @@
+     SPUURLRequest *urlRequest = [SPUURLRequest URLRequestWithRequest:request];
+     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
+     [self.download startPersistentDownloadWithRequest:urlRequest bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
++    SULog(SULogLevelDefault, @"Downloading an update started...");
+ }
+ 
+ 
+@@ -410,6 +422,7 @@
+         [[updater delegate] updater:self.updater didDownloadUpdate:self.updateItem];
+     }
+ 
++    SULog(SULogLevelDefault, @"Download completed, extracting...");
+     [self extractUpdate];
+ }
+ 
+@@ -503,6 +516,7 @@
+ {
+     assert(self.updateItem);
+ 
++    SULog(SULogLevelDefault, @"Unarchiving completed, relaunching...");
+     [self installWithToolAndRelaunch:YES];
+ }
+ 
+@@ -589,6 +603,7 @@
+             [invocation setTarget:self];
+             postponedOnce = YES;
+             if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
++            SULog(SULogLevelDefault, @"Relaunch postponed");
+                 return;
+             }
+         } else if ([updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
+@@ -654,6 +669,8 @@
+         }
+     }
+ 
++    SULog(SULogLevelDefault, @"Extracted. Relaunching...");
++
+     if (!copiedRelaunchPath) {
+         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
+             NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
+diff --git a/Sparkle/SUUIBasedUpdateDriver.m b/Sparkle/SUUIBasedUpdateDriver.m
+index f32aac9a..7c629d00 100644
+--- a/Sparkle/SUUIBasedUpdateDriver.m
++++ b/Sparkle/SUUIBasedUpdateDriver.m
+@@ -18,6 +18,7 @@
+ #import "SULocalizations.h"
+ #import "SUAppcastItem.h"
+ #import "SUApplicationInfo.h"
++#import "SULog.h"
+ 
+ #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
+ @interface NSByteCountFormatter : NSFormatter {
+@@ -125,7 +126,7 @@
+ 
+     if (!self.automaticallyInstallUpdates) {
+         NSAlert *alert = [[NSAlert alloc] init];
+-        
++
+         if (self.latestAppcastItem) // if the appcast was successfully loaded
+         {
+             alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+@@ -146,7 +147,7 @@
+ 
+         [self showAlert:alert];
+     }
+-    
++
+     [self abortUpdate];
+ }
+ 
+@@ -173,19 +174,22 @@
+     id<SUUpdaterPrivate> updater = self.updater;
+     switch (choice) {
+         case SUInstallUpdateChoice:
++            SULog(SULogLevelDefault, @"User chose: update");
+             [self didDismissAlertPermanently:NO forItem:item];
+             [self downloadUpdate];
+             break;
+ 
+         case SUOpenInfoURLChoice:
++            SULog(SULogLevelDefault, @"User chose: see info");
+             [self didDismissAlertPermanently:NO forItem:item];
+             [[NSWorkspace sharedWorkspace] openURL:[self.updateItem infoURL]];
+             [self abortUpdate];
+             break;
+ 
+         case SUSkipThisVersionChoice:
+-            if ([[updater delegate] respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) { 
+-                [[updater delegate] updater:self.updater userDidSkipThisVersion:self.updateItem]; 
++            SULog(SULogLevelDefault, @"User chose: skip this version");
++            if ([[updater delegate] respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) {
++                [[updater delegate] updater:self.updater userDidSkipThisVersion:self.updateItem];
+             }
+             [self didDismissAlertPermanently:YES forItem:item];
+             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+@@ -193,6 +197,7 @@
+             break;
+ 
+         case SURemindMeLaterChoice:
++            SULog(SULogLevelDefault, @"User chose: remind later");
+             [self didDismissAlertPermanently:NO forItem:item];
+             [self abortUpdate];
+             break;
+@@ -206,15 +211,15 @@
+         self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+         createdStatusController = YES;
+     }
+-    
++
+     [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+     [self.statusController setButtonEnabled:YES];
+-    
++
+     if (createdStatusController) {
+         [self.statusController showWindow:self];
+     }
+-    
++
+     [super downloadUpdate];
+ }
+ 
+@@ -279,7 +284,7 @@
+ {
+     if (self.download) {
+         [self.download cancel];
+-        
++
+         id<SUUpdaterPrivate> updater = self.updater;
+         if ([[updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
+             [[updater delegate] userDidCancelDownload:self.updater];
+@@ -295,7 +300,7 @@
+         [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+         [self.statusController setButtonEnabled:NO];
+     };
+-    
++
+     if (![NSThread mainThread]) {
+         dispatch_sync(dispatch_get_main_queue(), updateUI);
+     } else {
+diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
+index f2bf066a..58c37beb 100644
+--- a/Sparkle/SUUpdater.m
++++ b/Sparkle/SUUpdater.m
+@@ -241,6 +241,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+ 
+     [[SUGlobalUpdateLock sharedLock] unlock];  // For safety, remove active lock if present in any case and not just when relaunching from an app update
+     
++    SULog(SULogLevelDefault, @"Sparkle module started. App version %@. Works with %@", [self.host version], [self feedURL]);
++
+     if (shouldPrompt) {
+         NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
+         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
+@@ -281,7 +283,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     {
+         [self setUpdateLastCheckedDate:[self.host objectForUserDefaultsKey:SULastCheckTimeKey]];
+     }
+-    
++
+     return [self updateLastCheckedDate];
+ }
+ 
+@@ -352,7 +354,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+ 
+     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
+     SUUpdateDriver *theUpdateDriver = [(SUBasicUpdateDriver *)[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+-    
++
+     [self checkForUpdatesWithDriver:theUpdateDriver];
+ }
+ 
+@@ -389,13 +391,19 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+ 
+ - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
+ {
+-    if ([self updateInProgress]) { return; }
++    SULog(SULogLevelDefault, @"Requested for update via %@", NSStringFromClass([d class]));
++
++    if ([self updateInProgress]) {
++        SULog(SULogLevelDefault, @"Update check rejected: in progress");
++        return;
++    }
+     if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }  // Timer is non-repeating, may have invalidated itself, so we had to retain it.
+ 
+     [self updateLastUpdateCheckDate];
+ 
+     if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
+     {
++        SULog(SULogLevelDefault, @"Update check rejected: not allowed by delegate");
+         [self scheduleNextUpdateCheck];
+         return;
+     }
+@@ -405,6 +413,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     // If we're not given a driver at all, just schedule the next update check and bail.
+     if (!self.driver)
+     {
++        SULog(SULogLevelDefault, @"Update check rejected: no driver is set");
+         [self scheduleNextUpdateCheck];
+         return;
+     }
+@@ -414,8 +423,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     NSURL *theFeedURL = [self parameterizedFeedURL];
+     if (theFeedURL) // Use a NIL URL to cancel quietly.
+         [self.driver checkForUpdatesAtURL:theFeedURL host:self.host];
+-    else
++    else {
++        SULog(SULogLevelDefault, @"Update check aborted: empty url");
+         [self.driver abortUpdate];
++    }
+ }
+ 
+ - (void)registerAsObserver
+@@ -581,6 +592,7 @@ static NSString *escapeURLComponent(NSString *str) {
+         parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
+         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
+     }
++
+     if ([parameters count] == 0) { return baseFeedURL; }
+ 
+     // Build up the parameterized URL.

@@ -351,6 +351,12 @@
 #include "components/unexportable_keys/features.h"  // nogncheck
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "rebel/chrome/browser/channel_selection_choices.h"
+#endif
+#endif
+
 using flags_ui::FeatureEntry;
 using flags_ui::kDeprecated;
 using flags_ui::kOsAndroid;
@@ -10792,6 +10798,13 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kPasswordGenerationStrongLabelExperimentName,
      flag_descriptions::kPasswordGenerationStrongLabelExperimentDescription,
      kOsDesktop, FEATURE_VALUE_TYPE(blink::features::kPasswordStrongLabel)},
+#endif
+
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+    {"channel", rebel::kChannelFlagName, rebel::kChannelFlagDescription, kOsMac,
+     MULTI_VALUE_TYPE(rebel::kChannelChoices)},
+#endif
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

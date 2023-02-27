@@ -1,0 +1,43 @@
+# Copyright 2023 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+assert(is_mac)
+
+import("//build/config/mac/rules.gni")
+
+bundle_data("sparkle_framework") {
+  public_deps = [ ":build_sparkle_framework" ]
+
+  sources = [ "$root_out_dir/Sparkle.framework" ]
+  outputs = [ "{{bundle_contents_dir}}/Frameworks/{{source_file_part}}" ]
+}
+
+action("build_sparkle_framework") {
+  script = "build_sparkle_framework.py"
+
+  sources = [ "src/REVISION" ]
+  outputs = [ "$root_out_dir/Sparkle.framework" ]
+}
+
+config("sparkle_link_test") {
+  ldflags = [
+    "-rpath",
+    "@executable_path",
+    "-F",
+    rebase_path(root_out_dir),
+    "-framework",
+    "Sparkle",
+  ]
+}
+
+config("sparkle_link_framework") {
+  ldflags = [
+    "-rpath",
+    "@loader_path/Frameworks",
+    "-F",
+    rebase_path(root_out_dir),
+    "-framework",
+    "Sparkle",
+  ]
+}

@@ -1,2 +1,4 @@
 /third_party/reclient_configs
 /third_party/remote_ntp
+/third_party/sparkle/src
+/third_party/sparkle/upstream

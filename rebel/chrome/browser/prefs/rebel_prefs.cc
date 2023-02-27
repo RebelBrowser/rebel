@@ -13,6 +13,10 @@
 #include "components/ntp_tiles/popular_sites_impl.h"
 #endif
 
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "rebel/chrome/browser/channel_selection.h"
+#endif
+
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
 #include "rebel/services/network/remote_ntp_api_allow_list.h"
 
@@ -21,6 +25,10 @@ namespace rebel {
 void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   rebel::RemoteNtpApiAllowList::RegisterProfilePrefs(registry);
   rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
+
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+  rebel::RegisterChannelSelectionProfilePrefs(registry);
+#endif
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   ntp_tiles::CustomLinksManagerImpl::RegisterProfilePrefs(registry);
