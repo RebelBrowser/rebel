@@ -6,7 +6,10 @@ group("rebel") {
   testonly = true
 
   if (is_win || is_mac || is_linux) {
-    deps = [ "//chrome" ]
+    deps = [
+      "//chrome",
+      "//chrome/installer",
+    ]
 
     if (!is_official_build) {
       deps += [ "//rebel/chrome/test:rebel_browser_tests" ]

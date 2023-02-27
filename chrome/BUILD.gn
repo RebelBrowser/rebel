@@ -507,6 +507,13 @@ if (is_win) {
   chrome_framework_name = chrome_product_full_name + " Framework"
   chrome_framework_version = chrome_version_full
 
+  if (is_rebel_based) {
+      # Rebel: We use an abbreviation to ensure the full package name does not
+      # exceed arbitrary length limits in Omaha (approximately 100 characters).
+      chrome_helper_name = rebel_browser_abbreviation + " Helper"
+      chrome_framework_name = rebel_browser_abbreviation + " Framework"
+  }
+
   verify_dynamic_libraries = !is_component_build && !is_asan
   if (host_os == "mac") {
     objdump_path = mac_bin_path
