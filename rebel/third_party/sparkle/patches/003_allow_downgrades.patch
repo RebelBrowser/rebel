@@ -1,0 +1,74 @@
+diff --git a/Configurations/ConfigCommon.xcconfig b/Configurations/ConfigCommon.xcconfig
+index a6694c2e..e5f1b746 100644
+--- a/Configurations/ConfigCommon.xcconfig
++++ b/Configurations/ConfigCommon.xcconfig
+@@ -8,7 +8,7 @@ SPARKLE_APPEND_VERSION_NUMBER = 1
+ 
+ // Sparkle usually doesn't allow downgrades as they're usually accidental, but
+ // if your app has a downgrade function or URL handler, turn this on
+-SPARKLE_AUTOMATED_DOWNGRADES = 0
++SPARKLE_AUTOMATED_DOWNGRADES = 1
+ 
+ // If your app file on disk is named "MyApp 1.1b4", Sparkle usually updates it
+ // in place, giving you an app named 1.1b4 that is actually 1.2. Turn the
+diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
+index a98bc21b..95665c47 100644
+--- a/Sparkle/SUUpdater.m
++++ b/Sparkle/SUUpdater.m
+@@ -188,18 +188,29 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+ {
+     NSMutableArray *parameters = [NSMutableArray new];
+ 
+-    if ([self.host displayVersion].length > 0) {
++    bool includeVersion = true;
++    bool includeDeviceUID = true;
++
++    if ([self.delegate respondsToSelector:@selector(updateRequestShouldIncludeVersion:)]) {
++        includeVersion = [self.delegate updateRequestShouldIncludeVersion:self];
++    }
++    if ([self.delegate respondsToSelector:@selector(updateRequestShouldIncludeDeviceUID:)]) {
++        includeDeviceUID = [self.delegate updateRequestShouldIncludeDeviceUID:self];
++    }
++
++    if (includeVersion && ([self.host displayVersion].length > 0)) {
+         NSMutableDictionary *item = [NSMutableDictionary new];
+         item[@"key"] = @"appVersionShort";
+         item[@"value"] = [self.host displayVersion];
+         [parameters addObject:item];
+     }
+-    if (self.deviceUIDString.length > 0) {
++    if (includeDeviceUID && (self.deviceUIDString.length > 0)) {
+         NSMutableDictionary *item = [NSMutableDictionary new];
+         item[@"key"] = @"deviceID";
+         item[@"value"] = self.deviceUIDString;
+         [parameters addObject:item];
+     }
++
+     return parameters;
+ }
+ 
+diff --git a/Sparkle/SUUpdaterDelegate.h b/Sparkle/SUUpdaterDelegate.h
+index f026d752..fb8326f4 100644
+--- a/Sparkle/SUUpdaterDelegate.h
++++ b/Sparkle/SUUpdaterDelegate.h
+@@ -79,6 +79,20 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+  */
+ - (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater;
+ 
++/*!
++ Returns whether the appcast request should include the current version.
++
++ \param updater The SUUpdater instance.
++ */
++- (BOOL)updateRequestShouldIncludeVersion:(SUUpdater *)updater;
++
++/*!
++ Returns whether the appcast request should include the device UID.
++
++ \param updater The SUUpdater instance.
++ */
++- (BOOL)updateRequestShouldIncludeDeviceUID:(SUUpdater *)updater;
++
+ /*!
+  Returns whether Sparkle should prompt the user about automatic update checks.
+  

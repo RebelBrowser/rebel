@@ -1,0 +1,17 @@
+diff --git a/Sparkle/SUBasicUpdateDriver.m b/Sparkle/SUBasicUpdateDriver.m
+index 383590a0..c0c2354e 100644
+--- a/Sparkle/SUBasicUpdateDriver.m
++++ b/Sparkle/SUBasicUpdateDriver.m
+@@ -215,11 +215,7 @@
+ 
+ - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
+ {
+-    NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
+-    if (skippedVersion == nil) { return NO; }
+-    BOOL isSkipped = [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+-    SULog(SULogLevelDefault, @"Comparing skipped version: %@ vs %@ = %@", ui.versionString, skippedVersion, isSkipped ? @"skipped" : @"not skipped");
+-    return isSkipped;
++    return NO;
+ }
+ 
+ - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui

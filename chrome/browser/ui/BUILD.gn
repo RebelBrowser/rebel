@@ -6648,6 +6648,15 @@ static_library("ui") {
   if (is_rebel_based) {
     sources += rebase_path(rebel_chrome_browser_ui_sources, ".", "//rebel")
     deps += [ "//rebel/chrome/common/ntp:remote_ntp_mojom" ]
+
+    if (is_mac) {
+      sources -= [
+        "webui/help/version_updater_mac.h",
+        "webui/help/version_updater_mac.mm",
+      ]
+
+      public_configs = [ "//rebel/third_party/sparkle:sparkle_link_test" ]
+    }
   }
 }
 
