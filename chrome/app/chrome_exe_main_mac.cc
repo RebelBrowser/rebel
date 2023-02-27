@@ -28,6 +28,10 @@
 #include "sandbox/mac/seatbelt_exec.h"  // nogncheck
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 extern "C" {
 // abort_report_np() records the message in a special section that both the
 // system CrashReporter and Crashpad collect in crash reports. Using a Crashpad
@@ -180,11 +184,21 @@ __attribute__((visibility("default"))) int main(int argc, char* argv[]) {
 
   // The helper lives within the versioned framework directory, so simply
   // go up to find the main dylib.
+#if BUILDFLAG(REBEL_BROWSER)
+  const char rel_path[] = "../../../../" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_ABBREVIATION) " Framework";
+#else
   const char rel_path[] = "../../../../" PRODUCT_FULLNAME_STRING " Framework";
+#endif
+#else
+#if BUILDFLAG(REBEL_BROWSER)
+  const char rel_path[] = "../Frameworks/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_ABBREVIATION)
+                          " Framework.framework/Versions/" CHROME_VERSION_STRING
+                          "/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_ABBREVIATION) " Framework";
 #else
   const char rel_path[] = "../Frameworks/" PRODUCT_FULLNAME_STRING
                           " Framework.framework/Versions/" CHROME_VERSION_STRING
                           "/" PRODUCT_FULLNAME_STRING " Framework";
+#endif
 #endif  // defined(HELPER_EXECUTABLE)
 
   // Slice off the last part of the main executable path, and append the
