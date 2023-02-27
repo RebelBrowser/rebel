@@ -318,6 +318,12 @@
 #include "ui/views/views_switches.h"
 #endif  // defined(TOOLKIT_VIEWS)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "rebel/chrome/browser/channel_selection_choices.h"
+#endif
+#endif
+
 using flags_ui::FeatureEntry;
 using flags_ui::kDeprecated;
 using flags_ui::kOsAndroid;
@@ -9464,6 +9470,13 @@ const FeatureEntry kFeatureEntries[] = {
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag
     // Histograms" in tools/metrics/histograms/README.md (run the
     // AboutFlagsHistogramTest unit test to verify this process).
+
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+    {"channel", rebel::kChannelFlagName, rebel::kChannelFlagDescription, kOsMac,
+     MULTI_VALUE_TYPE(rebel::kChannelChoices)},
+#endif
+#endif
 };
 
 class FlagsStateSingleton : public flags_ui::FlagsState::Delegate {
