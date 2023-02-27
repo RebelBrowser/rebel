@@ -176,6 +176,10 @@ void ProfileMenuView::BuildMenu() {
 }
 
 gfx::ImageSkia ProfileMenuView::GetSyncIcon() const {
+#if BUILDFLAG(REBEL_BROWSER)
+  // Do not show the small circular "sync" icon on top of the user's avatar.
+  return gfx::ImageSkia();
+#else
   Profile* profile = browser()->profile();
   if (profile->IsOffTheRecord() || profile->IsGuestSession())
     return gfx::ImageSkia();
@@ -198,6 +202,7 @@ gfx::ImageSkia ProfileMenuView::GetSyncIcon() const {
                              ? ui::kColorButtonBackgroundProminent
                              : ui::kColorAlertHighSeverity;
   return ColoredImageForMenu(kSyncPausedCircleIcon, color_id);
+#endif  // BUILDFLAG(REBEL_BROWSER)
 }
 
 std::u16string ProfileMenuView::GetAccessibleWindowTitle() const {
@@ -467,8 +472,12 @@ void ProfileMenuView::BuildIdentity() {
         menu_subtitle_);
   } else {
     menu_title_ = std::u16string();
+#if BUILDFLAG(REBEL_BROWSER)
+    menu_subtitle_ = std::u16string();
+#else
     menu_subtitle_ =
         l10n_util::GetStringUTF16(IDS_PROFILES_LOCAL_PROFILE_STATE);
+#endif  // BUILDFLAG(REBEL_BROWSER)
     SetProfileIdentityInfo(
         profile_name, background_color, edit_button_params,
         ui::ImageModel::FromImage(
