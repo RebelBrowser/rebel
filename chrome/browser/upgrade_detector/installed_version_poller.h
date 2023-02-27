@@ -15,6 +15,11 @@
 #include "base/timer/timer.h"
 #include "chrome/browser/upgrade_detector/get_installed_version.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+class VersionUpdater;
+#endif
+
 class BuildState;
 class InstalledVersionMonitor;
 
@@ -95,6 +100,10 @@ class InstalledVersionPoller {
   BuildState* const build_state_;
   const GetInstalledVersionCallback get_installed_version_;
   base::OneShotTimer timer_;
+
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+  std::unique_ptr<VersionUpdater> version_updater_;
+#endif
 
   // Valid while observing modifications to the installation.
   std::unique_ptr<InstalledVersionMonitor> monitor_;

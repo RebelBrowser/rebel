@@ -310,6 +310,10 @@
 #include "ui/views/views_switches.h"
 #endif  // defined(TOOLKIT_VIEWS)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/channel_selection_choices.h"
+#endif
+
 using flags_ui::FeatureEntry;
 using flags_ui::kDeprecated;
 using flags_ui::kOsAndroid;
@@ -9517,6 +9521,11 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kUseMojoVideoDecoderForPepperName,
      flag_descriptions::kUseMojoVideoDecoderForPepperDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(media::kUseMojoVideoDecoderForPepper)},
+
+#if BUILDFLAG(REBEL_BROWSER)
+    {"channel", rebel::kChannelFlagName, rebel::kChannelFlagDescription, kOsMac,
+     MULTI_VALUE_TYPE(rebel::kChannelChoices)},
+#endif
 
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag

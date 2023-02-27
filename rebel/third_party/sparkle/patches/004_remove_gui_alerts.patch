@@ -1,0 +1,16 @@
+diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
+index c65e8a07..7b1ac825 100644
+--- a/Sparkle/SUUpdater.m
++++ b/Sparkle/SUUpdater.m
+@@ -227,10 +227,7 @@ - (NSArray *)viasatRelatedParameters
+ #pragma mark - End Viasat methods
+ 
+ -(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
+-    NSAlert *alert = [[NSAlert alloc] init];
+-    alert.messageText = text;
+-    alert.informativeText = informativeText;
+-    [self.driver showAlert:alert];
++    SULog(SULogLevelError, @"WARNING: %s, %s", text, informativeText);
+ }
+ 
+ -(void)checkIfConfiguredProperly {

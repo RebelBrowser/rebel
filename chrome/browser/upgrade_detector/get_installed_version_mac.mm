@@ -14,15 +14,25 @@
 #include "chrome/browser/updater/browser_updater_client_util.h"
 #include "chrome/common/chrome_features.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#endif
+
 namespace {
 
 InstalledAndCriticalVersion GetInstalledVersionSynchronous() {
+#if BUILDFLAG(REBEL_BROWSER)
+  return InstalledAndCriticalVersion(base::Version(
+      base::UTF16ToASCII(rebel::CurrentlyDownloadedVersion())));
+#else
   if (base::FeatureList::IsEnabled(features::kUseChromiumUpdater)) {
     return InstalledAndCriticalVersion(
         base::Version(CurrentlyInstalledVersion()));
   }
   return InstalledAndCriticalVersion(base::Version(
       base::UTF16ToASCII(keystone_glue::CurrentlyInstalledVersion())));
+#endif
 }
 
 }  // namespace

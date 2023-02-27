@@ -508,6 +508,10 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
 #endif
 
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "rebel/chrome/browser/channel_selection.h"
+#endif
+
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
 #endif
 
@@ -1425,6 +1429,10 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #else
   ntp_tiles::PopularSitesImpl::RegisterProfilePrefs(registry);
   rebel::RemoteNtpThemeProvider::RegisterProfilePrefs(registry);
+#endif
+
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+  rebel::RegisterChannelSelectionProfilePrefs(registry);
 #endif
 #endif
 

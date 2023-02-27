@@ -44,7 +44,18 @@ buildflag_header("branding_buildflags") {
       "REBEL_BROWSER_NEW_TAB_PAGE=\"$rebel_new_tab_page_url\"",
       "REBEL_BROWSER_HELP=\"$rebel_help_url\"",
       "REBEL_BROWSER_DEFAULT_SITES=\"$rebel_default_sites_url\"",
+      "REBEL_OMAHA_PUBLIC_URL=\"$rebel_omaha_public_url\"",
+      "REBEL_OMAHA_PRIVATE_URL=\"$rebel_omaha_private_url\"",
+      "REBEL_SPARKLE_PRODUCT_NAME=\"$rebel_sparkle_product_name\"",
     ]
+
+    if (is_mac) {
+      if (is_rebel_sparkle_enabled) {
+        flags += [ "REBEL_SPARKLE_ENABLED=1" ]
+      } else {
+        flags += [ "REBEL_SPARKLE_ENABLED=0" ]
+      }
+    }
   } else {
     flags = [
       "CHROMIUM_BRANDING=1",

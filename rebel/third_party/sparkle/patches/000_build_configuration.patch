@@ -1,0 +1,97 @@
+diff --git a/Configurations/ConfigCommon.xcconfig b/Configurations/ConfigCommon.xcconfig
+index 065ac4f1..a6694c2e 100644
+--- a/Configurations/ConfigCommon.xcconfig
++++ b/Configurations/ConfigCommon.xcconfig
+@@ -13,7 +13,7 @@ SPARKLE_AUTOMATED_DOWNGRADES = 0
+ // If your app file on disk is named "MyApp 1.1b4", Sparkle usually updates it
+ // in place, giving you an app named 1.1b4 that is actually 1.2. Turn the
+ // following on to always reset the name back to "MyApp":
+-SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME = 0
++SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME = 1
+ 
+ // If you change any of these version details, you must increase CURRENT_PROJECT_VERSION
+ SPARKLE_VERSION_MAJOR = 1
+diff --git a/Sparkle.xcodeproj/project.pbxproj b/Sparkle.xcodeproj/project.pbxproj
+index 11d147f9..3041cbb1 100644
+--- a/Sparkle.xcodeproj/project.pbxproj
++++ b/Sparkle.xcodeproj/project.pbxproj
+@@ -40,6 +40,12 @@
+ /* End PBXAggregateTarget section */
+ 
+ /* Begin PBXBuildFile section */
++		03BCA9511C69EDAA00004122 /* SUDeviceUIDTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 03BCA9501C69EDAA00004122 /* SUDeviceUIDTest.m */; };
++		03BCA9591C6A3FD100004122 /* SUDeviceUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 03BCA9571C6A3FD100004122 /* SUDeviceUID.h */; };
++		03BCA95A1C6A3FD100004122 /* SUDeviceUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 03BCA9581C6A3FD100004122 /* SUDeviceUID.m */; };
++		03BCA95B1C6A3FD100004122 /* SUDeviceUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 03BCA9581C6A3FD100004122 /* SUDeviceUID.m */; };
++		03D2DD901DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 03D2DD8E1DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.h */; };
++		03D2DD911DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 03D2DD8F1DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.m */; };
+ 		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
+ 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+ 		142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+@@ -640,6 +646,11 @@
+ /* Begin PBXFileReference section */
+ 		004A8652192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Sparkle.strings; sourceTree = "<group>"; };
+ 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
++		03BCA9501C69EDAA00004122 /* SUDeviceUIDTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDeviceUIDTest.m; sourceTree = "<group>"; };
++		03BCA9571C6A3FD100004122 /* SUDeviceUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDeviceUID.h; sourceTree = "<group>"; };
++		03BCA9581C6A3FD100004122 /* SUDeviceUID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDeviceUID.m; sourceTree = "<group>"; };
++		03D2DD8E1DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAutomaticUIlessUpdateDriver.h; sourceTree = "<group>"; };
++		03D2DD8F1DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUIlessUpdateDriver.m; sourceTree = "<group>"; };
+ 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+ 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+ 		0A8DAD73207FA6F300FFD934 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Sparkle.strings; sourceTree = "<group>"; };
+@@ -1527,6 +1538,7 @@
+ 				7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */,
+ 				14950074195FDF5900BC5B5B /* SUUpdaterTest.m */,
+ 				61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */,
++				03BCA9501C69EDAA00004122 /* SUDeviceUIDTest.m */,
+ 			);
+ 			path = Tests;
+ 			sourceTree = "<group>";
+@@ -1608,6 +1620,8 @@
+ 				726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */,
+ 				72316BE11E0E1C7F0039EFD9 /* SUSystemUpdateInfo.h */,
+ 				72316BE21E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m */,
++				03BCA9571C6A3FD100004122 /* SUDeviceUID.h */,
++				03BCA9581C6A3FD100004122 /* SUDeviceUID.m */,
+ 			);
+ 			includeInIndex = 1;
+ 			name = "Other Sources";
+@@ -1655,6 +1669,8 @@
+ 			children = (
+ 				61B93B250DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h */,
+ 				61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */,
++				03D2DD8E1DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.h */,
++				03D2DD8F1DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.m */,
+ 				61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */,
+ 				61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */,
+ 				610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */,
+@@ -1810,7 +1826,9 @@
+ 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
+ 				7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */,
+ 				722954C41D04E66F00ECF9CA /* SUFileOperationConstants.h in Headers */,
+-				72E1D7DF25A3E3AD0001BA6D /* SUWKWebView.h in Headers */,
++                               72E1D7DF25A3E3AD0001BA6D /* SUWKWebView.h in Headers */,
++				03D2DD901DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.h in Headers */,
++				03BCA9591C6A3FD100004122 /* SUDeviceUID.h in Headers */,
+ 				767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */,
+ 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
+ 				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
+@@ -2451,6 +2469,8 @@
+ 				F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */,
+ 				5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */,
+ 				72A4A2401BB6567D00E7820D /* SUFileManagerTest.swift in Sources */,
++				03BCA95B1C6A3FD100004122 /* SUDeviceUID.m in Sources */,
++				03BCA9511C69EDAA00004122 /* SUDeviceUIDTest.m in Sources */,
+ 				5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */,
+ 				723ABE91259AA3B100BDB4FA /* SUAdHocCodeSigning.m in Sources */,
+ 				14652F8219A9746000959E44 /* SULog.m in Sources */,
+@@ -2513,6 +2533,8 @@
+ 				61B5FC6F09C51F4900B25A18 /* SUAppcastItem.m in Sources */,
+ 				72316BDF1E0E17910039EFD9 /* SUApplicationInfo.m in Sources */,
+ 				6120721309CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m in Sources */,
++				03D2DD911DCF4F04009FF68F /* SUAutomaticUIlessUpdateDriver.m in Sources */,
++				03BCA95A1C6A3FD100004122 /* SUDeviceUID.m in Sources */,
+ 				61B93B280DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m in Sources */,
+ 				61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */,
+ 				5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */,

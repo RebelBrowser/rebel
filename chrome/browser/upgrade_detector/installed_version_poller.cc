@@ -23,6 +23,10 @@
 #include "chrome/common/chrome_switches.h"
 #include "components/version_info/version_info.h"
 
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+#include "chrome/browser/ui/webui/help/version_updater.h"
+#endif
+
 namespace {
 
 bool g_disabled_for_testing = false;
@@ -130,6 +134,10 @@ InstalledVersionPoller::InstalledVersionPoller(
     : build_state_(build_state),
       get_installed_version_(std::move(get_installed_version)),
       timer_(tick_clock) {
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+  version_updater_.reset(VersionUpdater::Create(nullptr));
+#endif
+
   // Make the first check in the background without delay. Suppress this if
   // polling is disabled for testing. This prevents all polling from taking
   // place since the result of poll N kicks off poll N+1.
@@ -195,6 +203,14 @@ void InstalledVersionPoller::OnInstalledVersion(
         break;
     }
   }
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+  else if (version_updater_) {
+    // Rebel: On macOS, Sparkle will only provide a valid |installed_version|
+    // when it has actually downloaded an upgrade. Ask Sparkle to check now.
+    version_updater_->CheckForUpdate(base::DoNothing(), base::DoNothing());
+    update_type = BuildState::UpdateType::kNone;
+  }
+#endif
 
   if (update_type == BuildState::UpdateType::kNone) {
     // The discovered version matches the current version, so report that no
