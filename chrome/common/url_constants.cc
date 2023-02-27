@@ -60,6 +60,8 @@ const char kChromeHelpViaKeyboardURL[] =
 #else
     "https://support.google.com/chromebook/?p=help&ctx=keyboard";
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#elif BUILDFLAG(REBEL_BROWSER)
+    BUILDFLAG(REBEL_BROWSER_HELP);
 #else
     "https://support.google.com/chrome/?p=help&ctx=keyboard";
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
@@ -71,12 +73,19 @@ const char kChromeHelpViaMenuURL[] =
 #else
     "https://support.google.com/chromebook/?p=help&ctx=menu";
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#elif BUILDFLAG(REBEL_BROWSER)
+    BUILDFLAG(REBEL_BROWSER_HELP);
 #else
     "https://support.google.com/chrome/?p=help&ctx=menu";
 #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
 
+#if BUILDFLAG(REBEL_BROWSER)
+const char kChromeHelpViaWebUIURL[] =
+    BUILDFLAG(REBEL_BROWSER_HELP);
+#else
 const char kChromeHelpViaWebUIURL[] =
     "https://support.google.com/chrome/?p=help&ctx=settings";
+#endif
 #if BUILDFLAG(IS_CHROMEOS_ASH)
 const char kChromeOsHelpViaWebUIURL[] =
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
