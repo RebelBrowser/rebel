@@ -1,0 +1,16 @@
+diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
+index 95665c47..b584dc9c 100644
+--- a/Sparkle/SUUpdater.m
++++ b/Sparkle/SUUpdater.m
+@@ -217,10 +217,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+ #pragma mark - End Viasat methods
+ 
+ -(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
+-    NSAlert *alert = [[NSAlert alloc] init];
+-    alert.messageText = text;
+-    alert.informativeText = informativeText;
+-    [self.driver showAlert:alert];
++    SULog(SULogLevelError, @"WARNING: %s, %s", text, informativeText);
+ }
+ 
+ -(void)checkIfConfiguredProperly {

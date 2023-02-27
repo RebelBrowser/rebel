@@ -57,6 +57,10 @@
 #include "chrome/browser/sessions/session_data_service_factory.h"
 #endif  // BUILDFLAG(ENABLE_SESSION_SERVICE)
 
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#endif
+
 namespace chrome {
 
 namespace {
@@ -86,6 +90,15 @@ void AttemptRestartInternal(IgnoreUnloadHandlers ignore_unload_handlers) {
   PrefService* pref_service = g_browser_process->local_state();
   pref_service->SetBoolean(prefs::kWasRestarted, true);
   KeepAliveRegistry::GetInstance()->SetRestarting();
+
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+  // Sparkle can't properly handle relaunch event which is performed by the
+  // browser. So, it's better to use the framework if there is an update.
+  if (rebel::SparkleEnabled() && rebel::ApplicationIsNearlyUpdated()) {
+    rebel::RelaunchBrowserUsingSparkle();
+    return;
+  }
+#endif
 
 #if BUILDFLAG(IS_CHROMEOS_ASH)
   DCHECK(!chrome::IsSendingStopRequestToSessionManager());
