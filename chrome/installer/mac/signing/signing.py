@@ -18,6 +18,12 @@ class Invoker(invoker.Base):
         command = ['codesign', '--sign', config.identity]
         if replace_existing_signature:
             command.append('--force')
+#if defined(REBEL_BROWSER)
+        # Rebel: Add force flag so anything that was already signed during the
+        # build (Sparkle) can be re-signed with our Team ID.
+        else:
+            command.append('--force')
+#endif
         if config.notarize.should_notarize():
             # If the products will be notarized, the signature requires a secure
             # timestamp.
