@@ -16,6 +16,7 @@ export function getHtml(this: CrToolbarElement) {
           aria-label="${this.menuLabel || nothing}"
           title="${this.menuLabel}">
       </cr-icon-button>` : ''}
+    <!-- Temporarily disabled for Rebel
     <slot name="product-logo">
       <picture>
         <source media="(prefers-color-scheme: dark)"
@@ -26,6 +27,7 @@ export function getHtml(this: CrToolbarElement) {
             role="presentation">
       </picture>
     </slot>
+    -->
     <h1>${this.pageName}</h1>
   </div>
 </div>
