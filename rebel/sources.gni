@@ -103,6 +103,13 @@ if (is_ios) {
     "chrome/browser/ui/ntp/remote_ntp_tab_helper.cc",
     "chrome/browser/ui/ntp/remote_ntp_tab_helper.h",
   ]
+
+  if (is_mac) {
+    rebel_chrome_browser_ui_sources += [
+      "chrome/browser/mac/sparkle_glue.h",
+      "chrome/browser/mac/sparkle_glue.mm",
+    ]
+  }
 }
 
 if (is_android) {
