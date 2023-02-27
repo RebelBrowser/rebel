@@ -49,6 +49,8 @@ if (is_ios) {
     "chrome/browser/ntp/remote_ntp_source.h",
     "chrome/browser/rebel_content_browser_client.cc",
     "chrome/browser/rebel_content_browser_client.h",
+    "chrome/browser/rebel_main_extra_parts.cc",
+    "chrome/browser/rebel_main_extra_parts.h",
   ]
 
   if (is_android) {
@@ -65,6 +67,8 @@ if (is_ios) {
 
   if (is_mac || is_win) {
     rebel_chrome_browser_sources += [
+      "chrome/browser/channel_selection.cc",
+      "chrome/browser/channel_selection.h",
       "chrome/browser/ntp/remote_ntp_wifi_service.cc",
       "chrome/browser/ntp/remote_ntp_wifi_service.h",
     ]
@@ -102,6 +106,13 @@ if (is_ios) {
     "chrome/browser/ui/ntp/remote_ntp_tab_helper.cc",
     "chrome/browser/ui/ntp/remote_ntp_tab_helper.h",
   ]
+
+  if (is_mac) {
+    rebel_chrome_browser_ui_sources += [
+      "chrome/browser/mac/sparkle_glue.h",
+      "chrome/browser/mac/sparkle_glue.mm",
+    ]
+  }
 }
 
 if (is_android) {
