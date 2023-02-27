@@ -1,0 +1,342 @@
+diff --git a/Sparkle/SUConstants.h b/Sparkle/SUConstants.h
+index 43e557b5..135839fb 100644
+--- a/Sparkle/SUConstants.h
++++ b/Sparkle/SUConstants.h
+@@ -60,6 +60,7 @@ extern NSString *const SUAppendVersionNumberKey __attribute__((deprecated("This
+ extern NSString *const SUEnableAutomatedDowngradesKey __attribute__((deprecated("This key is obsolete. See SPARKLE_AUTOMATED_DOWNGRADES.")));
+ extern NSString *const SUNormalizeInstalledApplicationNameKey __attribute__((deprecated("This key is obsolete. SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME.")));
+ extern NSString *const SURelaunchToolNameKey __attribute__((deprecated("This key is obsolete. SPARKLE_RELAUNCH_TOOL_NAME.")));
++extern NSString *const SUMinimumUpdateIntervalKey;
+ 
+ // -----------------------------------------------------------------------------
+ // Appcast keys::
+diff --git a/Sparkle/SUConstants.m b/Sparkle/SUConstants.m
+index 48398965..5a46f5a4 100644
+--- a/Sparkle/SUConstants.m
++++ b/Sparkle/SUConstants.m
+@@ -49,6 +49,7 @@ NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
+ NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
+ NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
+ NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
++NSString *const SUMinimumUpdateIntervalKey = @"SUMinimumUpdateInterval";
+ 
+ NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
+ NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
+diff --git a/Sparkle/SUUpdateDriver.h b/Sparkle/SUUpdateDriver.h
+index 0be22a08..e818a4f8 100644
+--- a/Sparkle/SUUpdateDriver.h
++++ b/Sparkle/SUUpdateDriver.h
+@@ -36,6 +36,8 @@ extern NSString *const SUUpdateDriverFinishedNotification;
+ @property (readonly) BOOL downloadsUpdatesInBackground;
+ @property BOOL automaticallyInstallUpdates;
+ 
++- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
++
+ @end
+ 
+ #endif
+diff --git a/Sparkle/SUUpdateDriver.m b/Sparkle/SUUpdateDriver.m
+index 8c68afc2..cf3706d2 100644
+--- a/Sparkle/SUUpdateDriver.m
++++ b/Sparkle/SUUpdateDriver.m
+@@ -69,4 +69,9 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
+     SULog(SULogLevelDefault, @"ALERT: %@\n%@", alert.messageText, alert.informativeText);
+ }
+ 
++- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI {
++    (void)showUI;
++    (void)relaunch;
++}
++
+ @end
+diff --git a/Sparkle/SUUpdater.h b/Sparkle/SUUpdater.h
+index 45cd984d..4733a2a3 100644
+--- a/Sparkle/SUUpdater.h
++++ b/Sparkle/SUUpdater.h
+@@ -34,7 +34,7 @@ SU_EXPORT @interface SUUpdater : NSObject
+ 
+ /*!
+  The shared updater for the main bundle.
+- 
++
+  This is equivalent to passing [NSBundle mainBundle] to SUUpdater::updaterForBundle:
+  */
+ + (SUUpdater *)sharedUpdater;
+@@ -48,7 +48,7 @@ SU_EXPORT @interface SUUpdater : NSObject
+ 
+ /*!
+  Designated initializer for SUUpdater.
+- 
++
+  If an updater has already been initialized for the provided bundle, that shared instance will be returned.
+  */
+ - (instancetype)initForBundle:(NSBundle *)bundle;
+@@ -228,6 +228,22 @@ SU_EXPORT @interface SUUpdater : NSObject
+  */
+ @property (readonly) BOOL updateInProgress;
+ 
++/*!
++ Calls -installWithToolAndRelaunch: displayingUserInterface: on currently active driver. Returns NO when there is no driver and app can't be relauned in this way.
++ */
++- (BOOL)forceInstallAndRelaunch;
++
++/*!
++ A property indicating whether or not an update was downloaded and extracted and application may be relaunched to apply update.
++ True when uiless driver sent nearly updated notification.
++ */
++@property (readonly) BOOL isNearlyUpdated;
++
++/*!
++ A property holding a version string of a downloaded update. Not empty only when isNearlyUpdated = YES.
++ */
++@property (strong, readonly) NSString *nearlyUpdatedVersionString;
++
+ @end
+ 
+ #endif
+diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
+index 58c37beb..a98bc21b 100644
+--- a/Sparkle/SUUpdater.m
++++ b/Sparkle/SUUpdater.m
+@@ -29,9 +29,14 @@
+ #import "SUOperatingSystem.h"
+ #import "SUGlobalUpdateLock.h"
+ 
++#import "SUAppcastItem.h"
++#import "SUAutomaticUIlessUpdateDriver.h"
++#import "SUDeviceUID.h"
++
+ NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
+ NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
+ NSString *const SUUpdaterDidNotFindUpdateNotification = @"SUUpdaterDidNotFindUpdateNotification";
++NSString *const SUUpdaterDidReachNearlyUpdatedStateNotification = @"SUUpdaterDidReachNearlyUpdatedStateNotification";
+ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
+ NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
+ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
+@@ -41,6 +46,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
+ @property (assign) BOOL shouldRescheduleOnWake;
+ @property (strong) NSBundle *sparkleBundle;
+ @property (nonatomic) BOOL loggedNoSecureKeyWarning;
++@property (strong) NSString *deviceUIDString;
+ 
+ - (instancetype)initForBundle:(NSBundle *)bundle;
+ - (void)startUpdateCycle;
+@@ -56,6 +62,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
+ 
+ @property (copy) NSDate *updateLastCheckedDate;
+ 
++@property BOOL isNearlyUpdated;
++@property (strong) NSString *nearlyUpdatedVersionString;
++
+ @end
+ 
+ @implementation SUUpdater
+@@ -71,6 +80,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
+ @synthesize decryptionPassword;
+ @synthesize updateLastCheckedDate;
+ @synthesize loggedNoSecureKeyWarning = _loggedNoSecureKeyWarning;
++@synthesize deviceUIDString;
++@synthesize isNearlyUpdated;
++@synthesize nearlyUpdatedVersionString;
+ 
+ static NSMutableDictionary *sharedUpdaters = nil;
+ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
+@@ -107,6 +119,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     self = [super init];
+     if (bundle == nil) bundle = [NSBundle mainBundle];
+ 
++    self.deviceUIDString = [SUDeviceUID uniqueIdentifierString];
++
+     // Use explicit class to use the correct bundle even when subclassed
+     self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
+     if (!self.sparkleBundle) {
+@@ -117,8 +131,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     // Register as observer straight away to avoid exceptions on -dealloc when -unregisterAsObserver is called:
+     if (self) {
+         [self registerAsObserver];
++        [self registerAsDriverObserver];
+     }
+-    
++
+     [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self selector:@selector(receiveSleepNote) name:NSWorkspaceWillSleepNotification object:NULL];
+     [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self selector:@selector(receiveWakeNote) name:NSWorkspaceDidWakeNotification object:NULL];
+ 
+@@ -141,6 +156,55 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     return self;
+ }
+ 
++#pragma mark - Begin Viasat methods
++
++- (void)uilessUpdateDriverDidNearlyUpdate:(NSNotification *)notification
++{
++    self.isNearlyUpdated = YES;
++    SUAppcastItem *item = notification.userInfo[SUUpdaterAppcastItemNotificationKey];
++    self.nearlyUpdatedVersionString = item.displayVersionString;
++}
++
++- (void)registerAsDriverObserver
++{
++    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uilessUpdateDriverDidNearlyUpdate:) name:SUUpdaterDidReachNearlyUpdatedStateNotification object:nil];
++}
++
++- (void)unregisterAsDriverObserver
++{
++    [[NSNotificationCenter defaultCenter] removeObserver:self name:SUUpdaterDidReachNearlyUpdatedStateNotification object:nil];
++}
++
++- (BOOL)forceInstallAndRelaunch
++{
++    if (self.driver) {
++        [self.driver installWithToolAndRelaunch:YES displayingUserInterface:NO];
++        return YES;
++    }
++    return NO;
++}
++
++- (NSArray *)viasatRelatedParameters
++{
++    NSMutableArray *parameters = [NSMutableArray new];
++
++    if ([self.host displayVersion].length > 0) {
++        NSMutableDictionary *item = [NSMutableDictionary new];
++        item[@"key"] = @"appVersionShort";
++        item[@"value"] = [self.host displayVersion];
++        [parameters addObject:item];
++    }
++    if (self.deviceUIDString.length > 0) {
++        NSMutableDictionary *item = [NSMutableDictionary new];
++        item[@"key"] = @"deviceID";
++        item[@"value"] = self.deviceUIDString;
++        [parameters addObject:item];
++    }
++    return parameters;
++}
++
++#pragma mark - End Viasat methods
++
+ -(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
+     NSAlert *alert = [[NSAlert alloc] init];
+     alert.messageText = text;
+@@ -172,7 +236,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+             } else {
+                 if (!self.loggedNoSecureKeyWarning) {
+                     SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key and only using Apple Code Signing is deprecated and may be unsupported in a future release. Visit Sparkle's documentation for more information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
+-                    
++
+                     self.loggedNoSecureKeyWarning = YES;
+                 }
+             }
+@@ -180,7 +244,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     } else if (!hasEdDSAPublicKey) {
+         if (!self.loggedNoSecureKeyWarning) {
+             SULog(SULogLevelError, @"Error: Serving updates without an EdDSA key is insecure and deprecated. DSA support may be removed in a future Sparkle release. Please migrate to using EdDSA (ed25519). Visit Sparkle's documentation for migration information: https://sparkle-project.org/documentation/#3-segue-for-security-concerns");
+-            
++
+             self.loggedNoSecureKeyWarning = YES;
+         }
+     }
+@@ -240,7 +304,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     }
+ 
+     [[SUGlobalUpdateLock sharedLock] unlock];  // For safety, remove active lock if present in any case and not just when relaunching from an app update
+-    
++
+     SULog(SULogLevelDefault, @"Sparkle module started. App version %@. Works with %@", [self.host version], [self feedURL]);
+ 
+     if (shouldPrompt) {
+@@ -311,8 +375,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+ 
+     // Now we want to figure out how long until we check again.
+     NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
+-    if (updateCheckInterval < SUMinimumUpdateCheckInterval)
+-        updateCheckInterval = SUMinimumUpdateCheckInterval;
++    NSNumber* checkIntervalValue = [self.host objectForKey:SUMinimumUpdateIntervalKey];
++    NSTimeInterval checkInterval = checkIntervalValue ? [checkIntervalValue doubleValue] : SUMinimumUpdateCheckInterval;
++    if (updateCheckInterval < checkInterval)
++        updateCheckInterval = checkInterval;
+     if (intervalSinceCheck < updateCheckInterval)
+         delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
+     else
+@@ -331,7 +397,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     else
+         self.shouldRescheduleOnWake = NO;
+ }
+-    
++
+ - (void)receiveWakeNote
+ {
+     if (self.shouldRescheduleOnWake) // the reason for rescheduling the update-check timer is that NSTimer does behave as if the time the Mac spends asleep did not exist at all, which can significantly prolong the time between update checks
+@@ -353,7 +419,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     }
+ 
+     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
+-    SUUpdateDriver *theUpdateDriver = [(SUBasicUpdateDriver *)[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
++    Class class = [self automaticallyDownloadsUpdates] ? [SUAutomaticUIlessUpdateDriver class] : [SUScheduledUpdateDriver class];
++    SUUpdateDriver *theUpdateDriver = [(SUBasicUpdateDriver*)[class alloc] initWithUpdater:self];
+ 
+     [self checkForUpdatesWithDriver:theUpdateDriver];
+ }
+@@ -409,6 +476,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     }
+ 
+     self.driver = d;
++    self.nearlyUpdatedVersionString = nil;
++    self.isNearlyUpdated = NO;
+ 
+     // If we're not given a driver at all, just schedule the next update check and bail.
+     if (!self.driver)
+@@ -545,7 +614,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
+     if (customUserAgentString) {
+         return customUserAgentString;
+     }
+-    
++
+     NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [self.host name], [self.host displayVersion], @""MARKETING_VERSION];
+     NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+     return [[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding];
+@@ -593,6 +662,9 @@ static NSString *escapeURLComponent(NSString *str) {
+         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
+     }
+ 
++    // Viasat requires app version and device uid to be sent every time.
++    parameters = [parameters arrayByAddingObjectsFromArray:[self viasatRelatedParameters]];
++
+     if ([parameters count] == 0) { return baseFeedURL; }
+ 
+     // Build up the parameterized URL.
+@@ -636,6 +708,7 @@ static NSString *escapeURLComponent(NSString *str) {
+ - (void)dealloc
+ {
+     [self unregisterAsObserver];
++    [self unregisterAsDriverObserver];
+     if (checkTimer) { [checkTimer invalidate]; }  // Timer is non-repeating, may have invalidated itself, so we had to retain it.
+ }
+ 
+diff --git a/Sparkle/SUUpdaterDelegate.h b/Sparkle/SUUpdaterDelegate.h
+index ec844d04..f026d752 100644
+--- a/Sparkle/SUUpdaterDelegate.h
++++ b/Sparkle/SUUpdaterDelegate.h
+@@ -27,6 +27,7 @@ SU_EXPORT extern NSString *const SUUpdaterDidFinishLoadingAppCastNotification;
+ SU_EXPORT extern NSString *const SUUpdaterDidFindValidUpdateNotification;
+ SU_EXPORT extern NSString *const SUUpdaterDidNotFindUpdateNotification;
+ SU_EXPORT extern NSString *const SUUpdaterWillRestartNotification;
++SU_EXPORT extern NSString *const SUUpdaterDidReachNearlyUpdatedStateNotification;
+ #define SUUpdaterWillRelaunchApplicationNotification SUUpdaterWillRestartNotification;
+ #define SUUpdaterWillInstallUpdateNotification SUUpdaterWillRestartNotification;
+ 
+@@ -347,6 +348,15 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+  */
+ - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
+ 
++/*!
++ Called on successful update process right after unarchiving process.
++ Used when automaticallyUpdatesWithoutUI is YES.
++
++ \param updater The SUUpdater instance.
++ \param item The appcast item correstponding to the update.
++*/
++- (void)updater:(SUUpdater *)updater didReachNearlyUpdateStateForItem:(SUAppcastItem *)item;
++
+ @end
+ 
+ NS_ASSUME_NONNULL_END

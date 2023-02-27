@@ -353,6 +353,12 @@
 #include "ui/views/views_switches.h"
 #endif  // defined(TOOLKIT_VIEWS)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#include "rebel/chrome/browser/channel_selection_choices.h"
+#endif
+#endif
+
 using flags_ui::FeatureEntry;
 using flags_ui::kDeprecated;
 using flags_ui::kOsAndroid;
@@ -11304,6 +11310,13 @@ const FeatureEntry kFeatureEntries[] = {
     {"fill-multi-line", flag_descriptions::kFillMultiLineName,
      flag_descriptions::kFillMultiLineDescription, kOsWin | kOsLinux | kOsMac,
      FEATURE_VALUE_TYPE(compose::features::kFillMultiLine)},
+#endif
+
+#if BUILDFLAG(REBEL_BROWSER)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+    {"channel", rebel::kChannelFlagName, rebel::kChannelFlagDescription, kOsMac,
+     MULTI_VALUE_TYPE(rebel::kChannelChoices)},
+#endif
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

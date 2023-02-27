@@ -128,6 +128,10 @@
 #include "ui/native_theme/native_theme_observer.h"
 #include "url/gurl.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#endif
+
 namespace {
 
 // True while AppController is calling chrome::NewEmptyWindow(). We need a
@@ -742,6 +746,12 @@ class AppControllerNativeThemeObserver : public ui::NativeThemeObserver {
   NSWindow.allowsAutomaticWindowTabbing = NO;
 
   [self initShareMenu];
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (rebel::SparkleEnabled()) {
+    rebel::InitializeSparkleFramework();
+  }
+#endif
 }
 
 - (BOOL)tryToTerminateApplication:(NSApplication*)app {
