@@ -14,11 +14,19 @@ if (is_chrome_branded) {
   import("//third_party/widevine/scripts/widevine_signing_sources.gni")
 }
 
+import("//rebel/rebel.gni")
+
 group("mac") {
   public_deps = [ ":copies" ]
 }
 
 _packaging_dir = "$root_out_dir/$chrome_product_full_name Packaging"
+
+if (is_rebel_based) {
+  # Rebel: We use an abbreviation to ensure the full package name does not
+  # exceed arbitrary length limits in Omaha (approximately 100 characters).
+  _packaging_dir = "$root_out_dir/$rebel_browser_abbreviation Packaging"
+}
 
 process_version_rc_template("sign_config") {
   visibility = [ ":copy_signing" ]
@@ -54,6 +62,10 @@ copy("copy_signing") {
 
   if (is_chrome_branded) {
     sources += [ "internal/internal_config.py" ]
+  }
+
+  if (is_rebel_based) {
+    sources += [ "$rebel_browser_branding_directory/mac/internal_config.py" ]
   }
 
   outputs = [ "$_packaging_dir/signing/{{source_file_part}}" ]
@@ -128,6 +140,10 @@ copy("copies") {
       "internal/chrome_dmg_icon.icns",
       "keystone_install.sh",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += [ "//rebel/chrome/installer/mac/helper-entitlements.plist" ]
   }
 
   outputs = [ "$_packaging_dir/{{source_file_part}}" ]

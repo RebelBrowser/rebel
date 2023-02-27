@@ -73,6 +73,14 @@ def sign_part(paths, config, part):
     path = os.path.join(paths.work, part.path)
     if _linker_signed_arm64_needs_force(path):
         command.append('--force')
+
+#if defined(REBEL_BROWSER)
+    # Rebel: Add force flag so anything that was already signed during the
+    # build (Sparkle) can be re-signed with our Team ID.
+    else:
+        command.append('--force')
+#endif
+
     if config.notary_user:
         # Assume if the config has notary authentication information that the
         # products will be notarized, which requires a secure timestamp.
