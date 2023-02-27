@@ -41,6 +41,9 @@ declare_args() {
   # e.g. most-visited tiles, theme settings, autocomplete results, etc.
   rebel_new_tab_page_url = "https://browser.viasat.com/rebel_ntp/index.html"
 
+  # The remote URL to be used for "help" links, e.g. a discussion forum or FAQ.
+  rebel_help_url = "https://github.com/RebelBrowser/rebel/discussions"
+
   # The remote URL containing the default set of New Tab Page tiles to display.
   # It is recommended to bundle this list with your NTP application.
   rebel_default_sites_url =
@@ -71,6 +74,7 @@ declare_args() {
     "REBEL_BROWSER_COMPANY_PATH=\"$rebel_browser_company_path_component\"",
     "REBEL_BROWSER_SCHEMA=\"$rebel_browser_schema\"",
     "REBEL_BROWSER_NEW_TAB_PAGE=\"$rebel_new_tab_page_url\"",
+    "REBEL_BROWSER_HELP=\"$rebel_help_url\"",
     "REBEL_BROWSER_DEFAULT_SITES=\"$rebel_default_sites_url\"",
     "REBEL_BROWSER_API_ALLOW_LIST=\"$rebel_browser_api_allow_list_url\"",
   ]
