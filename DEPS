@@ -609,6 +609,14 @@ deps = {
   'src/rebel/third_party/remote_ntp': {
     'url': 'https://github.com/RebelBrowser/remote_ntp.git@6b3046cb85c42216d53b0e2018a7685c69f86dd9',
   },
+  'src/rebel/third_party/sparkle/upstream': {
+    'url': 'https://github.com/sparkle-project/Sparkle.git' + '@' + '99dbdcbd96b80bbdf36ff02bf7f9f9cd7ed26f49',
+    'condition': 'checkout_mac',
+  },
+  'src/rebel/third_party/sparkle/upstream/Vendor/ed25519': {
+    'url': 'https://github.com/orlp/ed25519.git' + '@' + '7fa6712ef5d581a6981ec2b08ee623314cd1d1c4',
+    'condition': 'checkout_mac',
+  },
 
   # We don't know target_cpu at deps time. At least until there's a universal
   # binary of httpd-php, pull both intel and arm versions in DEPS and then pick
@@ -4377,6 +4385,18 @@ hooks = [
     'action': [ 'python3',
                 'src/rebel/third_party/remote_ntp/deploy.py',
                 '--target', 'local',
+    ],
+  },
+  {
+    'name': 'sparkle',
+    'pattern': '.',
+    'condition': 'checkout_mac',
+    'action': [ 'python3',
+                'src/rebel/scripts/patch_tool.py',
+                '--upstream', 'src/rebel/third_party/sparkle/upstream',
+                '--source', 'src/rebel/third_party/sparkle/src',
+                '--patches', 'src/rebel/third_party/sparkle/patches',
+                '--files', 'src/rebel/third_party/sparkle/files',
     ],
   },
 

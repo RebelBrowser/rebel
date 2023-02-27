@@ -519,6 +519,14 @@ if (is_win) {
     if (enable_chromium_updater) {
       args += [ "--privileged_helper_id=$privileged_helper_name" ]
     }
+
+    if (is_rebel_based && is_rebel_sparkle_enabled) {
+      args += [
+        "--sparkle=1",
+        "--sparkle_appcast_url=$rebel_sparkle_appcast_url",
+        "--sparkle_public_key=$rebel_sparkle_public_key",
+      ]
+    }
   }
 
   mac_app_bundle("chrome_app") {
@@ -684,6 +692,10 @@ if (is_win) {
     if (is_rebel_based) {
       sources -= [ "app/theme/$branding_path_component/mac/document.icns" ]
       sources += [ "$rebel_browser_branding_directory/mac/document.icns" ]
+
+      if (is_rebel_sparkle_enabled) {
+        sources += [ "$rebel_sparkle_public_key" ]
+      }
     }
   }
 
@@ -1201,6 +1213,10 @@ if (is_win) {
 
     if (is_component_build) {
       frameworks = [ "Carbon.framework" ]
+
+      if (is_rebel_based) {
+        configs += [ "//rebel/third_party/sparkle:sparkle_link_test" ]
+      }
     }
 
     ldflags = [
@@ -1273,6 +1289,16 @@ if (is_win) {
       chrome_dylib_version,
       "-Wl,-order_file," + rebase_path("app/framework.order", root_build_dir),
     ]
+
+    if (is_rebel_based) {
+      bundle_deps += [ "//rebel/third_party/sparkle:sparkle_framework" ]
+      configs += [ "//rebel/third_party/sparkle:sparkle_link_framework" ]
+
+      if (is_rebel_sparkle_enabled) {
+        # For Sparkle.framework.
+        framework_contents += [ "Frameworks" ]
+      }
+    }
 
     if (!is_component_build) {
       # Specify a sensible install_name for static builds. The library is

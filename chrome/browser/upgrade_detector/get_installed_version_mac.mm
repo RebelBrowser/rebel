@@ -16,12 +16,20 @@
 #include "chrome/browser/updater/browser_updater_client_util.h"
 #endif  // BUILDFLAG(ENABLE_CHROMIUM_UPDATER)
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#endif
+
 namespace {
 
 InstalledAndCriticalVersion GetInstalledVersionSynchronous() {
 #if BUILDFLAG(ENABLE_CHROMIUM_UPDATER)
   return InstalledAndCriticalVersion(
       base::Version(CurrentlyInstalledVersion()));
+#elif BUILDFLAG(REBEL_BROWSER)
+  return InstalledAndCriticalVersion(base::Version(
+      base::UTF16ToASCII(rebel::CurrentlyDownloadedVersion())));
 #else
   return InstalledAndCriticalVersion(base::Version(
       base::UTF16ToASCII(keystone_glue::CurrentlyInstalledVersion())));

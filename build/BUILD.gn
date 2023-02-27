@@ -45,6 +45,14 @@ buildflag_header("branding_buildflags") {
       "REBEL_BROWSER_HELP=\"$rebel_help_url\"",
       "REBEL_BROWSER_DEFAULT_SITES=\"$rebel_default_sites_url\"",
     ]
+
+    if (is_mac) {
+      if (is_rebel_sparkle_enabled) {
+        flags += [ "REBEL_SPARKLE_ENABLED=1" ]
+      } else {
+        flags += [ "REBEL_SPARKLE_ENABLED=0" ]
+      }
+    }
   } else {
     flags = [
       "CHROMIUM_BRANDING=1",
