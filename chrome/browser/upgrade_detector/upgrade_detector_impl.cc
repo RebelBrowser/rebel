@@ -43,6 +43,10 @@
 #include "chrome/installer/util/google_update_settings.h"
 #endif
 
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#endif  // BUILDFLAG(REBEL_BROWSER)
+
 namespace {
 
 // The default thresholds for reaching annoyance levels.
@@ -470,6 +474,11 @@ void UpgradeDetectorImpl::Init() {
   if (variations_service) {
     variations_service->AddObserver(this);
   }
+
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(IS_MAC)
+  if (!rebel::SparkleEnabled())
+    return;
+#endif
 
 #if BUILDFLAG(ENABLE_UPDATE_NOTIFICATIONS)
   // Start checking for outdated builds sometime after startup completes.

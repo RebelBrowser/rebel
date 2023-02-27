@@ -13,14 +13,27 @@
 #include "base/version.h"
 #include "chrome/browser/updater/browser_updater_client_util.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/strings/utf_string_conversions.h"
+#include "rebel/chrome/browser/mac/sparkle_glue.h"
+#endif
+
 void GetInstalledVersion(InstalledVersionCallback callback) {
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE,
       {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
        base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
+#if BUILDFLAG(REBEL_BROWSER)
+      base::BindOnce([] {
+        return InstalledAndCriticalVersion(base::Version(
+            base::UTF16ToASCII(rebel::CurrentlyDownloadedVersion())));
+      }),
+#else
       base::BindOnce([] {
         return InstalledAndCriticalVersion(
             base::Version(CurrentlyInstalledVersion()));
       }),
+#endif
       std::move(callback));
 }

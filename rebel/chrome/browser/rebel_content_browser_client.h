@@ -24,6 +24,7 @@ class AssociatedInterfaceRegistry;
 
 namespace content {
 class BrowserContext;
+class BrowserMainParts;
 class NavigationHandle;
 class NavigationThrottle;
 class RenderFrameHost;
@@ -44,6 +45,8 @@ class RebelContentBrowserClient : public ChromeContentBrowserClient {
   ~RebelContentBrowserClient() override;
 
   // content::ContentBrowserClient:
+  std::unique_ptr<content::BrowserMainParts> CreateBrowserMainParts(
+      bool is_integration_test) override;
   GURL GetEffectiveURL(content::BrowserContext* browser_context,
                        const GURL& url) override;
   bool ShouldUseProcessPerSite(content::BrowserContext* browser_context,

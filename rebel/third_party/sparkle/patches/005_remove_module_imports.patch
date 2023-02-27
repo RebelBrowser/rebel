@@ -1,0 +1,581 @@
+diff --git a/Sparkle/SPUDownloadData.h b/Sparkle/SPUDownloadData.h
+index 41cd5743..85c25ee2 100644
+--- a/Sparkle/SPUDownloadData.h
++++ b/Sparkle/SPUDownloadData.h
+@@ -6,11 +6,7 @@
+ //  Copyright © 2016 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
+ 
+ #import "SUExport.h"
+ 
+diff --git a/Sparkle/SPUDownloader.h b/Sparkle/SPUDownloader.h
+index 5eee9bd5..9cfcccdf 100644
+--- a/Sparkle/SPUDownloader.h
++++ b/Sparkle/SPUDownloader.h
+@@ -6,11 +6,8 @@
+ //  Copyright © 2016 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SPUDownloaderProtocol.h"
+ 
+ @protocol SPUDownloaderDelegate;
+diff --git a/Sparkle/SPUDownloaderDelegate.h b/Sparkle/SPUDownloaderDelegate.h
+index 76e7e750..760db6c3 100644
+--- a/Sparkle/SPUDownloaderDelegate.h
++++ b/Sparkle/SPUDownloaderDelegate.h
+@@ -6,11 +6,7 @@
+ //  Copyright © 2016 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
+ 
+ NS_ASSUME_NONNULL_BEGIN
+ 
+diff --git a/Sparkle/SPUDownloaderProtocol.h b/Sparkle/SPUDownloaderProtocol.h
+index ebe477fe..36f41fd4 100644
+--- a/Sparkle/SPUDownloaderProtocol.h
++++ b/Sparkle/SPUDownloaderProtocol.h
+@@ -6,11 +6,7 @@
+ //  Copyright © 2016 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
+ 
+ NS_ASSUME_NONNULL_BEGIN
+ 
+diff --git a/Sparkle/SPUDownloaderSession.h b/Sparkle/SPUDownloaderSession.h
+index 4bde75aa..1d972748 100644
+--- a/Sparkle/SPUDownloaderSession.h
++++ b/Sparkle/SPUDownloaderSession.h
+@@ -6,11 +6,8 @@
+ //  Copyright © 2017 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SPUDownloader.h"
+ #import "SPUDownloaderProtocol.h"
+ 
+diff --git a/Sparkle/SPUURLRequest.h b/Sparkle/SPUURLRequest.h
+index 69496147..62a4a70b 100644
+--- a/Sparkle/SPUURLRequest.h
++++ b/Sparkle/SPUURLRequest.h
+@@ -6,11 +6,7 @@
+ //  Copyright © 2016 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
+ 
+ NS_ASSUME_NONNULL_BEGIN
+ 
+diff --git a/Sparkle/SUAppcastItem.h b/Sparkle/SUAppcastItem.h
+index 77bcb1f8..4ba04738 100644
+--- a/Sparkle/SUAppcastItem.h
++++ b/Sparkle/SUAppcastItem.h
+@@ -9,15 +9,10 @@
+ #ifndef SUAPPCASTITEM_H
+ #define SUAPPCASTITEM_H
+ 
+-#if __has_feature(modules)
+-#if __has_warning("-Watimport-in-framework-header")
+-#pragma clang diagnostic ignored "-Watimport-in-framework-header"
+-#endif
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SUExport.h"
++
+ @class SUSignatures;
+ 
+ SU_EXPORT @interface SUAppcastItem : NSObject
+diff --git a/Sparkle/SUCodeSigningVerifier.h b/Sparkle/SUCodeSigningVerifier.h
+index 3756a378..47a83cd8 100644
+--- a/Sparkle/SUCodeSigningVerifier.h
++++ b/Sparkle/SUCodeSigningVerifier.h
+@@ -9,11 +9,8 @@
+ #ifndef SUCODESIGNINGVERIFIER_H
+ #define SUCODESIGNINGVERIFIER_H
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SUExport.h"
+ 
+ SU_EXPORT @interface SUCodeSigningVerifier : NSObject
+diff --git a/Sparkle/SUErrors.h b/Sparkle/SUErrors.h
+index 4d00f845..30877d24 100644
+--- a/Sparkle/SUErrors.h
++++ b/Sparkle/SUErrors.h
+@@ -9,11 +9,8 @@
+ #ifndef SUERRORS_H
+ #define SUERRORS_H
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SUExport.h"
+ 
+ /**
+@@ -39,7 +36,7 @@ typedef NS_ENUM(OSStatus, SUError) {
+     // Extraction phase errors.
+     SUUnarchivingError = 3000,
+     SUSignatureError = 3001,
+-    
++
+     // Installation phase errors.
+     SUFileCopyFailure = 4000,
+     SUAuthenticationFailure = 4001,
+@@ -49,7 +46,7 @@ typedef NS_ENUM(OSStatus, SUError) {
+     SUInstallationError = 4005,
+     SUDowngradeError = 4006,
+     SUInstallationCancelledError = 4007,
+-    
++
+     // System phase errors
+     SUSystemPowerOffError = 5000
+ };
+diff --git a/Sparkle/SUGlobalUpdateLock.h b/Sparkle/SUGlobalUpdateLock.h
+index f2e82286..0c1208a5 100644
+--- a/Sparkle/SUGlobalUpdateLock.h
++++ b/Sparkle/SUGlobalUpdateLock.h
+@@ -9,11 +9,7 @@
+ #ifndef SUGLOBALUPDATELOCK_H
+ #define SUGLOBALUPDATELOCK_H
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
+ 
+ @interface SUGlobalUpdateLock : NSObject
+ 
+diff --git a/Sparkle/SUStandardVersionComparator.h b/Sparkle/SUStandardVersionComparator.h
+index ed11921a..b3445e21 100644
+--- a/Sparkle/SUStandardVersionComparator.h
++++ b/Sparkle/SUStandardVersionComparator.h
+@@ -9,11 +9,8 @@
+ #ifndef SUSTANDARDVERSIONCOMPARATOR_H
+ #define SUSTANDARDVERSIONCOMPARATOR_H
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SUExport.h"
+ #import "SUVersionComparisonProtocol.h"
+ 
+@@ -35,7 +32,7 @@ SU_EXPORT @interface SUStandardVersionComparator : NSObject <SUVersionComparison
+ 
+ /*!
+     Returns a singleton instance of the comparator.
+- 
++
+     It is usually preferred to alloc/init new a comparator instead.
+ */
+ + (SUStandardVersionComparator *)defaultComparator;
+diff --git a/Sparkle/SUUpdater.h b/Sparkle/SUUpdater.h
+index 4733a2a3..c7d4d847 100644
+--- a/Sparkle/SUUpdater.h
++++ b/Sparkle/SUUpdater.h
+@@ -9,11 +9,8 @@
+ #ifndef SUUPDATER_H
+ #define SUUPDATER_H
+ 
+-#if __has_feature(modules)
+-@import Cocoa;
+-#else
+ #import <Cocoa/Cocoa.h>
+-#endif
++
+ #import "SUExport.h"
+ #import "SUVersionComparisonProtocol.h"
+ #import "SUVersionDisplayProtocol.h"
+diff --git a/Sparkle/SUUpdaterDelegate.h b/Sparkle/SUUpdaterDelegate.h
+index fb8326f4..83d89ebd 100644
+--- a/Sparkle/SUUpdaterDelegate.h
++++ b/Sparkle/SUUpdaterDelegate.h
+@@ -6,11 +6,7 @@
+ //  Copyright © 2016 Sparkle Project. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
+ 
+ #import "SUExport.h"
+ 
+@@ -48,33 +44,33 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Returns whether to allow Sparkle to pop up.
+- 
++
+  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (BOOL)updaterMayCheckForUpdates:(SUUpdater *)updater;
+ 
+ /*!
+  Returns additional parameters to append to the appcast URL's query string.
+- 
++
+  This is potentially based on whether or not Sparkle will also be sending along the system profile.
+- 
++
+  \param updater The SUUpdater instance.
+  \param sendingProfile Whether the system profile will also be sent.
+- 
++
+  \return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
+  */
+ - (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
+ 
+ /*!
+  Returns a custom appcast URL.
+- 
++
+  Override this to dynamically specify the entire URL.
+- 
++
+  An alternative may be to use SUUpdaterDelegate::feedParametersForUpdater:sendingSystemProfile:
+  and let the server handle what kind of feed to provide.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater;
+@@ -95,18 +91,18 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Returns whether Sparkle should prompt the user about automatic update checks.
+- 
++
+  Use this to override the default behavior.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SUUpdater *)updater;
+ 
+ /*!
+  Called after Sparkle has downloaded the appcast from the remote server.
+- 
++
+  Implement this if you want to do some special handling with the appcast once it finishes loading.
+- 
++
+  \param updater The SUUpdater instance.
+  \param appcast The appcast that was downloaded from the remote server.
+  */
+@@ -114,11 +110,11 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Returns the item in the appcast corresponding to the update that should be installed.
+- 
++
+  If you're using special logic or extensions in your appcast,
+  implement this to use your own logic for finding a valid update, if any,
+  in the given appcast.
+- 
++
+  \param appcast The appcast that was downloaded from the remote server.
+  \param updater The SUUpdater instance.
+  */
+@@ -126,7 +122,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called when a valid update is found by the update driver.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that is proposed to be installed.
+  */
+@@ -151,21 +147,21 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called when a valid update is not found.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)updaterDidNotFindUpdate:(SUUpdater *)updater;
+ 
+ /*!
+  Called when the user clicks the Skip This Version button.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)updater:(SUUpdater *)updater userDidSkipThisVersion:(SUAppcastItem *)item;
+ 
+ /*!
+  Called immediately before downloading the specified update.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that is proposed to be downloaded.
+  \param request The mutable URL request that will be used to download the update.
+@@ -174,7 +170,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called immediately after succesfull download of the specified update.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that has been downloaded.
+  */
+@@ -182,7 +178,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called after the specified update failed to download.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that failed to download.
+  \param error The error generated by the failed download.
+@@ -191,14 +187,14 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called when the user clicks the cancel button while and update is being downloaded.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)userDidCancelDownload:(SUUpdater *)updater;
+ 
+ /*!
+  Called immediately before extracting the specified downloaded update.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that is proposed to be extracted.
+  */
+@@ -206,7 +202,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called immediately after extracting the specified downloaded update.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that has been extracted.
+  */
+@@ -214,7 +210,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called immediately before installing the specified update.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that is proposed to be installed.
+  */
+@@ -222,14 +218,14 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Returns whether the relaunch should be delayed in order to perform other tasks.
+- 
++
+  This is not called if the user didn't relaunch on the previous update,
+  in that case it will immediately restart.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that is proposed to be installed.
+  \param invocation The invocation that must be completed with `[invocation invoke]` before continuing with the relaunch.
+- 
++
+  \return \c YES to delay the relaunch until \p invocation is invoked.
+  */
+ - (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation;
+@@ -251,58 +247,58 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Returns whether the application should be relaunched at all.
+- 
++
+  Some apps \b cannot be relaunched under certain circumstances.
+  This method can be used to explicitly prevent a relaunch.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (BOOL)updaterShouldRelaunchApplication:(SUUpdater *)updater;
+ 
+ /*!
+  Called immediately before relaunching.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)updaterWillRelaunchApplication:(SUUpdater *)updater;
+ 
+ /*!
+  Called immediately after relaunching. SUUpdater delegate must be set before applicationDidFinishLaunching: to catch this event.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)updaterDidRelaunchApplication:(SUUpdater *)updater;
+ 
+ /*!
+  Returns an object that compares version numbers to determine their arithmetic relation to each other.
+- 
++
+  This method allows you to provide a custom version comparator.
+  If you don't implement this method or return \c nil,
+  the standard version comparator will be used.
+- 
++
+  \sa SUStandardVersionComparator
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
+ 
+ /*!
+  Returns an object that formats version numbers for display to the user.
+- 
++
+  If you don't implement this method or return \c nil,
+  the standard version formatter will be used.
+- 
++
+  \sa SUUpdateAlert
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (nullable id<SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
+ 
+ /*!
+  Returns the path which is used to relaunch the client after the update is installed.
+- 
++
+  The default is the path of the host bundle.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (nullable NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
+@@ -310,7 +306,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ /*!
+  Called before an updater shows a modal alert window,
+  to give the host the opportunity to hide attached windows that may get in the way.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)updaterWillShowModalAlert:(SUUpdater *)updater;
+@@ -318,7 +314,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ /*!
+  Called after an updater shows a modal alert window,
+  to give the host the opportunity to hide attached windows that may get in the way.
+- 
++
+  \param updater The SUUpdater instance.
+  */
+ - (void)updaterDidShowModalAlert:(SUUpdater *)updater;
+@@ -327,7 +323,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+  Called when an update is scheduled to be silently installed on quit.
+  This is after an update has been automatically downloaded in the background.
+  (i.e. SUUpdater::automaticallyDownloadsUpdates is YES)
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that is proposed to be installed.
+  \param invocation Can be used to trigger an immediate silent install and relaunch.
+@@ -348,7 +344,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Calls after an update that was scheduled to be silently installed on quit has been canceled.
+- 
++
+  \param updater The SUUpdater instance.
+  \param item The appcast item corresponding to the update that was proposed to be installed.
+  */
+@@ -356,7 +352,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
+ 
+ /*!
+  Called after an update is aborted due to an error.
+- 
++
+  \param updater The SUUpdater instance.
+  \param error The error that caused the abort
+  */
+diff --git a/Sparkle/SUVersionComparisonProtocol.h b/Sparkle/SUVersionComparisonProtocol.h
+index c654fc4d..b5934d60 100644
+--- a/Sparkle/SUVersionComparisonProtocol.h
++++ b/Sparkle/SUVersionComparisonProtocol.h
+@@ -9,11 +9,8 @@
+ #ifndef SUVERSIONCOMPARISONPROTOCOL_H
+ #define SUVERSIONCOMPARISONPROTOCOL_H
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SUExport.h"
+ 
+ NS_ASSUME_NONNULL_BEGIN
+diff --git a/Sparkle/SUVersionDisplayProtocol.h b/Sparkle/SUVersionDisplayProtocol.h
+index 980efb3f..3dd36cd8 100644
+--- a/Sparkle/SUVersionDisplayProtocol.h
++++ b/Sparkle/SUVersionDisplayProtocol.h
+@@ -6,11 +6,8 @@
+ //  Copyright 2009 Elgato Systems GmbH. All rights reserved.
+ //
+ 
+-#if __has_feature(modules)
+-@import Foundation;
+-#else
+ #import <Foundation/Foundation.h>
+-#endif
++
+ #import "SUExport.h"
+ 
+ /*!

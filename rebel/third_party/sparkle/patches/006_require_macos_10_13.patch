@@ -1,0 +1,70 @@
+diff --git a/Configurations/ConfigCommon.xcconfig b/Configurations/ConfigCommon.xcconfig
+index e5f1b746..e919d21e 100644
+--- a/Configurations/ConfigCommon.xcconfig
++++ b/Configurations/ConfigCommon.xcconfig
+@@ -32,7 +32,7 @@ ENABLE_STRICT_OBJC_MSGSEND = YES
+ GCC_SYMBOLS_PRIVATE_EXTERN = YES
+ GCC_INLINES_ARE_PRIVATE_EXTERN = YES
+ ARCHS = $(ARCHS_STANDARD)
+-MACOSX_DEPLOYMENT_TARGET = 10.9
++MACOSX_DEPLOYMENT_TARGET = 10.13
+ PRODUCT_NAME = ${TARGET_NAME}
+ PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle.${PRODUCT_NAME:rfc1034identifier}
+ 
+diff --git a/Resources/SampleAppcast.xml b/Resources/SampleAppcast.xml
+index dd966015..59ee6707 100755
+--- a/Resources/SampleAppcast.xml
++++ b/Resources/SampleAppcast.xml
+@@ -13,7 +13,7 @@
+             </sparkle:releaseNotesLink>
+             <pubDate>Wed, 09 Jan 2006 19:20:11 +0000</pubDate>
+             <enclosure url="https://you.com/app/Your%20Great%20App%202.0.zip" length="1623481" type="application/octet-stream" sparkle:edSignature="WVyVJpOx+a5+vNWJVY79TRjFKveNk+VhGJf2iti4CZtJsJewIUGvh/1AKKEAFbH1qUwx+vro1ECuzOsMmumoBA==" />
+-            <sparkle:minimumSystemVersion>10.9</sparkle:minimumSystemVersion>
++            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+         </item>
+ 
+         <item>
+@@ -25,7 +25,7 @@
+             </sparkle:releaseNotesLink>
+             <pubDate>Wed, 01 Jan 2006 12:20:11 +0000</pubDate>
+             <enclosure url="https://you.com/app/Your%20Great%20App%201.5.zip" length="1472893" type="application/octet-stream" sparkle:edSignature="pNFd7KbcQSu+Mq7UYrbQXTPq82luht2ACXm/r2utp1u/Uv/5hWqctdT2jwQgMejW7DRoeV/hVr6J4VdZYdwWDw==" />
+-            <sparkle:minimumSystemVersion>10.9</sparkle:minimumSystemVersion>
++            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+         </item>
+ 
+         <!-- Now here's an example of a version with a weird internal version number (like an SVN revision) but a human-readable external one. -->
+@@ -39,7 +39,7 @@
+             <sparkle:shortVersionString>1.4</sparkle:shortVersionString>
+             <pubDate>Wed, 25 Dec 2005 12:20:11 +0000</pubDate>
+             <enclosure url="https://you.com/app/Your%20Great%20App%201.4.zip" sparkle:edSignature="Ody3D/ybSMH4T+P/oNj3LN4F0SA8RJGLEr1TI4UemrBAiJ9aEcDnYV3u58P75AbcFjI13jPYmHDUHXMSTFQbDw==" length="1472349" type="application/octet-stream" />
+-            <sparkle:minimumSystemVersion>10.9</sparkle:minimumSystemVersion>
++            <sparkle:minimumSystemVersion>10.13</sparkle:minimumSystemVersion>
+         </item>
+     </channel>
+ </rss>
+diff --git a/Sparkle.podspec b/Sparkle.podspec
+index bfd9b6cc..d7fe8454 100644
+--- a/Sparkle.podspec
++++ b/Sparkle.podspec
+@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
+     'Andy Matuschak' => 'andy@andymatuschak.org',
+   }
+ 
+-  s.platform = :osx, '10.9'
++  s.platform = :osx, '10.13'
+   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.xz" }
+   s.source_files = 'Sparkle.framework/Versions/A/Headers/*.h'
+ 
+diff --git a/generate_appcast/ArchiveItem.swift b/generate_appcast/ArchiveItem.swift
+index 145de107..c5ec0211 100644
+--- a/generate_appcast/ArchiveItem.swift
++++ b/generate_appcast/ArchiveItem.swift
+@@ -54,7 +54,7 @@ class ArchiveItem: CustomStringConvertible {
+         self.version = version
+         self._shortVersion = shortVersion
+         self.feedURL = feedURL
+-        self.minimumSystemVersion = minimumSystemVersion ?? "10.9"
++        self.minimumSystemVersion = minimumSystemVersion ?? "10.13"
+         self.archivePath = archivePath
+         self.appPath = appPath
+         self.supportsDSA = supportsDSA

@@ -53,8 +53,6 @@ class InternalCodeSignConfig(ChromiumCodeSignConfig):
         here because they need to be signed in a specific order, which the
         caller (sign_chrome) does not support.
         """
-        return
-
         full_hardened_runtime_options = (
             CodeSignOptions.HARDENED_RUNTIME | CodeSignOptions.RESTRICT |
             CodeSignOptions.LIBRARY_VALIDATION | CodeSignOptions.KILL)

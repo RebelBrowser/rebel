@@ -57,6 +57,17 @@ declare_args() {
   # browser APIs.
   rebel_browser_api_allow_list_url =
       "https://browser.viasat.com/rebel_ntp/remote_ntp_allow_list.json"
+
+  # The remote URLs for the Omaha instances used for upgrades, crash reporting,
+  # etc. These allow for separate public and internal servers, for situations
+  # where stable releases are provided on a public server and internal testing
+  # releases are provided on an internal server.
+  rebel_omaha_public_url = "https://omaha.rebel.com"
+  rebel_omaha_private_url = "https://omaha.internal.rebel.com"
+
+  # The Sparkle (macOS upgrades) configuration. Disabled by default.
+  rebel_sparkle_enabled = false
+  rebel_sparkle_product_name = "Rebel"
 }
 
 # Arguments to help with Chromium integration (i.e. not to be overridden).
@@ -65,6 +76,10 @@ declare_args() {
 
   rebel_browser_branding_directory =
       "//rebel/branding/$rebel_browser_name_path_component"
+
+  rebel_sparkle_appcast_url = "$rebel_omaha_public_url/sparkle/$rebel_sparkle_product_name/stable/appcast.xml"
+  rebel_sparkle_public_key =
+      "$rebel_browser_branding_directory/mac/chromium_pub.pem"
 
   # Branding build flags used by //build/BUILD.gn.
   rebel_branding_flags = [
@@ -82,7 +97,16 @@ declare_args() {
     "REBEL_BROWSER_HELP=\"$rebel_help_url\"",
     "REBEL_BROWSER_DEFAULT_SITES=\"$rebel_default_sites_url\"",
     "REBEL_BROWSER_API_ALLOW_LIST=\"$rebel_browser_api_allow_list_url\"",
+    "REBEL_OMAHA_PUBLIC_URL=\"$rebel_omaha_public_url\"",
+    "REBEL_OMAHA_PRIVATE_URL=\"$rebel_omaha_private_url\"",
+    "REBEL_SPARKLE_PRODUCT_NAME=\"$rebel_sparkle_product_name\"",
   ]
+
+  if (rebel_sparkle_enabled) {
+    rebel_branding_flags += [ "REBEL_SPARKLE_ENABLED=1" ]
+  } else {
+    rebel_branding_flags += [ "REBEL_SPARKLE_ENABLED=0" ]
+  }
 
   # Arguments to be passed to //build/util/version.py to fill in Rebel-branded
   # values while processing the BRANDING file.

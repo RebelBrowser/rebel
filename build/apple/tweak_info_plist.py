@@ -232,6 +232,27 @@ def _RemoveKeystoneKeys(plist):
   _RemoveKeys(plist, *tag_keys)
 
 
+#if defined(REBEL_BROWSER)
+def _AddSparkleKeys(plist, options):
+  """Adds the Sparkle keys."""
+  plist['SUEnableAutomaticChecks'] = True
+  plist['SUFeedURL'] = options.sparkle_appcast_url
+  plist['SUPublicDSAKeyFile'] = os.path.basename(options.sparkle_public_key)
+  plist['SUScheduledCheckInterval'] = 3600
+  plist['SUSendProfileInfo'] = True
+
+
+def _RemoveSparkleKeys(plist):
+  """Removes any set Sparkle keys."""
+  _RemoveKeys(plist,
+              'SUEnableAutomaticChecks',
+              'SUFeedURL',
+              'SUPublicDSAKeyFile',
+              'SUScheduledCheckInterval',
+              'SUSendProfileInfo')
+#endif
+
+
 def _AddGTMKeys(plist, platform):
   """Adds the GTM metadata keys. This must be called AFTER _AddVersionKeys()."""
   plist['GTMUserAgentID'] = plist['CFBundleName']
@@ -339,6 +360,26 @@ def Main(argv):
                     type='string',
                     default=None,
                     help='The id of the privileged helper executable.')
+#if BUILDFLAG(REBEL_BROWSER)
+  parser.add_option('--sparkle',
+                    dest='use_sparkle',
+                    action='store',
+                    type='int',
+                    default=False,
+                    help='Enable Sparkle [1 or 0]')
+  parser.add_option('--sparkle_public_key',
+                    dest='sparkle_public_key',
+                    action='store',
+                    type='string',
+                    default=None,
+                    help='Sparkle DSA public file')
+  parser.add_option('--sparkle_appcast_url',
+                    dest='sparkle_appcast_url',
+                    action='store',
+                    type='string',
+                    default=None,
+                    help='URL to Sparkle\'s appcast.xml')
+#endif
   (options, args) = parser.parse_args(argv)
 
   if len(args) > 0:
@@ -419,6 +460,17 @@ def Main(argv):
                      options.keystone_base_tag)
   else:
     _RemoveKeystoneKeys(plist)
+
+#if defined(REBEL_BROWSER)
+  # Add Sparkle if configured to do so.
+  if options.use_sparkle:
+    if options.sparkle_appcast_url is None or options.sparkle_public_key is None:
+      print('Use of Sparkle requires the appcast url and the public key.')
+      return 1
+    _AddSparkleKeys(plist, options)
+  else:
+    _RemoveSparkleKeys(plist)
+#endif
 
   # Adds or removes any SCM keys.
   if not _DoSCMKeys(plist, options.add_scm_info):
