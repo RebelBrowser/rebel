@@ -189,6 +189,10 @@ void ProfileMenuView::BuildMenu() {
 }
 
 gfx::ImageSkia ProfileMenuView::GetSyncIcon() const {
+#if BUILDFLAG(REBEL_BROWSER)
+  // Do not show the small circular "sync" icon on top of the user's avatar.
+  return gfx::ImageSkia();
+#else
   Profile* profile = browser()->profile();
   if (profile->IsOffTheRecord() || profile->IsGuestSession())
     return gfx::ImageSkia();
@@ -225,6 +229,7 @@ gfx::ImageSkia ProfileMenuView::GetSyncIcon() const {
              ? ColoredImageForMenu(kSyncDisabledChromeRefreshIcon,
                                    refreshed_color_id)
              : ColoredImageForMenu(kSyncPausedCircleIcon, color_id);
+#endif  // BUILDFLAG(REBEL_BROWSER)
 }
 
 std::u16string ProfileMenuView::GetAccessibleWindowTitle() const {
@@ -595,6 +600,10 @@ void ProfileMenuView::BuildIdentity() {
     profile_user_email = profile->GetPrefs()->GetString(
         enterprise_signin::prefs::kProfileUserEmail);
 #endif
+#if BUILDFLAG(REBEL_BROWSER)
+    menu_title_ = std::u16string();
+    menu_subtitle_ = std::u16string();
+#else
     menu_title_ =
         profile_user_display_name.empty()
             ? l10n_util::GetStringUTF16(IDS_PROFILES_LOCAL_PROFILE_STATE)
@@ -602,6 +611,7 @@ void ProfileMenuView::BuildIdentity() {
     // The email may be empty.
     menu_subtitle_ = base::UTF8ToUTF16(
         profile_user_email.empty() ? account_info.email : profile_user_email);
+#endif  // BUILDFLAG(REBEL_BROWSER)
 
     std::u16string management_label;
     SetProfileIdentityInfo(
