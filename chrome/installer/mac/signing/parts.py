@@ -141,6 +141,10 @@ def get_parts(config):
             library_basename.replace('.dylib', ''),
             verify_options=verify_options)
 
+#if defined(REBEL_BROWSER)
+    config.base_config.override_parts_for_rebel(parts)
+#endif
+
     return parts
 
 
@@ -203,6 +207,10 @@ def sign_chrome(paths, config, sign_framework=False):
             if name in ('app', 'framework', 'privileged-helper'):
                 continue
             signing.sign_part(paths, config, part)
+
+#if defined(REBEL_BROWSER)
+        config.base_config.sign_rebel_parts(paths, config)
+#endif
 
         # Sign the framework bundle.
         signing.sign_part(paths, config, parts['framework'])
