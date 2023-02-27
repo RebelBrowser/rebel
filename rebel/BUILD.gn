@@ -8,6 +8,7 @@ group("rebel") {
   if (is_win || is_mac || is_linux) {
     deps = [
       "//chrome",
+      "//chrome/installer",
       "//rebel/chrome/test:rebel_browser_tests",
     ]
   } else if (is_android) {

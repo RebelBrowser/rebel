@@ -22,6 +22,10 @@ declare_args() {
   # For example, the user's profile path will be under this path.
   rebel_browser_company_path_component = "Viasat"
 
+  # The abbreviated product name to be used for the browser in path-component
+  # contexts that have a limited length limit.
+  rebel_browser_abbreviation = "RB"
+
   # The URL schema to use for internal pages. This is an alias to the chrome://
   # schema.
   rebel_browser_schema = "rebel"
