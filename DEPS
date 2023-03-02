@@ -589,7 +589,7 @@ deps = {
 
   # Rebel deps:
   'src/rebel/third_party/remote_ntp': {
-    'url': 'https://github.com/RebelBrowser/remote_ntp.git@a722d47693eb2dd63781db0b7d720c3aed922027',
+    'url': 'https://github.com/RebelBrowser/remote_ntp.git@26c325bfefb54b2d955a51029345aba80f1c58ec',
   },
   'src/rebel/third_party/sparkle/upstream': {
     'url': 'https://github.com/sparkle-project/Sparkle.git' + '@' + '99dbdcbd96b80bbdf36ff02bf7f9f9cd7ed26f49',

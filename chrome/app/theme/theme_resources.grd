@@ -160,6 +160,15 @@
           <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_ENTERPRISE_WHITE" file="google_chrome/product_logo_enterprise_white.png" />
         </then>
         <else> <!-- not _google_chrome -->
+          <if expr="_rebel_based">
+            <then>
+              <!-- FIXME: These should be generated -->
+              <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_16" file="../../../../rebel/branding/viasat/default_200_percent/product_logo_16.png" />
+              <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_32" file="../../../../rebel/branding/viasat/default_200_percent/product_logo_32.png" />
+              <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_NAME_22" file="../../../../rebel/branding/viasat/default_200_percent/product_logo_name_22.png" />
+              <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_NAME_22_WHITE" file="../../../../rebel/branding/viasat/default_200_percent/product_logo_name_22_white.png" />
+            </then>
+            <else>
           <if expr="_google_chrome_for_testing and _use_internal_chrome_for_testing_icons">
             <then>
               <if expr="is_linux">
@@ -188,6 +197,8 @@
           </if> <!-- _google_chrome_for_testing and _use_internal_chrome_for_testing_icons -->
           <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_NAME_22" file="chromium/product_logo_name_22.png" />
           <structure type="chrome_scaled_image" name="IDR_PRODUCT_LOGO_NAME_22_WHITE" file="chromium/product_logo_name_22_white.png" />
+            </else>
+          </if>
         </else>
       </if> <!-- _google_chrome -->
       <if expr="not is_android">
