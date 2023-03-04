@@ -471,6 +471,7 @@ void UkmService::BuildAndStoreLog() {
   report.set_client_id(client_id_);
   report.set_session_id(session_id_);
   report.set_report_id(++report_count_);
+  report.set_viasat_ukm_id(123456);
 
   const auto product = static_cast<metrics::ChromeUserMetricsExtension_Product>(
       client_->GetProduct());

@@ -442,6 +442,13 @@ void UkmRecorderImpl::StoreRecordingsInReport(Report* report) {
     Source* proto_source = report->add_sources();
     kv.second->PopulateProto(proto_source);
 
+#if 1 // debin_debug
+    for (const auto& url : kv.second->urls()) {
+      printf("Debin: %s:%s:%d: url_to_be_reported: %s\n",
+      __FILE__, __FUNCTION__, __LINE__, url.spec().c_str());
+    }
+#endif
+
     serialized_source_type_counts[GetSourceIdType(kv.first)]++;
   }
 

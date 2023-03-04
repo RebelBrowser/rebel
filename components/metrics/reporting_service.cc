@@ -165,6 +165,10 @@ void ReportingService::SendStagedLog() {
   log_upload_in_progress_ = true;
 
   if (!log_uploader_) {
+    printf("Debin: %s:%s:%d: creating uploader: uploadUrl:%s... GetInsecureUploadUrl:%s... service_type:%d\n",
+      __FILE__, __FUNCTION__, __LINE__, GetUploadUrl().spec().c_str(), 
+      GetInsecureUploadUrl().spec().c_str(), service_type());
+
     log_uploader_ = client_->CreateUploader(
         GetUploadUrl(), GetInsecureUploadUrl(), upload_mime_type(),
         service_type(),
@@ -177,6 +181,10 @@ void ReportingService::SendStagedLog() {
   const std::string hash =
       base::HexEncode(log_store()->staged_log_hash().data(),
                       log_store()->staged_log_hash().size());
+
+  printf("Debin: %s:%s:%d: hash: %s\n",
+      __FILE__, __FUNCTION__, __LINE__, hash.c_str());
+
   std::string signature;
   base::Base64Encode(log_store()->staged_log_signature(), &signature);
 

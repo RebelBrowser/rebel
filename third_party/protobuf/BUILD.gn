@@ -149,6 +149,9 @@ static_library("protobuf_full") {
   visibility = [
     ":*",
 
+    # Viasat debugging
+    "//chrome/browser:browser",
+
     # requires descriptors & reflection; testonly.
     "//third_party/libprotobuf-mutator:*",
 

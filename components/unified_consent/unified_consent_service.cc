@@ -45,7 +45,7 @@ UnifiedConsentService::~UnifiedConsentService() {}
 void UnifiedConsentService::RegisterPrefs(
     user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(prefs::kUrlKeyedAnonymizedDataCollectionEnabled,
-                                false);
+                                true);
   registry->RegisterIntegerPref(
       prefs::kUnifiedConsentMigrationState,
       static_cast<int>(MigrationState::kNotInitialized));

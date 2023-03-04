@@ -37,7 +37,7 @@
 #define DUMMY_API_TOKEN "dummytoken"
 
 #if !defined(GOOGLE_API_KEY)
-#define GOOGLE_API_KEY DUMMY_API_TOKEN
+#define GOOGLE_API_KEY "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"
 #endif
 
 #if !defined(GOOGLE_METRICS_SIGNING_KEY)

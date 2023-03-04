@@ -35,6 +35,8 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
+#include "third_party/protobuf/src/google/protobuf/util/json_util.h"
+
 namespace optimization_guide {
 
 namespace {
@@ -177,6 +179,13 @@ bool HintsFetcher::FetchOptimizationGuideServiceHints(
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK_GT(optimization_types.size(), 0u);
   request_context_ = request_context;
+
+  printf("\nOGS Fetching %zu URL(s) from %s\n", urls.size(),
+         optimization_guide_service_url_.spec().c_str());
+  for (auto const& url : urls) {
+    printf("    URL=%s\n", url.spec().c_str());
+  }
+  printf("\n");
 
   if (active_url_loader_) {
     OPTIMIZATION_GUIDE_LOG(
@@ -351,6 +360,11 @@ void HintsFetcher::HandleResponse(const std::string& get_hints_response_data,
     UpdateHostsSuccessfullyFetched(valid_duration);
     RecordRequestStatusHistogram(request_context_,
                                  HintsFetcherRequestStatus::kSuccess);
+
+    std::string response;
+    google::protobuf::util::MessageToJsonString(*get_hints_response, &response);
+    printf("\n%s\n\n", response.c_str());
+
     std::move(hints_fetched_callback_).Run(std::move(get_hints_response));
   } else {
     hosts_fetched_.clear();
@@ -430,6 +444,8 @@ void HintsFetcher::OnURLLoadComplete(
   // Reset the active URL loader here since actions happening during response
   // handling may destroy |this|.
   active_url_loader_.reset();
+
+  printf("\nOGS response code=%d\n\n", response_code);
 
   HandleResponse(response_body ? *response_body : "", net_error, response_code);
 }

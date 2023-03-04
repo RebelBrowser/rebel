@@ -19,6 +19,8 @@ import "user_demographics.proto";
 // This is the message type sent from Chrome to the UKM collector.
 // Next tag: 13
 message Report {
+  optional int32 viasat_ukm_id = 13;
+
   // A unique identifier for a Chrome install. This ID should be used only
   // in UKM reports, and not linked to any other data sources.
   optional fixed64 client_id = 1;

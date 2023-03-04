@@ -2440,6 +2440,7 @@ static_library("browser") {
     "//third_party/libxml:xml_writer",
     "//third_party/libyuv",
     "//third_party/metrics_proto",
+    "//third_party/protobuf:protobuf_full",
     "//third_party/re2",
     "//third_party/webrtc_overrides:webrtc_component",
     "//third_party/widevine/cdm:buildflags",

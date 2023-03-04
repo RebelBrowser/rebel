@@ -42,7 +42,7 @@ const base::FeatureState
 #if BUILDFLAG(IS_ANDROID)
         base::FEATURE_ENABLED_BY_DEFAULT;
 #else
-        base::FEATURE_DISABLED_BY_DEFAULT;
+        base::FEATURE_ENABLED_BY_DEFAULT;
 #endif
 
 // Modifies loading predictor so that it can also use predictions coming from
@@ -55,7 +55,7 @@ const base::FeatureState kLoadingPredictorPrefetchDefaultFeatureState =
 #if BUILDFLAG(IS_ANDROID)
     base::FEATURE_ENABLED_BY_DEFAULT;
 #else
-    base::FEATURE_DISABLED_BY_DEFAULT;
+    base::FEATURE_ENABLED_BY_DEFAULT;
 #endif
 
 // Modifies loading predictor so that it does prefetches of subresources instead

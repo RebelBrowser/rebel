@@ -362,6 +362,7 @@ void UnsentLogStore::LoadPersistedUnsentLogs() {
 
 void UnsentLogStore::StoreLog(const std::string& log_data,
                               const LogMetadata& log_metadata) {
+  printf("Debin: %s:%s:%d: ... \n", __FILE__, __FUNCTION__, __LINE__);
   std::unique_ptr<LogInfo> info = std::make_unique<LogInfo>();
   info->Init(log_data, signing_key_, log_metadata);
   StoreLogInfo(std::move(info), log_data.size());
