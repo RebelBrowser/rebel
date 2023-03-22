@@ -215,6 +215,14 @@ void RemoteNtpRouter::SendWiFiStatusChanged(
   remote_ntp_client()->WiFiStatusChanged(std::move(status));
 }
 
+void RemoteNtpRouter::SendModemDataChanged(rebel::mojom::ModemDataPtr data) {
+  if (!remote_ntp_client()) {
+    return;
+  }
+
+  remote_ntp_client()->ModemDataChanged(std::move(data));
+}
+
 void RemoteNtpRouter::AddCustomTile(const GURL& tile_url,
                                     const std::u16string& tile_title) {
   delegate_->OnAddCustomTile(tile_url, tile_title);
@@ -286,6 +294,10 @@ void RemoteNtpRouter::CommitColor() {
 
 void RemoteNtpRouter::UpdateWiFiStatus() {
   delegate_->OnUpdateWiFiStatus();
+}
+
+void RemoteNtpRouter::UpdateModemData() {
+  delegate_->OnUpdateModemData();
 }
 
 }  // namespace rebel

@@ -261,6 +261,12 @@ void RemoteNtpTabHelper::OnUpdateWiFiStatus() {
 #endif
 }
 
+void RemoteNtpTabHelper::OnUpdateModemData() {
+  if (remote_ntp_service_) {
+    remote_ntp_service_->UpdateModemData();
+  }
+}
+
 void RemoteNtpTabHelper::OnAutocompleteResultChanged(
     rebel::mojom::AutocompleteResultPtr result) {
   remote_ntp_router_.SendAutocompleteResultChanged(std::move(result));
@@ -296,6 +302,10 @@ void RemoteNtpTabHelper::OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
 void RemoteNtpTabHelper::OnWiFiStatusChanged(
     const rebel::RemoteNtpWiFiStatusList& status) {
   remote_ntp_router_.SendWiFiStatusChanged(std::move(status));
+}
+
+void RemoteNtpTabHelper::OnModemDataChanged(rebel::mojom::ModemDataPtr data) {
+  remote_ntp_router_.SendModemDataChanged(std::move(data));
 }
 
 Profile* RemoteNtpTabHelper::profile() const {

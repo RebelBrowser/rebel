@@ -180,8 +180,16 @@ const rebel::RemoteNtpWiFiStatusList& RemoteNtp::GetWiFiStatus() const {
   return wifi_status_;
 }
 
+const rebel::mojom::ModemDataPtr& RemoteNtp::GetModemData() const {
+  return modem_data_;
+}
+
 void RemoteNtp::UpdateWiFiStatus() {
   remote_ntp_router_->UpdateWiFiStatus();
+}
+
+void RemoteNtp::UpdateModemData() {
+  remote_ntp_router_->UpdateModemData();
 }
 
 void RemoteNtp::NtpTilesChanged(rebel::RemoteNtpTileList tiles) {
@@ -257,6 +265,14 @@ void RemoteNtp::WiFiStatusChanged(rebel::RemoteNtpWiFiStatusList wifi_status) {
   if (can_run_js_in_renderframe_) {
     RemoteNtpExtension::DispatchWiFiStatusChanged(
         render_frame()->GetWebFrame());
+  }
+}
+
+void RemoteNtp::ModemDataChanged(rebel::mojom::ModemDataPtr data) {
+  modem_data_ = std::move(data);
+
+  if (can_run_js_in_renderframe_) {
+    RemoteNtpExtension::DispatchModemDataChanged(render_frame()->GetWebFrame());
   }
 }
 

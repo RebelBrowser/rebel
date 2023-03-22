@@ -96,6 +96,24 @@ struct WiFiStatus {
   int32 noise_measurement = -1;
 };
 
+struct ModemData {
+  string mac_address;
+  string modem_version;
+  string modem_type;
+  string ut_status;
+  string acceleration_status;
+  string online_time;
+  string led_status;
+  string led_color;
+  double modem_temperature = 0.0;
+  double idu_temperature = 0.0;
+  double fl_snr = 0.0;
+  double fl_power = 0.0;
+  double rl_power = 0.0;
+  double rl_symbol_rate = 0.0;
+  string rl_mod_code;
+};
+
 // Interface used to connect to the RemoteNTP interface. This is a separate
 // interface such that a reverse connection (|client| below) can be passed when
 // connecting.
@@ -139,6 +157,7 @@ interface RemoteNtp {
   CommitColor();
 
   UpdateWiFiStatus();
+  UpdateModemData();
 };
 
 // Renderer interface used by the browser to push updates to the client.
@@ -155,6 +174,7 @@ interface RemoteNtpClient {
   LocalBackgroundImageSelected();
 
   WiFiStatusChanged(array<WiFiStatus> status);
+  ModemDataChanged(ModemData data);
 };
 
 // List of possible icon types parsed from <link> tags on the DOM.
