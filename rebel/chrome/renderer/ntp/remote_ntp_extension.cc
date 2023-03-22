@@ -106,6 +106,15 @@ constexpr const char kDispatchWiFiStatusChangedScript[] =
     "  true;"
     "}";
 
+static const char kDispatchModemDataChanged[] =
+    "if (window.rebel &&"
+    "    window.rebel.network &&"
+    "    window.rebel.network.onModemDataChanged &&"
+    "    (typeof window.rebel.network.onModemDataChanged === 'function')) {"
+    "  window.rebel.network.onModemDataChanged();"
+    "  true;"
+    "}";
+
 void Dispatch(blink::WebLocalFrame* frame, const blink::WebString& script) {
   if (frame) {
     frame->ExecuteScript(blink::WebScriptSource(script));
@@ -320,6 +329,30 @@ v8::Local<v8::Object> GenerateWiFiStatus(
   }
 
   return v8_wifi_status;
+}
+
+// Populates a Javascript theme object for returning from
+// rebel.network.modemData.
+v8::Local<v8::Object> GenerateModemData(
+    v8::Isolate* isolate,
+    const rebel::mojom::ModemDataPtr& data) {
+  return gin::DataObjectBuilder(isolate)
+      .Set("macAddress", data->mac_address)
+      .Set("modemVersion", data->modem_version)
+      .Set("modemType", data->modem_type)
+      .Set("utStatus", data->ut_status)
+      .Set("accelerationStatus", data->acceleration_status)
+      .Set("onlineTime", data->online_time)
+      .Set("ledStatus", data->led_status)
+      .Set("ledColor", data->led_color)
+      .Set("modemTemperature", data->modem_temperature)
+      .Set("iduTemperature", data->idu_temperature)
+      .Set("flSnr", data->fl_snr)
+      .Set("flPower", data->fl_power)
+      .Set("rlPower", data->rl_power)
+      .Set("rlSymbolRate", data->rl_symbol_rate)
+      .Set("rlModCode", data->rl_mod_code)
+      .Build();
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -856,7 +889,9 @@ class NetworkBindings : public gin::Wrappable<NetworkBindings> {
       v8::Isolate* isolate) final {
     return gin::Wrappable<NetworkBindings>::GetObjectTemplateBuilder(isolate)
         .SetProperty("wiFiStatus", &NetworkBindings::GetWiFiStatus)
-        .SetMethod("updateWiFiStatus", &NetworkBindings::UpdateWiFiStatus);
+        .SetProperty("modemData", &NetworkBindings::GetModemData)
+        .SetMethod("updateWiFiStatus", &NetworkBindings::UpdateWiFiStatus)
+        .SetMethod("updateModemData", &NetworkBindings::UpdateModemData);
   }
 
   static v8::Local<v8::Value> GetWiFiStatus(v8::Isolate* isolate) {
@@ -873,6 +908,20 @@ class NetworkBindings : public gin::Wrappable<NetworkBindings> {
     return GenerateWiFiStatus(isolate, status);
   }
 
+  static v8::Local<v8::Value> GetModemData(v8::Isolate* isolate) {
+    const RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
+    if (!remote_ntp) {
+      return v8::Null(isolate);
+    }
+
+    const rebel::mojom::ModemDataPtr& data = remote_ntp->GetModemData();
+    if (!data) {
+      return v8::Null(isolate);
+    }
+
+    return GenerateModemData(isolate, data);
+  }
+
   static void UpdateWiFiStatus() {
     RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
     if (!remote_ntp) {
@@ -880,6 +929,15 @@ class NetworkBindings : public gin::Wrappable<NetworkBindings> {
     }
 
     remote_ntp->UpdateWiFiStatus();
+  }
+
+  static void UpdateModemData() {
+    RemoteNtp* remote_ntp = GetRemoteNtpForCurrentContext();
+    if (!remote_ntp) {
+      return;
+    }
+
+    remote_ntp->UpdateModemData();
   }
 };
 
@@ -982,6 +1040,11 @@ void RemoteNtpExtension::DispatchThemeChanged(blink::WebLocalFrame* frame) {
 void RemoteNtpExtension::DispatchWiFiStatusChanged(
     blink::WebLocalFrame* frame) {
   Dispatch(frame, kDispatchWiFiStatusChangedScript);
+}
+
+// static
+void RemoteNtpExtension::DispatchModemDataChanged(blink::WebLocalFrame* frame) {
+  Dispatch(frame, kDispatchModemDataChanged);
 }
 
 }  // namespace rebel

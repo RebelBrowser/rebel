@@ -21,6 +21,7 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_delegate.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
+#include "rebel/services/network/remote_ntp_modem_data.h"
 
 class AutocompleteController;
 class AutocompleteControllerDelegate;
@@ -39,7 +40,8 @@ class RemoteNtpApiAllowList;
 class RemoteNtpService : public KeyedService,
                          public ntp_tiles::MostVisitedSites::Observer,
                          public rebel::RemoteNtpThemeDelegate,
-                         public rebel::RemoteNtpIconStorage::Delegate {
+                         public rebel::RemoteNtpIconStorage::Delegate,
+                         public rebel::RemoteNtpModemData::Delegate {
  public:
   class Observer {
    public:
@@ -72,6 +74,9 @@ class RemoteNtpService : public KeyedService,
     // Indicates that the device's WiFi status has been updated.
     virtual void OnWiFiStatusChanged(
         const rebel::RemoteNtpWiFiStatusList& status) {}
+
+    // Indicates that the Viasat modem's data has been updated.
+    virtual void OnModemDataChanged(rebel::mojom::ModemDataPtr data) {}
 
    protected:
     virtual ~Observer() = default;
@@ -143,6 +148,9 @@ class RemoteNtpService : public KeyedService,
   // Invoked when the device's WiFi status has been updated.
   void OnWiFiStatusChanged(rebel::RemoteNtpWiFiStatusList wifi_status);
 
+  // Invoked when the NTP wants to retrieve data from the Viasat modem.
+  void UpdateModemData();
+
  protected:
   // Initialize the RemoteNtpService and set up observers needed to run the
   // service. Should be invoked by platform implementations once they determine
@@ -186,11 +194,15 @@ class RemoteNtpService : public KeyedService,
                      const base::FilePath& icon_file) override;
   void OnIconLoadComplete(const GURL& origin, bool successful) override;
 
+  // Overriden from rebel::RemoteNtpModemData::Delegate:
+  void OnModemDataChanged(rebel::RemoteNtpModemData::ModemData data) override;
+
   void NotifyAboutNtpTiles();
   void NotifyAboutBackgroundCollections();
   void NotifyAboutBackgroundImages();
   void NotifyAboutTheme();
   void NotifyAboutWiFiStatus();
+  void NotifyAboutModemData();
 
   const base::FilePath profile_path_;
   PrefService* pref_service_;
@@ -207,8 +219,10 @@ class RemoteNtpService : public KeyedService,
   std::unique_ptr<rebel::RemoteNtpIconStorage> icon_storage_;
 
   rebel::RemoteNtpWiFiStatusList wifi_status_;
+  rebel::mojom::ModemDataPtr modem_data_;
 
   std::unique_ptr<rebel::RemoteNtpApiAllowList> remote_ntp_api_allow_list_;
+  std::unique_ptr<rebel::RemoteNtpModemData> remote_ntp_modem_data_;
 
   base::WeakPtrFactory<RemoteNtpService> weak_factory_;
 };

@@ -179,4 +179,6 @@ rebel_services_network_public_cpp_sources = [
   "services/network/data_fetcher.h",
   "services/network/remote_ntp_api_allow_list.cc",
   "services/network/remote_ntp_api_allow_list.h",
+  "services/network/remote_ntp_modem_data.cc",
+  "services/network/remote_ntp_modem_data.h",
 ]

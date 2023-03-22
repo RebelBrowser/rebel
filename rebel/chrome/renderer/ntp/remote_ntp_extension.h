@@ -24,6 +24,7 @@ class RemoteNtpExtension {
   static void DispatchLocalBackgroundImageSelected(blink::WebLocalFrame* frame);
   static void DispatchThemeChanged(blink::WebLocalFrame* frame);
   static void DispatchWiFiStatusChanged(blink::WebLocalFrame* frame);
+  static void DispatchModemDataChanged(blink::WebLocalFrame* frame);
 
  private:
   RemoteNtpExtension() = delete;

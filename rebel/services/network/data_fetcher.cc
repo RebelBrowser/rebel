@@ -19,6 +19,7 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 
 #include "rebel/services/network/remote_ntp_api_allow_list.h"
+#include "rebel/services/network/remote_ntp_modem_data.h"
 
 namespace rebel {
 
@@ -247,5 +248,6 @@ void DataFetcher<T>::DelayedFetch(const base::TimeDelta delay) {
 
 // Explicitly declare the implementations of |DataFetcher|.
 template class DataFetcher<RemoteNtpApiAllowList>;
+template class DataFetcher<RemoteNtpModemData>;
 
 }  // namespace rebel

@@ -92,6 +92,7 @@ class RemoteNtpTabHelper
   void OnRevertColor() override;
   void OnCommitColor() override;
   void OnUpdateWiFiStatus() override;
+  void OnUpdateModemData() override;
 
   // Overriden from rebel::RemoteNtpSearchProvider::Delegate:
   void OnAutocompleteResultChanged(
@@ -109,6 +110,7 @@ class RemoteNtpTabHelper
   void OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) override;
   void OnWiFiStatusChanged(
       const rebel::RemoteNtpWiFiStatusList& status) override;
+  void OnModemDataChanged(rebel::mojom::ModemDataPtr data) override;
 
   Profile* profile() const;
 

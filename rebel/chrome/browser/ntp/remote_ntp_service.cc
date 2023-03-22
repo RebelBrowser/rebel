@@ -126,6 +126,9 @@ void RemoteNtpService::InitializeService(
     remote_ntp_api_allow_list_ = std::make_unique<rebel::RemoteNtpApiAllowList>(
         pref_service_, url_loader_factory);
     remote_ntp_api_allow_list_->MaybeStartFetch(true);
+
+    remote_ntp_modem_data_ =
+        std::make_unique<rebel::RemoteNtpModemData>(this, url_loader_factory);
   }
 }
 
@@ -221,6 +224,14 @@ void RemoteNtpService::OnWiFiStatusChanged(
   NotifyAboutWiFiStatus();
 }
 
+void RemoteNtpService::UpdateModemData() {
+  if (!remote_ntp_modem_data_) {
+    return;
+  }
+
+  remote_ntp_modem_data_->MaybeStartFetch(true);
+}
+
 void RemoteNtpService::OnURLsAvailable(
     const std::map<ntp_tiles::SectionType, ntp_tiles::NTPTilesVector>&
         sections) {
@@ -288,6 +299,29 @@ void RemoteNtpService::OnIconLoadComplete(const GURL& origin, bool successful) {
   }
 }
 
+void RemoteNtpService::OnModemDataChanged(
+    rebel::RemoteNtpModemData::ModemData data) {
+  modem_data_ = rebel::mojom::ModemData::New();
+
+  modem_data_->mac_address = std::move(data.mac_address);
+  modem_data_->modem_version = std::move(data.modem_version);
+  modem_data_->modem_type = std::move(data.modem_type);
+  modem_data_->ut_status = std::move(data.ut_status);
+  modem_data_->acceleration_status = std::move(data.acceleration_status);
+  modem_data_->online_time = std::move(data.online_time);
+  modem_data_->led_status = std::move(data.led_status);
+  modem_data_->led_color = std::move(data.led_color);
+  modem_data_->modem_temperature = data.modem_temperature;
+  modem_data_->idu_temperature = data.idu_temperature;
+  modem_data_->fl_snr = data.fl_snr;
+  modem_data_->fl_power = data.fl_power;
+  modem_data_->rl_power = data.rl_power;
+  modem_data_->rl_symbol_rate = data.rl_symbol_rate;
+  modem_data_->rl_mod_code = std::move(data.rl_mod_code);
+
+  NotifyAboutModemData();
+}
+
 void RemoteNtpService::NotifyAboutNtpTiles() {
   for (Observer& observer : observers_) {
     observer.OnNtpTilesChanged(ntp_tiles_);
@@ -315,6 +349,12 @@ void RemoteNtpService::NotifyAboutTheme() {
 void RemoteNtpService::NotifyAboutWiFiStatus() {
   for (Observer& observer : observers_) {
     observer.OnWiFiStatusChanged(wifi_status_);
+  }
+}
+
+void RemoteNtpService::NotifyAboutModemData() {
+  for (Observer& observer : observers_) {
+    observer.OnModemDataChanged(modem_data_->Clone());
   }
 }
 

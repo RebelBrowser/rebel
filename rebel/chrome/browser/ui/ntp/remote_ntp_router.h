@@ -84,6 +84,9 @@ class RemoteNtpRouter : public content::WebContentsObserver,
 
     // Called when the RemoteNTP wants to retrieve the device's WiFi status.
     virtual void OnUpdateWiFiStatus() = 0;
+
+    // Called when the RemoteNTP wants to retrieve data from the Viasat modem.
+    virtual void OnUpdateModemData() = 0;
   };
 
   // Creates rebel::mojom::RemoteNtpClient connections on request.
@@ -121,6 +124,7 @@ class RemoteNtpRouter : public content::WebContentsObserver,
   void SendLocalBackgroundImageSelected();
   void SendThemeChanged(rebel::mojom::RemoteNtpThemePtr theme);
   void SendWiFiStatusChanged(const rebel::RemoteNtpWiFiStatusList& status);
+  void SendModemDataChanged(rebel::mojom::ModemDataPtr data);
 
  private:
   RemoteNtpRouter(const RemoteNtpRouter&) = delete;
@@ -153,6 +157,7 @@ class RemoteNtpRouter : public content::WebContentsObserver,
   void RevertColor() override;
   void CommitColor() override;
   void UpdateWiFiStatus() override;
+  void UpdateModemData() override;
 
   rebel::mojom::RemoteNtpClient* remote_ntp_client() const {
     return remote_ntp_client_factory_->GetRemoteNtpClient();
