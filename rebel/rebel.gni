@@ -46,6 +46,10 @@ declare_args() {
   # It is recommended to bundle this list with your NTP application.
   rebel_default_sites_url = "https://browser.viasat.com/rebel_ntp/default_sites.json"
 
+  # The remote URL containing a JSON list of websites allowed to use the Rebel
+  # browser APIs.
+  rebel_browser_api_allow_list_url = "https://browser.viasat.com/rebel_ntp/remote_ntp_allow_list.json"
+
   # The remote URLs for the Omaha instances used for upgrades, crash reporting,
   # etc. These allow for separate public and internal servers, for situations
   # where stable releases are provided on a public server and internal testing

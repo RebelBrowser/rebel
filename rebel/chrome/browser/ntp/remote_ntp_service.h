@@ -32,6 +32,8 @@ class SharedURLLoaderFactory;
 
 namespace rebel {
 
+class RemoteNtpApiAllowList;
+
 // Per-profile service responsible for tracking information (e.g. most visited
 // tiles) required by the RemoteNTP.
 class RemoteNtpService : public KeyedService,
@@ -130,6 +132,11 @@ class RemoteNtpService : public KeyedService,
   // Retrieve the icon cache storage.
   RemoteNtpIconStorage* icon_storage() const { return icon_storage_.get(); }
 
+  // Retrieve the RemoteNTP API allow list.
+  const RemoteNtpApiAllowList* api_allow_list() const {
+    return remote_ntp_api_allow_list_.get();
+  }
+
   // Invoked when the NTP wants to retrieve the device's WiFi status.
   virtual void UpdateWiFiStatus() {}
 
@@ -200,6 +207,8 @@ class RemoteNtpService : public KeyedService,
   std::unique_ptr<rebel::RemoteNtpIconStorage> icon_storage_;
 
   rebel::RemoteNtpWiFiStatusList wifi_status_;
+
+  std::unique_ptr<rebel::RemoteNtpApiAllowList> remote_ntp_api_allow_list_;
 
   base::WeakPtrFactory<RemoteNtpService> weak_factory_;
 };

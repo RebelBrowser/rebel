@@ -4,9 +4,6 @@
 
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
 
-#include <array>
-#include <string_view>
-
 #include "base/bind.h"
 #include "chrome/browser/autocomplete/chrome_autocomplete_provider_client.h"
 #include "chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.h"
@@ -36,6 +33,7 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_source.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#include "rebel/services/network/remote_ntp_api_allow_list.h"
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
@@ -131,19 +129,17 @@ bool RemoteNtpServiceImpl::ShouldAllowUrlToUseRemoteNtpAPI(const GURL& url,
     return false;
   }
 
-  // FIXME(tflynn): Support a remotely configured allow list.
-  static constexpr std::array<std::string_view, 7> allowlist{{
-      "fast.viasat.com",
-      "fast.dev.viasat.com",
-      "fast.test.viasat.com",
-      "viasat-speedtest.vercel.app",
-      "viasat.speedtestcustom.com",
-      "speedcheck.viasat.com",
-      "speedcheck.test.viasat.com",
-  }};
+  auto* remote_ntp_service = RemoteNtpServiceFactory::GetForProfile(profile);
+  if (!remote_ntp_service) {
+    return false;
+  }
 
-  return std::find(allowlist.begin(), allowlist.end(), url.host()) !=
-         allowlist.end();
+  const auto* api_allow_list = remote_ntp_service->api_allow_list();
+  if (!api_allow_list) {
+    return false;
+  }
+
+  return api_allow_list->ContainsHost(url.host());
 }
 
 // static

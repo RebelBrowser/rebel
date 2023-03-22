@@ -513,6 +513,7 @@
 #endif
 
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
+#include "rebel/services/network/data_fetcher.h"
 #endif
 
 namespace {
@@ -1422,6 +1423,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #endif
 
 #if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterBrowserProcessDataFetcherProfilePrefs(registry);
   rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
 
 #if BUILDFLAG(IS_ANDROID)

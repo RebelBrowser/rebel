@@ -14,9 +14,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "ui/base/resource/resource_bundle.h"
 
-#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
-#include "rebel/grit/rebel_resources.h"
-
 #if !BUILDFLAG(IS_IOS)
 #include "base/no_destructor.h"
 #include "chrome/grit/locale_settings.h"
@@ -24,6 +21,10 @@
 
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
 #endif
+
+#include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
+#include "rebel/grit/rebel_resources.h"
+#include "rebel/services/network/remote_ntp_api_allow_list.h"
 
 namespace rebel {
 
@@ -121,6 +122,10 @@ void RemoteNtpService::InitializeService(
   if (url_loader_factory) {
     icon_storage_ = std::make_unique<rebel::RemoteNtpIconStorage>(
         this, profile_path_, pref_service_, url_loader_factory);
+
+    remote_ntp_api_allow_list_ = std::make_unique<rebel::RemoteNtpApiAllowList>(
+        pref_service_, url_loader_factory);
+    remote_ntp_api_allow_list_->MaybeStartFetch(true);
   }
 }
 

@@ -91,6 +91,7 @@
 #include "components/ntp_tiles/custom_links_manager_impl.h"
 
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
+#include "rebel/services/network/data_fetcher.h"
 #endif
 
 #if !defined(__has_feature) || !__has_feature(objc_arc)
@@ -260,6 +261,8 @@ void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {
 
 #if BUILDFLAG(REBEL_BROWSER)
   ntp_tiles::CustomLinksManagerImpl::RegisterProfilePrefs(registry);
+
+  rebel::RegisterBrowserProcessDataFetcherProfilePrefs(registry);
   rebel::RemoteNtpIconStorage::RegisterProfilePrefs(registry);
 #endif
 

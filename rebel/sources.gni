@@ -172,3 +172,10 @@ rebel_ios_chrome_browser_web_internal_sources = [
 rebel_ios_web_favicon_sources = [
   "ios/web/favicon/resources/touch_icon_utils.ts",
 ]
+
+rebel_services_network_public_cpp_sources = [
+  "services/network/data_fetcher.cc",
+  "services/network/data_fetcher.h",
+  "services/network/remote_ntp_api_allow_list.cc",
+  "services/network/remote_ntp_api_allow_list.h",
+]
