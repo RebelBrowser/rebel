@@ -32,6 +32,8 @@ if (is_android) {
   import("//v8/gni/v8.gni")
 }
 
+import("//rebel/rebel.gni")
+
 source_set("android_descriptors") {
   sources = [ "browser/android_descriptors.h" ]
   public_deps = [ "//content/public/common:content_descriptors" ]
@@ -68,6 +70,11 @@ if (is_android) {
         [ "grit/components_strings.h" ] +
         process_file_template(all_chrome_locales,
                               [ "components_strings_{{source_name_part}}.pak" ])
+
+    if (is_rebel_based) {
+      source = "$root_gen_dir/rebel/components_strings/components_strings.grd"
+      deps = [ "//rebel/branding:components_strings" ]
+    }
   }
 
   grit("generate_components_chromium_strings") {
@@ -86,6 +93,11 @@ if (is_android) {
               process_file_template(
                   all_chrome_locales,
                   [ "components_chromium_strings_{{source_name_part}}.pak" ])
+
+    if (is_rebel_based) {
+      source = "$root_gen_dir/rebel/components_chromium_strings/components_chromium_strings.grd"
+      deps = [ "//rebel/branding:components_chromium_strings" ]
+    }
   }
 
   repack_locales("weblayer_locales") {
