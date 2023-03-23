@@ -29,6 +29,8 @@ import("//third_party/jni_zero/jni_zero.gni")
 import("//tools/grit/repack.gni")
 import("//tools/resources/generate_resource_allowlist.gni")
 
+import("//rebel/rebel.gni")
+
 assert(!is_cronet_build)
 
 if (android_64bit_target_cpu && skip_secondary_abi_for_cq) {
@@ -1190,6 +1192,11 @@ grit("generate_components_strings") {
           [ "java/res/values-{{source_name_part}}/components_strings.xml" ]) +
       process_file_template(all_chrome_locales,
                             [ "components_strings_{{source_name_part}}.pak" ])
+
+  if (is_rebel_based) {
+    source = "$root_gen_dir/rebel/components_strings/components_strings.grd"
+    deps = [ "//rebel/branding:components_strings" ]
+  }
 }
 
 java_strings_grd("strings_grd") {

@@ -42,6 +42,8 @@ import("java_sources.gni")
 import("static_initializers.gni")
 import("trichrome.gni")
 
+import("//rebel/sources.gni")
+
 assert(!is_cronet_build)
 
 if (android_64bit_target_cpu && skip_secondary_abi_for_cq) {
@@ -170,6 +172,15 @@ if (current_toolchain == default_toolchain) {
       "java/res_chromium_base/mipmap-xxxhdpi/layered_app_icon_background.png",
       "java/res_chromium_base/values/channel_constants.xml",
     ]
+
+    if (is_rebel_based) {
+      sources -= [ "java/res_chromium_base/values/channel_constants.xml" ]
+      sources += [ "$root_gen_dir/rebel/chrome/android/java/res/values/channel_constants.xml" ]
+      deps = [ "//rebel/branding:channel_constants" ]
+
+      allow_missing_resources = true
+      resource_overlay = true
+    }
   }
 
   android_resources("chrome_app_java_resources") {
@@ -2174,6 +2185,15 @@ if (current_toolchain == default_toolchain) {
 
     # Dep needed to ensure override works properly.
     deps = [ ":chrome_base_module_resources" ]
+
+    if (is_rebel_based) {
+      sources -= [ "java/res_chromium_base/values/channel_constants.xml" ]
+      sources += [ "$root_gen_dir/rebel/chrome/android/java/res/values/channel_constants.xml" ]
+      deps += [ "//rebel/branding:channel_constants" ]
+
+      allow_missing_resources = true
+      resource_overlay = true
+    }
   }
 
   version_resource_dir = "$target_gen_dir/templates/chrome_version_xml/res"
@@ -2515,6 +2535,10 @@ if (current_toolchain == default_toolchain) {
     target_type = "android_apk"
     apk_name = "ChromePublic"
     art_profile_path = "//chrome/android/baseline_profiles/profile.txt"
+
+    if (is_rebel_based) {
+      apk_name = "$rebel_browser_name"
+    }
   }
 
   chrome_public_bundle("chrome_public_bundle") {
