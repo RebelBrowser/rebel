@@ -13,6 +13,8 @@ import("//ios/chrome/tools/strings/generate_localizable_strings.gni")
 import("//ios/public/provider/chrome/browser/build_config.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/rebel.gni")
+
 group("resources") {
   public_deps = [
     ":launchscreen_xib",
@@ -121,6 +123,11 @@ repack("repack_unscaled_resources") {
       "//third_party/blink/public/strings:accessibility_strings",
       "//ui/resources:ui_resources_grd_grit",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += [ "$root_gen_dir/rebel/rebel_resources.pak" ]
+    deps += [ "//rebel/chrome/browser/resources:rebel_resources" ]
   }
 }
 

@@ -6,6 +6,8 @@ import("//build/config/apple/symbols.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/ios/ios_sdk.gni")
 
+import("//rebel/rebel.gni")
+
 # Xcode 13.1 or higher is required to build Chromium on iOS. This file should
 # only be included when building Chromium, not other related projects (cronet,
 # webrtc, ...).
@@ -116,6 +118,13 @@ if (is_chrome_branded) {
   url_ssoauth_scheme = "$ios_app_bundle_id_prefix.sso.chrome.stable"
   url_unsecure_scheme = "googlechrome"
   url_x_callback_scheme = "googlechrome-x-callback"
+} else if (is_rebel_based) {
+  chromium_short_name = "$rebel_browser_name"
+  url_channel_scheme = "chromium-dev"
+  url_secure_scheme = "chromiums"
+  url_ssoauth_scheme = "$ios_app_bundle_id_prefix.sso.chromium"
+  url_unsecure_scheme = "chromium"
+  url_x_callback_scheme = "chromium-x-callback"
 } else {
   chromium_short_name = "Chromium"
   url_channel_scheme = "chromium-dev"
