@@ -4,6 +4,20 @@
 
 import("//rebel/branding/create_branded_grd.gni")
 
+create_branded_grd("android_chrome_strings") {
+  grd_file = "//chrome/browser/ui/android/strings/android_chrome_strings.grd"
+
+  xtb_relative_path = "translations"
+}
+
+create_branded_grd("browser_ui_strings") {
+  grd_file = "//components/browser_ui/strings/android/browser_ui_strings.grd"
+
+  grdp_files = [ "//components/browser_ui/strings/android/site_settings.grdp" ]
+
+  xtb_relative_path = "translations"
+}
+
 create_branded_grd("chromium_strings") {
   grd_file = "//chrome/app/chromium_strings.grd"
 
@@ -130,6 +144,26 @@ create_branded_grd("generated_resources") {
   grdp_extras = [ "//rebel/chrome/app/generated_resources.grdp" ]
 
   xtb_relative_path = "resources"
+}
+
+action("channel_constants") {
+  chromium_channel_constants =
+      "//chrome/android/java/res_chromium_base/values/channel_constants.xml"
+  rebel_channel_constants =
+      "$root_gen_dir/rebel/chrome/android/java/res/values/channel_constants.xml"
+
+  script = "//rebel/branding/create_channel_constants.py"
+  inputs = [ chromium_channel_constants ]
+  outputs = [ rebel_channel_constants ]
+
+  args = [
+    "--browser-name",
+    "$rebel_browser_name",
+    "--input-xml",
+    rebase_path(chromium_channel_constants),
+    "--output-xml",
+    rebase_path(rebel_channel_constants),
+  ]
 }
 
 action("linux_package_info") {
