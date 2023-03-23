@@ -6,6 +6,8 @@ import("//build/config/locales.gni")
 import("//chrome/common/features.gni")
 import("//tools/grit/grit_rule.gni")
 
+import("//rebel/rebel.gni")
+
 java_strings_grd("ui_strings_grd") {
   defines = chrome_grit_defines
   grd_file = "android_chrome_strings.grd"
@@ -13,4 +15,9 @@ java_strings_grd("ui_strings_grd") {
             process_file_template(
                 android_bundle_locales_as_resources,
                 [ "values-{{source_name_part}}/android_chrome_strings.xml" ])
+
+  if (is_rebel_based) {
+    grd_file = "$root_gen_dir/rebel/android_chrome_strings/android_chrome_strings.grd"
+    deps = [ "//rebel/branding:android_chrome_strings" ]
+  }
 }

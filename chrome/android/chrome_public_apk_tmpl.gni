@@ -18,6 +18,8 @@ import("//components/optimization_guide/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
 import("channel.gni")
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   # Android package name to use when compiling the public chrome targets
   # (chrome_public_apk, monochrome_public_apk, etc. as well as the
@@ -31,6 +33,10 @@ declare_args() {
     chrome_public_manifest_package += ".stable"
   } else if (android_channel != "default") {
     chrome_public_manifest_package += "." + android_channel
+  }
+
+  if (is_rebel_based) {
+    chrome_public_manifest_package = "$rebel_package"
   }
 }
 

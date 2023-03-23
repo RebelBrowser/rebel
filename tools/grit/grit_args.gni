@@ -7,6 +7,8 @@ import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/devtools.gni")
 import("//build/config/ui.gni")
 
+import("//rebel/rebel.gni")
+
 shared_intermediate_dir = rebase_path(root_gen_dir, root_build_dir)
 devtools_grd_path = "$shared_intermediate_dir/$devtools_grd_location"
 devtools_grd_path_no_ext = get_path_info(devtools_grd_path, "dir") + "/" +
@@ -52,6 +54,9 @@ _grit_environment_vars = [
 
 if (is_chrome_branded) {
   _grit_environment_vars += [ "CHROMIUM_BUILD=google_chrome" ]
+} else if (is_rebel_based) {
+  _grit_defines += [ "_rebel_based=${is_rebel_based}" ]
+  _grit_environment_vars += [ "CHROMIUM_BUILD=$rebel_browser_name_path_component" ]
 } else {
   _grit_environment_vars += [ "CHROMIUM_BUILD=chromium" ]
 }
