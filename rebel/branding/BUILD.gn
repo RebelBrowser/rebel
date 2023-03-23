@@ -146,6 +146,50 @@ create_branded_grd("generated_resources") {
   xtb_relative_path = "resources"
 }
 
+create_branded_grd("ios_strings") {
+  grd_file = "//ios/chrome/app/strings/ios_strings.grd"
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_open_extension_chromium_strings") {
+  grd_file = "//ios/chrome/open_extension/strings/ios_open_extension_chromium_strings.grd"
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_chromium_strings") {
+  grd_file = "//ios/chrome/app/strings/ios_chromium_strings.grd"
+
+  grdp_extras = [ "//rebel/chrome/app/generated_resources.grdp" ]
+
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_content_widget_extension_chromium_strings") {
+  grd_file = "//ios/chrome/content_widget_extension/strings/ios_content_widget_extension_chromium_strings.grd"
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_credential_provider_extension_strings") {
+  grd_file = "//ios/chrome/credential_provider_extension/strings/ios_credential_provider_extension_strings.grd"
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_search_widget_extension_chromium_strings") {
+  grd_file = "//ios/chrome/search_widget_extension/strings/ios_search_widget_extension_chromium_strings.grd"
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_share_extension_strings") {
+  grd_file =
+      "//ios/chrome/share_extension/strings/ios_share_extension_strings.grd"
+  xtb_relative_path = "resources"
+}
+
+create_branded_grd("ios_widget_kit_extension_strings") {
+  grd_file = "//ios/chrome/widget_kit_extension/strings/ios_widget_kit_extension_strings.grd"
+  xtb_relative_path = "resources"
+}
+
 action("channel_constants") {
   chromium_channel_constants =
       "//chrome/android/java/res_chromium_base/values/channel_constants.xml"
