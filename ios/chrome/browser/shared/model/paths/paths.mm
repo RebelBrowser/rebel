@@ -14,12 +14,19 @@
 #import "components/gcm_driver/gcm_driver_constants.h"
 #import "ios/chrome/browser/shared/model/paths/paths_internal.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace ios {
 namespace {
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 const base::FilePath::CharType kProductDirName[] =
     FILE_PATH_LITERAL("Google/Chrome");
+#elif BUILDFLAG(REBEL_BROWSER)
+const base::FilePath::CharType kProductDirName[] = REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "/" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME);
 #else
 const base::FilePath::CharType kProductDirName[] =
     FILE_PATH_LITERAL("Chromium");
