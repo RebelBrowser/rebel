@@ -198,6 +198,8 @@ std::string CrashReporterClient::GetUploadUrl() {
   // Only allow the possibility of report upload in official builds. This
   // crash server won't have symbols for any other build types.
   return kDefaultUploadURL;
+#elif BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(REBEL_CRASH_REPORT_ENABLED)
+  return BUILDFLAG(REBEL_CRASH_REPORT_URL);
 #else
   return std::string();
 #endif

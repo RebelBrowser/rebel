@@ -214,6 +214,10 @@ void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
       prefs::kAutofillBrandingIconAnimationRemainingCountPrefName, 2);
 
   registry->RegisterDictionaryPref(kLocalConsentsDictionary);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterLocalState(registry);
+#endif
 }
 
 void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {

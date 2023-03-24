@@ -8,8 +8,11 @@ namespace user_prefs {
 class PrefRegistrySyncable;
 }  // namespace user_prefs
 
+class PrefRegistrySimple;
+
 namespace rebel {
 
+void RegisterLocalState(PrefRegistrySimple* registry);
 void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
 
 }  // namespace rebel
