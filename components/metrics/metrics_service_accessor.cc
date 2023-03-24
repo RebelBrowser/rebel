@@ -32,7 +32,7 @@ bool MetricsServiceAccessor::IsMetricsReportingEnabled(
                     "servers. Should not be used for tests.";
     return true;
   }
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(REBEL_BROWSER)
   return IsMetricsReportingEnabledForOfficialBuild(pref_service);
 #else
   // In non-official builds, disable metrics reporting completely.
