@@ -277,6 +277,10 @@ void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
 
   registry->RegisterBooleanPref(prefs::kIosCredentialProviderPromoPolicyEnabled,
                                 true);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterLocalState(registry);
+#endif
 }
 
 void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {
