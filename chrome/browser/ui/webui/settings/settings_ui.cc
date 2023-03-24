@@ -245,7 +245,7 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   AddSettingsPageUIHandler(
       std::make_unique<MediaDevicesSelectionHandler>(profile));
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS_ASH)
+#if (BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(REBEL_BROWSER)) && !BUILDFLAG(IS_CHROMEOS_ASH)
   AddSettingsPageUIHandler(std::make_unique<MetricsReportingHandler>());
 #endif
   AddSettingsPageUIHandler(std::make_unique<OnStartupHandler>(profile));
