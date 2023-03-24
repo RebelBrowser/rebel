@@ -65,6 +65,10 @@ declare_args() {
   rebel_omaha_public_url = "https://omaha.rebel.com"
   rebel_omaha_private_url = "https://omaha.internal.rebel.com"
 
+  # The remote URL to receive crash reports. Disabled by default.
+  rebel_crash_report_enabled = false
+  rebel_crash_report_url = "https://crash.rebel.com"
+
   # The Sparkle (macOS upgrades) configuration. Disabled by default.
   rebel_sparkle_enabled = false
   rebel_sparkle_product_name = "Rebel"
@@ -118,11 +122,18 @@ declare_args() {
     "REBEL_BROWSER_API_ALLOW_LIST=\"$rebel_browser_api_allow_list_url\"",
     "REBEL_OMAHA_PUBLIC_URL=\"$rebel_omaha_public_url\"",
     "REBEL_OMAHA_PRIVATE_URL=\"$rebel_omaha_private_url\"",
+    "REBEL_CRASH_REPORT_URL=\"$rebel_crash_report_url\"",
     "REBEL_SPARKLE_PRODUCT_NAME=\"$rebel_sparkle_product_name\"",
     "REBEL_WINDOWS_APP_GUID=\"$rebel_windows_app_guid\"",
     "REBEL_WINDOWS_GOOGLE_UPDATE_APP_GUID=\"$rebel_windows_google_update_app_guid\"",
     "REBEL_WINDOWS_APP_ICON=\"$rebel_windows_app_icon\"",
   ]
+
+  if (rebel_crash_report_enabled) {
+    rebel_branding_flags += [ "REBEL_CRASH_REPORT_ENABLED=1" ]
+  } else {
+    rebel_branding_flags += [ "REBEL_CRASH_REPORT_ENABLED=0" ]
+  }
 
   if (rebel_sparkle_enabled) {
     rebel_branding_flags += [ "REBEL_SPARKLE_ENABLED=1" ]

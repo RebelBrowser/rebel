@@ -17,6 +17,8 @@
 #define DCHECK assert
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 namespace crash_reporter {
 
 namespace {
@@ -190,7 +192,11 @@ void CrashReporterClient::GetSanitizationInformation(
 #endif
 
 std::string CrashReporterClient::GetUploadUrl() {
+#if BUILDFLAG(REBEL_BROWSER) && BUILDFLAG(REBEL_CRASH_REPORT_ENABLED)
+  return BUILDFLAG(REBEL_CRASH_REPORT_URL);
+#else
   return kDefaultUploadUrl;
+#endif
 }
 
 bool CrashReporterClient::ShouldMonitorCrashHandlerExpensively() {
