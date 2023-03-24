@@ -431,6 +431,10 @@ void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
   registry->RegisterIntegerPref(kAppStoreRatingTotalDaysOnChromeKey, 0);
   registry->RegisterListPref(kAppStoreRatingActiveDaysInPastWeekKey);
   registry->RegisterTimePref(kAppStoreRatingLastShownPromoDayKey, base::Time());
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterLocalState(registry);
+#endif
 }
 
 void RegisterBrowserStatePrefs(user_prefs::PrefRegistrySyncable* registry) {

@@ -1631,6 +1631,10 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
 
   // This is intentionally last.
   RegisterLocalStatePrefsForMigration(registry);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  rebel::RegisterLocalState(registry);
+#endif
 }
 
 // Register prefs applicable to all profiles.
