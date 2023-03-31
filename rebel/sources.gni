@@ -49,6 +49,8 @@ if (is_ios) {
     "chrome/browser/ntp/remote_ntp_service_impl.h",
     "chrome/browser/ntp/remote_ntp_source.cc",
     "chrome/browser/ntp/remote_ntp_source.h",
+    "chrome/browser/prism/prism.cc",
+    "chrome/browser/prism/prism.h",
     "chrome/browser/rebel_content_browser_client.cc",
     "chrome/browser/rebel_content_browser_client.h",
     "chrome/browser/rebel_main_extra_parts.cc",
@@ -158,6 +160,11 @@ rebel_chrome_android_java_sources = [
 
 rebel_chrome_android_jni_sources = [
   "chrome/android/java/src/org/chromium/chrome/browser/ntp/RemoteNtpBridge.java",
+]
+
+rebel_components_ukm_sources = [
+  "components/ukm/prism.cc",
+  "components/ukm/prism.h",
 ]
 
 rebel_components_url_formatter_sources = [
