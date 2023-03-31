@@ -14,6 +14,7 @@ namespace rebel {
 class RebelMainExtraParts : public ChromeBrowserMainExtraParts {
  public:
   // ChromeBrowserMainExtraParts:
+  void PreProfileInit() override;
   void PostProfileInit(Profile* profile, bool is_initial_profile) override;
 };
 

@@ -1,0 +1,22 @@
+# Copyright 2023 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/buildflag_header.gni")
+
+import("//rebel/components/ukm/prism.gni")
+
+buildflag_header("prism_buildflags") {
+  header = "prism_buildflags.h"
+
+  if (prism_enabled) {
+    flags = [ "PRISM_ENABLED=1" ]
+  } else {
+    flags = [ "PRISM_ENABLED=0" ]
+  }
+
+  flags += [
+    "PRISM_HINTS_URL=\"$prism_hints_url\"",
+    "PRISM_METRICS_URL=\"$prism_metrics_url\"",
+  ]
+}

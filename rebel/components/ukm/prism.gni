@@ -1,0 +1,9 @@
+# Copyright 2023 Viasat Inc. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+declare_args() {
+  prism_enabled = true
+  prism_hints_url = "http://127.0.0.1:8082/v1/prism/hints"
+  prism_metrics_url = "http://127.0.0.1:8082/v1/prism/ukms"
+}
