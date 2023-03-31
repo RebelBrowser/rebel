@@ -34,6 +34,11 @@
 #include "third_party/metrics_proto/ukm/report.pb.h"
 #include "third_party/metrics_proto/user_demographics.pb.h"
 
+#include "rebel/components/ukm/prism_buildflags.h"  // Needed for PRISM_ENABLED.
+#if BUILDFLAG(PRISM_ENABLED)
+#include "rebel/components/ukm/prism.h"
+#endif
+
 namespace ukm {
 
 namespace {
@@ -499,6 +504,12 @@ void UkmService::BuildAndStoreLog(
     report.set_product(product);
 
   StoreRecordingsInReport(&report);
+
+#if BUILDFLAG(PRISM_ENABLED)
+  // Viasat: Note that this must be called *after* StoreRecordingsInReport, as
+  // that is what sets the |sources| field in the report.
+  rebel::AddViasatMetricsToReport(report);
+#endif
 
   metrics::MetricsLog::RecordCoreSystemProfile(client_,
                                                report.mutable_system_profile());

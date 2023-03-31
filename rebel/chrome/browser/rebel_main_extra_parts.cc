@@ -11,6 +11,8 @@
 #include "rebel/chrome/browser/channel_selection.h"
 #endif
 
+#include "rebel/chrome/browser/prism/prism.h"
+
 namespace rebel {
 
 void RebelMainExtraParts::PostProfileInit(Profile* profile,
@@ -26,6 +28,8 @@ void RebelMainExtraParts::PostProfileInit(Profile* profile,
     InitializeChannelSelection(pref_service);
   }
 #endif
+
+  InitializeProfileForPrism(*profile);
 }
 
 }  // namespace rebel

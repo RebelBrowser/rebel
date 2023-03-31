@@ -25,6 +25,15 @@
 #include "components/ukm/ios/ukm_reporting_ios_util.h"
 #endif
 
+#include "rebel/components/ukm/prism_buildflags.h"  // Needed for PRISM_ENABLED.
+#if BUILDFLAG(PRISM_ENABLED)
+// FIXME: This is to allow overriding the UKM server URL via command line. Can
+//        we set UKM's URL from //rebel without changing this file somehow?
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+#endif
+
 namespace ukm {
 
 namespace {

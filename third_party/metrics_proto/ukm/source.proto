@@ -92,6 +92,10 @@ message NavigationMetadata {
 
 // Next tag: 20
 message Source {
+  // VIASAT:
+  // Absolute time of navigation.
+  optional string viasat_navigation_start_time = 20;
+
   // An identifier for the source. This should be unique within a session.
   optional int64 id = 1;
 
