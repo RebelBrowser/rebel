@@ -19,6 +19,16 @@ import "user_demographics.proto";
 // This is the message type sent from Chrome to the UKM collector.
 // Next tag: 13
 message Report {
+  // VIASAT:
+  // A string that is provided via Viasat Browser command line switch
+  // |rebel-ukm-label|. It is used only for testing to identify a particular
+  // browser instance.
+  optional string viasat_prism_label = 13;
+
+  // VIASAT:
+  // A boolean indicating whether Viasat Browser's Prism service is enabled.
+  optional bool viasat_prism_enabled = 14;
+
   // A unique identifier for a Chrome install. This ID should be used only
   // in UKM reports, and not linked to any other data sources.
   optional fixed64 client_id = 1;

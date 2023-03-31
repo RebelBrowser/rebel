@@ -4,6 +4,8 @@
 
 import("//testing/test.gni")
 
+import("//rebel/sources.gni")
+
 component("ukm_recorder") {
   output_name = "ukm_recorder"
 
@@ -75,6 +77,11 @@ static_library("ukm") {
   ]
   if (is_ios) {
     deps += [ "//components/ukm/ios:ukm_reporting_ios_util" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_components_ukm_sources, ".", "//rebel")
+    deps += [ "//rebel/components/ukm:prism_buildflags" ]
   }
 }
 
