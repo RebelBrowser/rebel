@@ -12,6 +12,7 @@
 
 #include "base/base_switches.h"
 #include "base/command_line.h"
+#include "base/time/time.h"
 #include "third_party/metrics_proto/ukm/report.pb.h"
 #include "third_party/metrics_proto/ukm/source.pb.h"
 
