@@ -6,6 +6,7 @@
 
 #include "base/no_destructor.h"
 
+#include "rebel/chrome/browser/prism/prism.h"
 #include "rebel/chrome/browser/rebel_content_browser_client.h"
 #include "rebel/chrome/renderer/rebel_content_renderer_client.h"
 
@@ -18,6 +19,12 @@ RebelMainDelegate::~RebelMainDelegate() = default;
 RebelMainDelegate::RebelMainDelegate(base::TimeTicks exe_entry_point_ticks)
     : RebelMainDelegateBase(exe_entry_point_ticks) {}
 #endif
+
+absl::optional<int> RebelMainDelegate::PreBrowserMain() {
+  InitializeCommandLineForPrism();
+
+  return RebelMainDelegateBase::PreBrowserMain();
+}
 
 content::ContentClient* RebelMainDelegate::CreateContentClient() {
   return &rebel_content_client_;

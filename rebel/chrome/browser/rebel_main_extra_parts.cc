@@ -15,10 +15,6 @@
 
 namespace rebel {
 
-void RebelMainExtraParts::PreProfileInit() {
-  InitializeCommandLineForPrism();
-}
-
 void RebelMainExtraParts::PostProfileInit(Profile* profile,
                                           bool is_initial_profile) {
   if (!profile) {

@@ -46,6 +46,7 @@ class RebelMainDelegate : public RebelMainDelegateBase {
   RebelMainDelegate& operator=(const RebelMainDelegate&) = delete;
 
   // content::ContentMainDelegate:
+  absl::optional<int> PreBrowserMain() override;
   content::ContentClient* CreateContentClient() override;
   content::ContentBrowserClient* CreateContentBrowserClient() override;
   content::ContentRendererClient* CreateContentRendererClient() override;
