@@ -48,41 +48,40 @@ std::string JoinCSVList(const ContainerType& list) {
 }  // namespace
 
 void InitializeCommandLineForPrism() {
-  if (!IsPrismHintingEnabled()) {
-    return;
-  }
-
   auto& command_line = *base::CommandLine::ForCurrentProcess();
 
-  std::set<base::StringPiece> enabled_features = {
-      features::kLoadingPredictorPrefetch.name,
-      features::kLoadingPredictorUseOptimizationGuide.name,
-  };
+  if (IsPrismHintingEnabled()) {
+    std::set<base::StringPiece> enabled_features = {
+        features::kLoadingPredictorPrefetch.name,
+        features::kLoadingPredictorUseOptimizationGuide.name,
+    };
 
-  auto current_enabled_features =
-      command_line.GetSwitchValueASCII(switches::kEnableFeatures);
-  for (const auto& feature :
-       base::FeatureList::SplitFeatureListString(current_enabled_features)) {
-    enabled_features.insert(feature);
+    auto current_enabled_features =
+        command_line.GetSwitchValueASCII(switches::kEnableFeatures);
+    for (const auto& feature :
+         base::FeatureList::SplitFeatureListString(current_enabled_features)) {
+      enabled_features.insert(feature);
+    }
+
+    std::string enabled = JoinCSVList(enabled_features);
+    command_line.AppendSwitchASCII(switches::kEnableFeatures, enabled);
+
+    if (!command_line.HasSwitch(optimization_guide::switches::
+                                    kOptimizationGuideServiceGetHintsURL)) {
+      command_line.AppendSwitchASCII(
+          optimization_guide::switches::kOptimizationGuideServiceGetHintsURL,
+          kPrismHintsURL);
+    }
   }
 
-  std::string enabled = JoinCSVList(enabled_features);
-  command_line.AppendSwitchASCII(switches::kEnableFeatures, enabled);
-
-  if (!command_line.HasSwitch(kPrismHintsURL)) {
-    command_line.AppendSwitchASCII(
-        optimization_guide::switches::kOptimizationGuideServiceGetHintsURL,
-        kPrismHintsURL);
-  }
-
-  if (!command_line.HasSwitch(kPrismMetricsUrl)) {
+  if (!command_line.HasSwitch(metrics::switches::kUkmServerUrl)) {
     command_line.AppendSwitchASCII(metrics::switches::kUkmServerUrl,
                                    kPrismMetricsUrl);
   }
 }
 
 void InitializeProfileForPrism(Profile& profile) {
-  if (!IsPrismHintingEnabled() || profile.IsOffTheRecord()) {
+  if (profile.IsOffTheRecord()) {
     return;
   }
 
