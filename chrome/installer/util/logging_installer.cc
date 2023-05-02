@@ -24,6 +24,10 @@
 #include "chrome/installer/util/initial_preferences_constants.h"
 #include "chrome/installer/util/util_constants.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 // {93BCE0BF-3FAF-43b1-9E28-BEB6FAB5ECE7}
 static const GUID kSetupTraceProvider = {
     0x93bce0bf,
@@ -121,6 +125,9 @@ base::FilePath GetLogFilePath(const installer::InitialPreferences& prefs) {
   static const base::FilePath::CharType kLogFilename[] =
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
       FILE_PATH_LITERAL("chrome_installer.log");
+#elif BUILDFLAG(REBEL_BROWSER)
+      FILE_PATH_LITERAL(
+          REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME_PATH) "_installer.log");
 #else  // BUILDFLAG(CHROMIUM_BRANDING)
       FILE_PATH_LITERAL("chromium_installer.log");
 #endif

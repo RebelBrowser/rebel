@@ -5,6 +5,10 @@
 #include "chrome_command_ids.h"
 #include "printing/buildflags/buildflags.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -171,6 +175,8 @@ IDR_MAINFRAME       ICON                        "theme\google_chrome\win\chrome.
 IDR_SXS             ICON                        "theme\google_chrome\win\chrome_sxs.ico"
 IDR_X004_DEV        ICON                        "theme\google_chrome\win\chrome_dev.ico"
 IDR_X005_BETA       ICON                        "theme\google_chrome\win\chrome_beta.ico"
+#elif BUILDFLAG(REBEL_BROWSER)
+IDR_MAINFRAME       ICON                        REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_APP_ICON)
 #else
 IDR_MAINFRAME       ICON                        "theme\chromium\win\chromium.ico"
 #endif

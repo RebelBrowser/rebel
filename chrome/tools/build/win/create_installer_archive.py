@@ -571,6 +571,17 @@ def main(options):
 
   config = Readconfig(options.input_file, current_version)
 
+  # Rebel: Override chrome.exe with the Rebel-branded browser name.
+  value = config.get('GENERAL', 'chrome.exe')
+  config.remove_option('GENERAL', 'chrome.exe')
+  config.set('GENERAL', options.rebel_browser_exe, value)
+
+  # Rebel: Include Google Chrome files with the Rebel-branded browser.
+  for option in config.options('GOOGLE_CHROME'):
+    value = config.get('GOOGLE_CHROME', option)
+    config.remove_option('GOOGLE_CHROME', option)
+    config.set('GENERAL', option, value)
+
   staging_dir = MakeStagingDirectory(options.staging_dir)
 
   prev_version = GetPrevVersion(options.build_dir, staging_dir,
@@ -676,6 +687,9 @@ def _ParseOptions():
            'archived, to keep output artifacts deterministic.')
   parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
                     default=False)
+
+  # Rebel: Added to override chrome.exe with the Rebel-branded browser name.
+  parser.add_option('--rebel_browser_exe', help='Name of the Rebel-branded executable')
 
   options, _ = parser.parse_args()
   if not options.build_dir:
