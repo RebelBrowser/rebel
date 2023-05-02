@@ -21,10 +21,20 @@
 #include "build/branding_buildflags.h"
 #include "crypto/random.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace extensions {
 
+#if BUILDFLAG(REBEL_BROWSER)
+const wchar_t kChromeNativeMessagingRegistryKey[] =
+    L"SOFTWARE\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH) "\\"
+    REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) "\\NativeMessagingHosts";
+#else
 const wchar_t kChromeNativeMessagingRegistryKey[] =
     L"SOFTWARE\\Google\\Chrome\\NativeMessagingHosts";
+#endif
 #if BUILDFLAG(CHROMIUM_BRANDING)
 const wchar_t kChromiumNativeMessagingRegistryKey[] =
     L"SOFTWARE\\Chromium\\NativeMessagingHosts";

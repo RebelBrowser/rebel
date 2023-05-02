@@ -20,6 +20,10 @@
 #include "chrome/installer/util/google_update_settings.h"
 #include "components/version_info/channel.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 InstallerCrashReporterClient::InstallerCrashReporterClient(
     bool is_per_user_install)
     : is_per_user_install_(is_per_user_install) {}
@@ -130,6 +134,9 @@ bool InstallerCrashReporterClient::ReportingIsEnforcedByPolicy(bool* enabled) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   static const wchar_t kRegistryChromePolicyKey[] =
       L"SOFTWARE\\Policies\\Google\\Chrome";
+#elif BUILDFLAG(REBEL_BROWSER)
+  static const wchar_t kRegistryChromePolicyKey[] =
+      L"SOFTWARE\\Policies\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH) "\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME);
 #else
   static const wchar_t kRegistryChromePolicyKey[] =
       L"SOFTWARE\\Policies\\Chromium";

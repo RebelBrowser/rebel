@@ -6,23 +6,45 @@
 
 #include "chrome/install_static/buildflags.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace install_static {
 
 namespace {
 
 #if BUILDFLAG(USE_GOOGLE_UPDATE_INTEGRATION)
 std::wstring GetClientsKeyPathForApp(const wchar_t* app_guid) {
+#if BUILDFLAG(REBEL_BROWSER)
+  return std::wstring(L"Software\\"
+      REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH)
+      "\\BrowserUpdate\\Clients\\").append(app_guid);
+#else
   return std::wstring(L"Software\\Google\\Update\\Clients\\").append(app_guid);
+#endif
 }
 
 std::wstring GetClientStateKeyPathForApp(const wchar_t* app_guid) {
+#if BUILDFLAG(REBEL_BROWSER)
+  return std::wstring(L"Software\\"
+      REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH)
+      "\\BrowserUpdate\\ClientState\\").append(app_guid);
+#else
   return std::wstring(L"Software\\Google\\Update\\ClientState\\")
       .append(app_guid);
+#endif
 }
 
 std::wstring GetClientStateMediumKeyPathForApp(const wchar_t* app_guid) {
+#if BUILDFLAG(REBEL_BROWSER)
+  return std::wstring(L"Software\\"
+      REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH)
+      "\\BrowserUpdate\\ClientStateMedium\\").append(app_guid);
+#else
   return std::wstring(L"Software\\Google\\Update\\ClientStateMedium\\")
       .append(app_guid);
+#endif
 }
 #else
 std::wstring GetUnregisteredKeyPathForProduct() {
