@@ -4,6 +4,11 @@
 
 #include "chrome/installer/util/util_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace installer {
 
 namespace switches {
@@ -212,7 +217,12 @@ const char kGoogleUpdateIsMachineEnvVar[] = "GoogleUpdateIsMachine";
 // Active Setup.
 const wchar_t kActiveSetupExe[] = L"chrmstp.exe";
 const wchar_t kChromeDll[] = L"chrome.dll";
+#if BUILDFLAG(REBEL_BROWSER)
+const wchar_t kChromeExe[] =
+    L"" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) ".exe";
+#else
 const wchar_t kChromeExe[] = L"chrome.exe";
+#endif
 const wchar_t kChromeNewExe[] = L"new_chrome.exe";
 const wchar_t kChromeOldExe[] = L"old_chrome.exe";
 const wchar_t kChromeProxyExe[] = L"chrome_proxy.exe";

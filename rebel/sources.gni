@@ -138,6 +138,11 @@ if (!is_ios) {
   ]
 }
 
+rebel_chrome_install_static_sources = [
+  "chrome/install_static/rebel_install_modes.cc",
+  "chrome/install_static/rebel_install_modes.h",
+]
+
 rebel_chrome_renderer_sources = [
   "chrome/renderer/ntp/remote_ntp.cc",
   "chrome/renderer/ntp/remote_ntp.h",

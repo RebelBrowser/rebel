@@ -27,12 +27,23 @@
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 using content::BrowserThread;
 
 namespace {
 
 // The Registry subkey that contains information about external extensions.
+#if BUILDFLAG(REBEL_BROWSER)
+const wchar_t kRegistryExtensions[] =
+    L"Software\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH) "\\"
+    REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) "\\Extensions";
+#else
 const wchar_t kRegistryExtensions[] = L"Software\\Google\\Chrome\\Extensions";
+#endif
 
 // Registry value of the key that defines the installation parameter.
 const wchar_t kRegistryExtensionInstallParam[] = L"install_parameter";

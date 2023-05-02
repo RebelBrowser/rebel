@@ -6,9 +6,13 @@ import("//build/buildflag_header.gni")
 import("//build/config/chrome_build.gni")
 import("//testing/test.gni")
 
+import("//rebel/sources.gni")
+
 buildflag_header("buildflags") {
   header = "buildflags.h"
   if (is_chrome_branded && is_win) {
+    flags = [ "USE_GOOGLE_UPDATE_INTEGRATION=1" ]
+  } else if (is_rebel_based && is_win) {
     flags = [ "USE_GOOGLE_UPDATE_INTEGRATION=1" ]
   } else {
     flags = [ "USE_GOOGLE_UPDATE_INTEGRATION=0" ]
@@ -58,6 +62,8 @@ if (is_win) {
         "google_chrome_install_modes.cc",
         "google_chrome_install_modes.h",
       ]
+    } else if (is_rebel_based) {
+      sources += rebase_path(rebel_chrome_install_static_sources, ".", "//rebel")
     } else if (is_chrome_for_testing_branded) {
       sources += [
         "google_chrome_for_testing_install_modes.cc",
