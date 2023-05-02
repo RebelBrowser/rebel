@@ -9,14 +9,30 @@
 #include "base/win/registry.h"
 #include "chrome/installer/util/google_update_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace gcapi_internals {
 
+#if BUILDFLAG(REBEL_BROWSER)
+const wchar_t kChromeRegClientsKey[] =
+    L"Software\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH)
+    "\\BrowserUpdate\\Clients\\" REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_APP_GUID);
+
+const wchar_t kChromeRegClientStateKey[] =
+    L"Software\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH)
+    "\\BrowserUpdate\\ClientState\\"
+    REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_APP_GUID);
+#else
 const wchar_t kChromeRegClientsKey[] =
     L"Software\\Google\\Update\\Clients\\"
     L"{8A69D345-D564-463c-AFF1-A69D9E530F96}";
 const wchar_t kChromeRegClientStateKey[] =
     L"Software\\Google\\Update\\ClientState\\"
     L"{8A69D345-D564-463c-AFF1-A69D9E530F96}";
+#endif
 
 // Mirror the strategy used by GoogleUpdateSettings::GetBrand.
 bool GetBrand(std::wstring* value) {

@@ -13,6 +13,10 @@
 #include "base/win/registry.h"
 #include "build/branding_buildflags.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace chrome_launcher_support {
 
 namespace {
@@ -27,18 +31,31 @@ const wchar_t kUpdateClientsRegKey[] = L"Software\\Google\\Update\\Clients";
 // Copied from google_chrome_install_modes.cc.
 const wchar_t kBrowserAppGuid[] = L"{8A69D345-D564-463c-AFF1-A69D9E530F96}";
 const wchar_t kSxSBrowserAppGuid[] = L"{4ea16ac7-fd5a-47c3-875b-dbf4a2008c20}";
+#elif BUILDFLAG(REBEL_BROWSER)
+const wchar_t kUpdateClientStateRegKey[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\ClientState";
+
+const wchar_t kUpdateClientsRegKey[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\Clients";
+
+const wchar_t kBrowserAppGuid[] =
+    L"" REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_APP_GUID);
 #else
 const wchar_t kInstallationRegKey[] = L"Software\\Chromium";
 #endif
 
 // Copied from util_constants.cc.
+#if BUILDFLAG(REBEL_BROWSER)
+const wchar_t kChromeExe[] = L"" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME);
+#else
 const wchar_t kChromeExe[] = L"chrome.exe";
+#endif
 const wchar_t kUninstallStringField[] = L"UninstallString";
 const wchar_t kVersionStringField[] = L"pv";
 
 // Returns the registry path to where Client state is stored.
 std::wstring GetClientStateRegKey() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(REBEL_BROWSER)
   return kUpdateClientStateRegKey;
 #else
   return kInstallationRegKey;
@@ -48,7 +65,7 @@ std::wstring GetClientStateRegKey() {
 // Returns the registry path to where basic information about the Clients
 // like name and version information are stored.
 std::wstring GetClientsRegKey() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(REBEL_BROWSER)
   return kUpdateClientsRegKey;
 #else
   return kInstallationRegKey;
@@ -96,7 +113,7 @@ base::FilePath GetSetupExeFromRegistry(InstallationLevel level,
 // Returns the path to an existing setup.exe at the specified level, if it can
 // be found via the registry.
 base::FilePath GetSetupExeForInstallationLevel(InstallationLevel level) {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(REBEL_BROWSER)
   // Look in the registry for Chrome.
   return GetSetupExeFromRegistry(level, kBrowserAppGuid);
 #else

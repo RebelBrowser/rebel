@@ -68,11 +68,21 @@ declare_args() {
   # The Sparkle (macOS upgrades) configuration. Disabled by default.
   rebel_sparkle_enabled = false
   rebel_sparkle_product_name = "Rebel"
+
+  # The Omaha (Windows upgrades) configuration.
+  rebel_windows_app_guid = "{8A69D345-D564-463c-AFF1-A69D9E530F96}"
+  rebel_windows_google_update_app_guid =
+      "{430FD4D0-B729-4F61-AA34-91526481799D}"
 }
 
 # Arguments to help with Chromium integration (i.e. not to be overridden).
 declare_args() {
   is_rebel_based = true
+
+  rebel_browser_name_without_spaces =
+      string_replace("$rebel_browser_name", " ", "")
+  rebel_browser_name_with_underscores =
+      string_replace("$rebel_browser_name", " ", "_")
 
   rebel_browser_branding_directory =
       "//rebel/branding/$rebel_browser_name_path_component"
@@ -81,6 +91,13 @@ declare_args() {
   rebel_sparkle_public_key =
       "$rebel_browser_branding_directory/mac/chromium_pub.pem"
 
+  _rebel_windows_app_icon =
+      rebase_path("$rebel_browser_branding_directory/win/app.ico",
+                  "//chrome/app",
+                  "//rebel")
+  rebel_windows_app_icon =
+      string_replace("$_rebel_windows_app_icon", "/", "\\\\\\\\")
+
   # Branding build flags used by //build/BUILD.gn.
   rebel_branding_flags = [
     "CHROMIUM_BRANDING=0",
@@ -88,6 +105,8 @@ declare_args() {
 
     "REBEL_BROWSER=1",
     "REBEL_BROWSER_NAME=\"$rebel_browser_name\"",
+    "REBEL_BROWSER_NAME_WITHOUT_SPACES=\"$rebel_browser_name_without_spaces\"",
+    "REBEL_BROWSER_NAME_WITH_UNDERSCORES=\"$rebel_browser_name_with_underscores\"",
     "REBEL_BROWSER_NAME_PATH=\"$rebel_browser_name_path_component\"",
     "REBEL_BROWSER_COMPANY=\"$rebel_browser_company\"",
     "REBEL_BROWSER_COMPANY_PATH=\"$rebel_browser_company_path_component\"",
@@ -100,6 +119,9 @@ declare_args() {
     "REBEL_OMAHA_PUBLIC_URL=\"$rebel_omaha_public_url\"",
     "REBEL_OMAHA_PRIVATE_URL=\"$rebel_omaha_private_url\"",
     "REBEL_SPARKLE_PRODUCT_NAME=\"$rebel_sparkle_product_name\"",
+    "REBEL_WINDOWS_APP_GUID=\"$rebel_windows_app_guid\"",
+    "REBEL_WINDOWS_GOOGLE_UPDATE_APP_GUID=\"$rebel_windows_google_update_app_guid\"",
+    "REBEL_WINDOWS_APP_ICON=\"$rebel_windows_app_icon\"",
   ]
 
   if (rebel_sparkle_enabled) {
