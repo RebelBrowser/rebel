@@ -371,8 +371,9 @@ template("single_msvc_toolchain") {
 
     tool("alink") {
       rspfile = "{{output}}.rsp"
+      # Rebel: Changed to wrap {{output}} and $rspfile in quotes to preserve spaces.
       command =
-          "$linker_wrapper$lib /OUT:{{output}} /nologo {{arflags}} @$rspfile"
+          "$linker_wrapper$lib /OUT:\"{{output}}\" /nologo {{arflags}} @\"$rspfile\""
       description = "LIB {{output}}"
       outputs = [
         # Ignore {{output_extension}} and always use .lib, there's no reason to
@@ -395,7 +396,8 @@ template("single_msvc_toolchain") {
       rspfile = "${dllname}.rsp"
       pool = "//build/toolchain:link_pool($default_toolchain)"
 
-      command = "$linker_wrapper$link /OUT:$dllname /nologo ${sys_lib_flags}/IMPLIB:$libname /DLL /PDB:$pdbname @$rspfile"
+      # Rebel: Changed to wrap $dllname, $libname, $pdbname, and $rspfile in quotes to preserve spaces.
+      command = "$linker_wrapper$link /OUT:\"$dllname\" /nologo ${sys_lib_flags}/IMPLIB:\"$libname\" /DLL /PDB:\"$pdbname\" @\"$rspfile\""
 
       default_output_extension = ".dll"
       default_output_dir = "{{root_out_dir}}"
@@ -430,7 +432,8 @@ template("single_msvc_toolchain") {
       rspfile = "${dllname}.rsp"
       pool = "//build/toolchain:link_pool($default_toolchain)"
 
-      command = "$linker_wrapper$link /OUT:$dllname /nologo ${sys_lib_flags}/DLL /PDB:$pdbname @$rspfile"
+      # Rebel: Changed to wrap $dllname, $pdbname, and $rspfile in quotes to preserve spaces.
+      command = "$linker_wrapper$link /OUT:\"$dllname\" /nologo ${sys_lib_flags}/DLL /PDB:\"$pdbname\" @\"$rspfile\""
 
       default_output_extension = ".dll"
       default_output_dir = "{{root_out_dir}}"
@@ -453,7 +456,8 @@ template("single_msvc_toolchain") {
       rspfile = "$exename.rsp"
       pool = "//build/toolchain:link_pool($default_toolchain)"
 
-      command = "$linker_wrapper$link /OUT:$exename /nologo ${sys_lib_flags} /PDB:$pdbname @$rspfile"
+      # Rebel: Changed to wrap $exename, $pdbname, and $rspfile in quotes to preserve spaces.
+      command = "$linker_wrapper$link /OUT:\"$exename\" /nologo ${sys_lib_flags} /PDB:\"$pdbname\" @\"$rspfile\""
 
       default_output_extension = ".exe"
       default_output_dir = "{{root_out_dir}}"

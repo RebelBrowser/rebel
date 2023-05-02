@@ -25,7 +25,8 @@ def reorder_imports(input_dir, output_dir, architecture, browser):
   # correct executable in the first place, so that this script
   # only needs to verify that and not write a whole new exe.
 
-  # Rebel: Upstream hard-codes 'chrome.exe' here. This was changed to retrieve
+  # Rebel: Upstream hard-codes 'chrome.exe' here and at the bottom of this
+  # function (in the invocation to |iglob|). These were changed to retrieve
   # the real file name from the invoker in //chrome:reorder_imports.
   input_image = os.path.join(input_dir, browser)
   output_image = os.path.join(output_dir, browser)
@@ -76,7 +77,7 @@ def reorder_imports(input_dir, output_dir, architecture, browser):
 
   pe.write(filename=output_image)
 
-  for fname in glob.iglob(os.path.join(input_dir, 'chrome.exe.*')):
+  for fname in glob.iglob(os.path.join(input_dir, '%s.*' % (browser))):
     shutil.copy(fname, os.path.join(output_dir, os.path.basename(fname)))
   return 0
 

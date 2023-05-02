@@ -131,7 +131,7 @@ action("mini_installer_archive") {
 
   if (is_rebel_based) {
     inputs -= [ "$root_out_dir/chrome.exe" ]
-    inputs += [ "$root_out_dir/$rebel_browser_name_path_component.exe" ]
+    inputs += [ "$root_out_dir/$rebel_browser_name.exe" ]
   }
 
   outputs = [

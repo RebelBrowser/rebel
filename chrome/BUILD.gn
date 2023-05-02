@@ -97,19 +97,16 @@ if (is_win) {
     deps = [ ":chrome_initial" ]
 
     if (is_rebel_based) {
-      inputs -= [ "$root_out_dir/initialexe/chrome.exe" ]
-      outputs -= [
-        "$root_out_dir/chrome.exe",
-        "$root_out_dir/chrome.exe.pdb",
-      ]
+      inputs = []
+      inputs += [ "$root_out_dir/initialexe/$rebel_browser_name.exe" ]
 
-      inputs += [ "$root_out_dir/initialexe/$rebel_browser_name_path_component.exe" ]
+      outputs = []
       outputs += [
-        "$root_out_dir/$rebel_browser_name_path_component.exe",
-        "$root_out_dir/$rebel_browser_name_path_component.exe.pdb",
+        "$root_out_dir/$rebel_browser_name.exe",
+        "$root_out_dir/$rebel_browser_name.exe.pdb",
       ]
 
-      args += [ "-b", "$rebel_browser_name_path_component.exe" ]
+      args += [ "-b", "$rebel_browser_name.exe" ]
     }
   }
 }
@@ -168,9 +165,9 @@ if (!is_android && !is_mac) {
 
     if (is_rebel_based) {
       if (is_win) {
-        output_name = "initialexe/$rebel_browser_name_path_component"
+        output_name = "initialexe/$rebel_browser_name"
       } else {
-        output_name = "$rebel_browser_name_path_component"
+        output_name = "$rebel_browser_name"
       }
     }
 
