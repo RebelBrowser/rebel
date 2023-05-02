@@ -11,10 +11,20 @@
 #include "base/process/launch.h"
 #include "chrome/common/chrome_switches.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace {
 
+#if BUILDFLAG(REBEL_BROWSER)
+constexpr base::FilePath::CharType kChromeExecutable[] =
+    FILE_PATH_LITERAL(REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) ".exe");
+#else
 constexpr base::FilePath::CharType kChromeExecutable[] =
     FILE_PATH_LITERAL("chrome.exe");
+#endif
 
 constexpr base::FilePath::CharType kChromeProxyExecutable[] =
     FILE_PATH_LITERAL("chrome_proxy.exe");

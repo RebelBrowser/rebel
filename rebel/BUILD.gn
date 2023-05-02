@@ -11,6 +11,13 @@ group("rebel") {
       "//chrome/installer",
     ]
 
+    if (is_win) {
+      deps += [
+        "//chrome/installer/gcapi",
+        "//chrome/installer/mini_installer",
+      ]
+    }
+
     if (!is_official_build) {
       deps += [ "//rebel/chrome/test:rebel_browser_tests" ]
     }
