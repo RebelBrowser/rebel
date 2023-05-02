@@ -21,7 +21,11 @@ namespace installer {
 
 namespace {
 
+#if BUILDFLAG(REBEL_BROWSER)
+constexpr wchar_t kRegValueAp[] = L"channel";
+#else
 constexpr wchar_t kRegValueAp[] = L"ap";
+#endif
 constexpr base::WStringPiece kFullSuffix = L"-full";
 constexpr base::WStringPiece kExtendedChannel = L"extended";
 const wchar_t kTokenSeparator = L'-';

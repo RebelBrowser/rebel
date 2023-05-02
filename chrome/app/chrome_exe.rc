@@ -3,6 +3,10 @@
 #include "build/branding_buildflags.h"
 #include "chrome_exe_resource.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -46,6 +50,8 @@ IDR_MAINFRAME_4         ICON       "theme\\google_chrome\\win\\placeholder.ico"
 // The SXS icon must have an index of 4, the constant is used in Chrome code to
 // identify it.
 IDR_SXS                 ICON       "theme\\google_chrome\\win\\chrome_sxs.ico"
+#elif BUILDFLAG(REBEL_BROWSER)
+IDR_MAINFRAME           ICON       REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_APP_ICON)
 #else
 IDR_MAINFRAME           ICON       "theme\\chromium\\win\\chromium.ico"
 #endif

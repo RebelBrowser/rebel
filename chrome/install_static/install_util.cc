@@ -60,7 +60,7 @@ const wchar_t kUtilityProcess[] = L"utility";
 
 namespace {
 
-#if BUILDFLAG(USE_GOOGLE_UPDATE_INTEGRATION)
+#if BUILDFLAG(USE_GOOGLE_UPDATE_INTEGRATION) && !BUILDFLAG(REBEL_BROWSER)
 // TODO(ananta)
 // http://crbug.com/604923
 // The constants defined in this file are also defined in chrome/installer and
@@ -215,7 +215,7 @@ std::vector<StringType> TokenizeStringT(
   return tokens;
 }
 
-#if BUILDFLAG(USE_GOOGLE_UPDATE_INTEGRATION)
+#if BUILDFLAG(USE_GOOGLE_UPDATE_INTEGRATION) && !BUILDFLAG(REBEL_BROWSER)
 // Returns true if `channel_test` is a valid name of a Chrome update channel
 // (irrespective of case), or false otherwise. When returning true, `channel` is
 // populated with the canonical channel name and `is_extended_stable` is set to
@@ -896,6 +896,15 @@ DetermineChannelResult DetermineChannel(const InstallConstants& mode,
     update_cohort_name->erase();
   }
 
+#if BUILDFLAG(REBEL_BROWSER)
+  // Rebel: For Google Chrome, Omaha delivers additional parameters through the
+  // "update_ap" variable ("ap" registry key). This variable may contain a
+  // channel name along with additional information. For Rebel-branded browsers
+  // this logic is different. We are using the "channel" registry key instead of
+  // the "ap" key so we don't parse the "ap" variable, just return empty string.
+  return {std::wstring(), ChannelOrigin::kInstallMode,
+          /*is_extended_stable=*/false};
+#else
   switch (mode.channel_strategy) {
     case ChannelStrategy::FLOATING: {
       std::wstring channel_from_override;
@@ -912,6 +921,7 @@ DetermineChannelResult DetermineChannel(const InstallConstants& mode,
       return {mode.default_channel_name, ChannelOrigin::kInstallMode,
               /*is_extended_stable=*/false};
   }
+#endif  // BUILDFLAG(REBEL_BROWSER
 #endif  // !BUILDFLAG(USE_GOOGLE_UPDATE_INTEGRATION)
 }
 

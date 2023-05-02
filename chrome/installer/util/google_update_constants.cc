@@ -4,8 +4,33 @@
 
 #include "chrome/installer/util/google_update_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace google_update {
 
+#if BUILDFLAG(REBEL_BROWSER)
+const wchar_t kChromeUpgradeCode[] =
+    L"" REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_APP_GUID);
+
+const wchar_t kGoogleUpdateUpgradeCode[] =
+    L"" REBEL_STRING_BUILDFLAG(REBEL_WINDOWS_GOOGLE_UPDATE_APP_GUID);
+
+const wchar_t kGoogleUpdateSetupExe[] = L"" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_NAME_WITHOUT_SPACES) "UpdateSetup.exe";
+
+const wchar_t kRegPathClients[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\Clients";
+const wchar_t kRegPathClientState[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\ClientState";
+const wchar_t kRegPathClientStateMedium[] =
+    L"Software\\" REBEL_STRING_BUILDFLAG(
+        REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\ClientStateMedium";
+const wchar_t kRegPathGoogleUpdate[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate";
+#else
 const wchar_t kChromeUpgradeCode[] = L"{8A69D345-D564-463C-AFF1-A69D9E530F96}";
 
 const wchar_t kGoogleUpdateUpgradeCode[] =
@@ -18,6 +43,7 @@ const wchar_t kRegPathClientState[] = L"Software\\Google\\Update\\ClientState";
 const wchar_t kRegPathClientStateMedium[] =
     L"Software\\Google\\Update\\ClientStateMedium";
 const wchar_t kRegPathGoogleUpdate[] = L"Software\\Google\\Update";
+#endif
 
 const wchar_t kRegCommandsKey[] = L"Commands";
 
