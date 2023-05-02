@@ -171,6 +171,13 @@ action("mini_installer_archive") {
     #"--verbose",
   ]
 
+  if (is_rebel_based) {
+    args += [
+      "--rebel_browser_exe",
+      "$rebel_browser_name.exe",
+    ]
+  }
+
   deps = [
     ":chrome_runtime_deps",
     ":setup_runtime_deps",

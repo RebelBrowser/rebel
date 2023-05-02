@@ -104,7 +104,7 @@ LONG OpenClientStateKey(HKEY root_key,
   StackString<MAX_PATH> client_state_key;
   if (!client_state_key.assign(kClientStateKeyBase))
     return ERROR_BUFFER_OVERFLOW;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) || BUILDFLAG(REBEL_BROWSER)
   if (!client_state_key.append(app_guid))
     return ERROR_BUFFER_OVERFLOW;
 #endif

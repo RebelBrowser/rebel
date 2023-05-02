@@ -6,6 +6,10 @@
 
 #include "build/branding_buildflags.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/build/buildflag.h"
+#endif
+
 namespace mini_installer {
 
 // Various filenames and prefixes.
@@ -63,6 +67,18 @@ const wchar_t kClientStateKeyBase[] =
     L"Software\\Google\\Update\\ClientState\\";
 // The path to the key in which kCleanupRegistryValue is found.
 const wchar_t kCleanupRegistryKey[] = L"Software\\Google";
+#elif BUILDFLAG(REBEL_BROWSER)
+// The path to the key containing each app's Clients registry key. The trailing
+// slash is required.
+const wchar_t kClientsKeyBase[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\Clients\\";
+// The path to the key containing each app's Client State registry key. The
+// trailing slash is required.
+const wchar_t kClientStateKeyBase[] = L"Software\\" REBEL_STRING_BUILDFLAG(
+    REBEL_BROWSER_COMPANY_PATH) "\\BrowserUpdate\\ClientState\\";
+// The path to the key in which kCleanupRegistryValue is found.
+const wchar_t kCleanupRegistryKey[] =
+    L"Software\\" REBEL_STRING_BUILDFLAG(REBEL_BROWSER_COMPANY_PATH);
 #elif BUILDFLAG(GOOGLE_CHROME_FOR_TESTING_BRANDING)
 // The path to the key containing each app's Clients registry key.
 // No trailing slash on this one because the app's GUID is not appended.
