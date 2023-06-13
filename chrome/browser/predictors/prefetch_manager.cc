@@ -29,6 +29,12 @@
 #include "third_party/blink/public/common/loader/throttling_url_loader.h"
 #include "third_party/blink/public/mojom/loader/resource_load_info.mojom-shared.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/prism/prism.h"
+#include "rebel/components/ukm/prism_buildflags.h"
+#endif
+
 namespace predictors {
 
 namespace {
@@ -177,6 +183,11 @@ void PrefetchManager::Start(const GURL& url,
   }
 
   for (auto& request : requests) {
+#if BUILDFLAG(PRISM_ENABLED)
+    rebel::OptimizationGuideLogger(profile_)
+        << "VIASAT: Queueing prefetch on site " << url << " for URL "
+        << request.url;
+#endif
     queued_jobs_.emplace_back(
         std::make_unique<PrefetchJob>(std::move(request), *info));
   }
@@ -215,6 +226,12 @@ void PrefetchManager::PrefetchUrl(
 
   PrefetchInfo& info = *job->info;
   url::Origin top_frame_origin = url::Origin::Create(info.url);
+
+#if BUILDFLAG(PRISM_ENABLED)
+  rebel::OptimizationGuideLogger(profile_)
+      << "VIASAT: Issuing prefetch on site " << info.url << " for URL "
+      << job->url;
+#endif
 
   network::ResourceRequest request;
   request.method = "GET";
@@ -302,6 +319,12 @@ void PrefetchManager::OnPrefetchFinished(
   PrefetchInfo& info = *job->info;
   if (observer_for_testing_)
     observer_for_testing_->OnPrefetchFinished(info.url, job->url, status);
+
+#if BUILDFLAG(PRISM_ENABLED)
+  rebel::OptimizationGuideLogger(profile_)
+      << "VIASAT: Finshed prefetch on site " << info.url << " for URL "
+      << job->url;
+#endif
 
   loader.reset();
   client.reset();
