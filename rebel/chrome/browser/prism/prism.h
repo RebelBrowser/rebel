@@ -5,12 +5,16 @@
 #ifndef REBEL_CHROME_BROWSER_PRISM_PRISM_H_
 #define REBEL_CHROME_BROWSER_PRISM_PRISM_H_
 
+#include "components/optimization_guide/core/optimization_guide_logger.h"
+
 class Profile;
 
 namespace rebel {
 
 void InitializeCommandLineForPrism();
 void InitializeProfileForPrism(Profile&);
+
+OptimizationGuideLogger::LogMessageBuilder OptimizationGuideLogger(Profile*);
 
 }  // namespace rebel
 

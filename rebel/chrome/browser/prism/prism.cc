@@ -11,6 +11,8 @@
 #include "base/base_switches.h"
 #include "base/command_line.h"
 #include "chrome/browser/browser_process.h"
+#include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
+#include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/predictors/predictors_features.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
@@ -88,6 +90,26 @@ void InitializeProfileForPrism(Profile& profile) {
   if (auto* service = UnifiedConsentServiceFactory::GetForProfile(&profile)) {
     service->SetUrlKeyedAnonymizedDataCollectionEnabled(true);
   }
+}
+
+OptimizationGuideLogger::LogMessageBuilder OptimizationGuideLogger(
+    Profile* profile) {
+  static constexpr auto source =
+      optimization_guide_common::mojom::LogSource::HINTS;
+
+  if (!profile || !IsPrismHintingEnabled()) {
+    return OPTIMIZATION_GUIDE_LOGGER(source, nullptr);
+  }
+
+  auto* optimization_guide_service =
+      OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
+  if (!optimization_guide_service) {
+    return OPTIMIZATION_GUIDE_LOGGER(source, nullptr);
+  }
+
+  auto* optimization_guide_logger =
+      optimization_guide_service->GetOptimizationGuideLogger();
+  return OPTIMIZATION_GUIDE_LOGGER(source, optimization_guide_logger);
 }
 
 }  // namespace rebel
