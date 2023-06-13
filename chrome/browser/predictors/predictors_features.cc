@@ -7,6 +7,11 @@
 #include "base/metrics/field_trial_params.h"
 #include "build/build_config.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/ukm/prism_buildflags.h"
+#endif
+
 namespace features {
 
 // Whether local predictions should be used to make preconnect predictions.
@@ -98,9 +103,13 @@ bool ShouldAlwaysRetrieveOptimizationGuidePredictions() {
 }
 
 size_t GetMaxInflightPrefetches() {
+#if BUILDFLAG(PRISM_ENABLED)
+  return 100;
+#else
   return static_cast<size_t>(base::GetFieldTrialParamByFeatureAsInt(
       kLoadingPredictorInflightPredictiveActions, "max_inflight_prefetches",
       3));
+#endif
 }
 
 }  // namespace features
