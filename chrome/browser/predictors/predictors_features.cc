@@ -97,9 +97,13 @@ bool ShouldUseOptimizationGuidePredictions() {
 }
 
 bool ShouldAlwaysRetrieveOptimizationGuidePredictions() {
+#if BUILDFLAG(PRISM_ENABLED)
+  return true;
+#else
   return base::GetFieldTrialParamByFeatureAsBool(
       kLoadingPredictorUseOptimizationGuide, "always_retrieve_predictions",
       false);
+#endif
 }
 
 size_t GetMaxInflightPrefetches() {

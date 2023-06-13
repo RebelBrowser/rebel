@@ -23,6 +23,11 @@
 #include "net/base/url_util.h"
 #include "ui/base/l10n/l10n_util.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/components/ukm/prism_buildflags.h"
+#endif
+
 namespace optimization_guide {
 namespace features {
 
@@ -423,8 +428,12 @@ size_t MaxURLKeyedHintCacheSize() {
 }
 
 bool ShouldPersistHintsToDisk() {
+#if BUILDFLAG(PRISM_ENABLED)
+  return false;
+#else
   return GetFieldTrialParamByFeatureAsBool(kOptimizationHints,
                                            "persist_hints_to_disk", true);
+#endif
 }
 
 bool ShouldOverrideOptimizationTargetDecisionForMetricsPurposes(
