@@ -13,6 +13,7 @@
 #include "base/functional/callback_helpers.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
+#include "base/metrics/per_isp_histogram.h"
 #include "base/trace_event/trace_event.h"
 #include "net/base/connection_endpoint_metadata.h"
 #include "net/base/features.h"
@@ -515,12 +516,13 @@ int SSLConnectJob::DoSSLConnectComplete(int result) {
     DCHECK(!connect_timing_.ssl_start.is_null());
     base::TimeDelta connect_duration =
         connect_timing_.ssl_end - connect_timing_.ssl_start;
-    UMA_HISTOGRAM_CUSTOM_TIMES("Net.SSL_Connection_Latency_2", connect_duration,
-                               base::Milliseconds(1), base::Minutes(1), 100);
+    UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+        PER_ISP_HISTOGRAM("Net.SSL_Connection_Latency_2"), connect_duration,
+        base::Milliseconds(1), base::Minutes(1), 100);
     if (is_ech_capable) {
-      UMA_HISTOGRAM_CUSTOM_TIMES("Net.SSL_Connection_Latency_ECH",
-                                 connect_duration, base::Milliseconds(1),
-                                 base::Minutes(1), 100);
+      UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+          PER_ISP_HISTOGRAM("Net.SSL_Connection_Latency_ECH"), connect_duration,
+          base::Milliseconds(1), base::Minutes(1), 100);
     }
 
     SSLInfo ssl_info;

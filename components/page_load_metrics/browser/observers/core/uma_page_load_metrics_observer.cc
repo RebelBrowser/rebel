@@ -13,6 +13,7 @@
 #include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
+#include "base/metrics/per_isp_histogram.h"
 #include "base/strings/strcat.h"
 #include "base/trace_event/trace_event.h"
 #include "build/chromeos_buildflags.h"
@@ -597,8 +598,9 @@ void UmaPageLoadMetricsObserver::OnFirstContentfulPaintInPage(
         }
         break;
       case LOAD_TYPE_NEW_NAVIGATION:
-        PAGE_LOAD_HISTOGRAM(
-            internal::kHistogramLoadTypeFirstContentfulPaintNewNavigation,
+        PAGE_LOAD_HISTOGRAM_DYNAMIC(
+            PER_ISP_HISTOGRAM(
+                internal::kHistogramLoadTypeFirstContentfulPaintNewNavigation),
             timing.paint_timing->first_contentful_paint.value());
         break;
       case LOAD_TYPE_NONE:

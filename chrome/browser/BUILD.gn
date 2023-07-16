@@ -140,6 +140,8 @@ source_set("browser_process") {
 # require many files from it. This makes linking more efficient.
 static_library("browser") {
   sources = [
+    "//services/network/isp_watcher.cc",
+    "//services/network/isp_watcher.h",
     "about_flags.cc",
     "about_flags.h",
     "accessibility/accessibility_labels_service.cc",

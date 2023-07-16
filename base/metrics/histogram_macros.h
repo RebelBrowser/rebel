@@ -259,6 +259,26 @@
           name, min, max, bucket_count,                                  \
           base::HistogramBase::kUmaTargetedHistogramFlag))
 
+// This is the dynamic version of UMA_HISTOGRAM_CUSTOM_TIMES, where the name of
+// the histogram is dynamic, which means it can be defined at runtime, and
+// doesn't have to be the same name every time. However, each unique name will
+// always refer to a unique histogram of that name, i.e two different names will
+// refer to two to different histograms.
+
+// Sample usage:
+//   UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(dynamic_histogram_name, time_delta,
+//       base::Seconds(1), base::Days(1), 100);
+#define UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(name, sample, min, max,      \
+                                           bucket_count)                \
+  do {                                                                  \
+    const std::string& dynamic_histogram_name = name;                   \
+    STATIC_HISTOGRAM_POINTER_MAP_BLOCK(                                 \
+        dynamic_histogram_name, AddTimeMillisecondsGranularity(sample), \
+        base::Histogram::FactoryTimeGet(                                \
+            dynamic_histogram_name, min, max, bucket_count,             \
+            base::HistogramBase::kUmaTargetedHistogramFlag));           \
+  } while (0)
+
 // Same as UMA_HISTOGRAM_CUSTOM_TIMES but reports |sample| in microseconds,
 // dropping the report if this client doesn't have a high-resolution clock.
 //

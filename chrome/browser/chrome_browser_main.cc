@@ -186,6 +186,7 @@
 #include "ppapi/buildflags/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 #include "rlz/buildflags/buildflags.h"
+#include "services/network/isp_watcher.h"
 #include "services/tracing/public/cpp/stack_sampling/tracing_sampler_profiler.h"
 #include "third_party/blink/public/common/privacy_budget/identifiability_study_settings.h"
 #include "third_party/blink/public/common/switches.h"
@@ -1323,6 +1324,11 @@ void ChromeBrowserMainParts::PostBrowserStart() {
                                   base::Unretained(web_usb_detector_.get())));
   }
 #endif
+
+  ISPWatcher::StartWithURLLoaderFactoryProvider([]() {
+    return g_browser_process->system_network_context_manager()
+        ->GetURLLoaderFactory();
+  });
 
   // At this point, StartupBrowserCreator::Start has run creating initial
   // browser windows and tabs, but no progress has been made in loading

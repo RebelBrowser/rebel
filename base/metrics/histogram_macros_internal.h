@@ -11,10 +11,13 @@
 #include <limits>
 #include <memory>
 #include <type_traits>
+#include <unordered_map>
 
 #include "base/dcheck_is_on.h"
 #include "base/metrics/histogram.h"
 #include "base/metrics/sparse_histogram.h"
+#include "base/no_destructor.h"
+#include "base/strings/string_piece.h"
 #include "base/time/time.h"
 
 // This is for macros and helpers internal to base/metrics. They should not be
@@ -114,6 +117,27 @@ struct EnumSizeTraits<
     static std::atomic_uintptr_t atomic_histogram_pointer;                    \
     HISTOGRAM_POINTER_USE(                                                    \
         std::addressof(atomic_histogram_pointer), constant_histogram_name,    \
+        histogram_add_method_invocation, histogram_factory_get_invocation);   \
+  } while (0)
+
+// This is a helper macro used by other macros and shouldn't be used directly.
+// Defines a static map of atomic histogram pointers, and forwards to
+// HISTOGRAM_POINTER_USE.
+#define STATIC_HISTOGRAM_POINTER_MAP_BLOCK(dynamic_histogram_name,            \
+                                           histogram_add_method_invocation,   \
+                                           histogram_factory_get_invocation)  \
+  do {                                                                        \
+    /*                                                                        \
+     * The pointer's presence indicates that the initialization is complete.  \
+     * Initialization is idempotent, so it can safely be atomically repeated. \
+     */                                                                       \
+    static base::NoDestructor<std::unordered_map<                             \
+        base::StringPiece, std::atomic_uintptr_t, base::StringPieceHash>>     \
+        atomic_histogram_pointer_map;                                         \
+    std::atomic_uintptr_t& atomic_histogram_pointer =                         \
+        (*atomic_histogram_pointer_map)[dynamic_histogram_name];              \
+    HISTOGRAM_POINTER_USE(                                                    \
+        std::addressof(atomic_histogram_pointer), dynamic_histogram_name,     \
         histogram_add_method_invocation, histogram_factory_get_invocation);   \
   } while (0)
 

@@ -18,6 +18,10 @@
   UMA_HISTOGRAM_CUSTOM_TIMES(name, sample, base::Milliseconds(10), \
                              base::Minutes(10), 100)
 
+#define PAGE_LOAD_HISTOGRAM_DYNAMIC(name, sample)                          \
+  UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(name, sample, base::Milliseconds(10), \
+                                     base::Minutes(10), 100)
+
 // Up to 1 hour, with 100 buckets.
 #define PAGE_LOAD_LONG_HISTOGRAM(name, sample)                     \
   UMA_HISTOGRAM_CUSTOM_TIMES(name, sample, base::Milliseconds(10), \

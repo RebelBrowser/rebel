@@ -13,6 +13,7 @@
 #include "base/location.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_macros.h"
+#include "base/metrics/per_isp_histogram.h"
 #include "base/notreached.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/time/time.h"
@@ -416,13 +417,14 @@ int TransportConnectJob::DoTransportConnectComplete(int result) {
     DCHECK(socket());
     base::TimeTicks now = base::TimeTicks::Now();
     base::TimeDelta total_duration = now - connect_timing_.domain_lookup_start;
-    UMA_HISTOGRAM_CUSTOM_TIMES("Net.DNS_Resolution_And_TCP_Connection_Latency2",
-                               total_duration, base::Milliseconds(1),
-                               base::Minutes(10), 100);
+    UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+        PER_ISP_HISTOGRAM("Net.DNS_Resolution_And_TCP_Connection_Latency2"),
+        total_duration, base::Milliseconds(1), base::Minutes(10), 100);
 
     base::TimeDelta connect_duration = now - connect_timing_.connect_start;
-    UMA_HISTOGRAM_CUSTOM_TIMES("Net.TCP_Connection_Latency", connect_duration,
-                               base::Milliseconds(1), base::Minutes(10), 100);
+    UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+        PER_ISP_HISTOGRAM("Net.TCP_Connection_Latency"), connect_duration,
+        base::Milliseconds(1), base::Minutes(10), 100);
   } else {
     // Don't try the next route if entering suspend mode.
     if (result != ERR_NETWORK_IO_SUSPENDED) {

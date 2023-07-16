@@ -322,6 +322,7 @@ bool UtilityProcessHost::StartProcess() {
 #if BUILDFLAG(IS_CHROMEOS_LACROS)
       switches::kEnableResourcesFileSharing,
 #endif
+      switches::kEnablePerISPHistograms,
     };
     cmd_line->CopySwitchesFrom(browser_command_line, kSwitchNames,
                                std::size(kSwitchNames));

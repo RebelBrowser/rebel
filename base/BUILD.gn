@@ -494,6 +494,7 @@ component("base") {
     "metrics/histogram_snapshot_manager.h",
     "metrics/metrics_hashes.cc",
     "metrics/metrics_hashes.h",
+    "metrics/per_isp_histogram.h",
     "metrics/persistent_histogram_allocator.cc",
     "metrics/persistent_histogram_allocator.h",
     "metrics/persistent_memory_allocator.cc",

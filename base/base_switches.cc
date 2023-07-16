@@ -186,4 +186,7 @@ extern const char kEnableCrashpad[] = "enable-crashpad";
 const char kSchedulerBoostUrgent[] = "scheduler-boost-urgent";
 #endif
 
+// Segregate network latency histograms by ISP.
+const char kEnablePerISPHistograms[] = "enable-per-isp-histograms";
+
 }  // namespace switches

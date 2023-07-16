@@ -9477,6 +9477,11 @@ const FeatureEntry kFeatureEntries[] = {
      MULTI_VALUE_TYPE(rebel::kChannelChoices)},
 #endif
 #endif
+
+    {"enable-per-isp-histograms", "Per ISP network latency histogram",
+     "Collect network latency samples into separate histograms based on the "
+     "ISP.",
+     kOsAll, SINGLE_VALUE_TYPE(switches::kEnablePerISPHistograms)},
 };
 
 class FlagsStateSingleton : public flags_ui::FlagsState::Delegate {
