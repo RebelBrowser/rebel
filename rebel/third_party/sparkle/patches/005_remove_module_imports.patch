@@ -213,7 +213,7 @@ index ed11921a..b3445e21 100644
  */
  + (SUStandardVersionComparator *)defaultComparator;
 diff --git a/Sparkle/SUUpdater.h b/Sparkle/SUUpdater.h
-index 0af49132..8e955b76 100644
+index 4733a2a3..c7d4d847 100644
 --- a/Sparkle/SUUpdater.h
 +++ b/Sparkle/SUUpdater.h
 @@ -9,11 +9,8 @@
@@ -229,24 +229,6 @@ index 0af49132..8e955b76 100644
  #import "SUExport.h"
  #import "SUVersionComparisonProtocol.h"
  #import "SUVersionDisplayProtocol.h"
-@@ -34,7 +31,7 @@ SU_EXPORT @interface SUUpdater : NSObject
- 
- /*!
-  The shared updater for the main bundle.
-- 
-+
-  This is equivalent to passing [NSBundle mainBundle] to SUUpdater::updaterForBundle:
-  */
- + (SUUpdater *)sharedUpdater;
-@@ -48,7 +45,7 @@ SU_EXPORT @interface SUUpdater : NSObject
- 
- /*!
-  Designated initializer for SUUpdater.
-- 
-+
-  If an updater has already been initialized for the provided bundle, that shared instance will be returned.
-  */
- - (instancetype)initForBundle:(NSBundle *)bundle;
 diff --git a/Sparkle/SUUpdaterDelegate.h b/Sparkle/SUUpdaterDelegate.h
 index fb8326f4..83d89ebd 100644
 --- a/Sparkle/SUUpdaterDelegate.h

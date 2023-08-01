@@ -356,7 +356,6 @@ void InitializeSparkleFramework() {
   if (updater) {
     updater.automaticallyChecksForUpdates = YES;
     updater.automaticallyDownloadsUpdates = YES;
-    updater.automaticallyUpdatesWithoutUI = YES;
   }
 }
 
