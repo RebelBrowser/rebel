@@ -12,10 +12,10 @@ index a6694c2e..e5f1b746 100644
  // If your app file on disk is named "MyApp 1.1b4", Sparkle usually updates it
  // in place, giving you an app named 1.1b4 that is actually 1.2. Turn the
 diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
-index 0dc58ed3..c65e8a07 100644
+index a98bc21b..95665c47 100644
 --- a/Sparkle/SUUpdater.m
 +++ b/Sparkle/SUUpdater.m
-@@ -198,18 +198,29 @@ - (NSArray *)viasatRelatedParameters
+@@ -188,18 +188,29 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
  {
      NSMutableArray *parameters = [NSMutableArray new];
  

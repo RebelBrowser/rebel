@@ -2,7 +2,7 @@ diff --git a/Sparkle/SUBasicUpdateDriver.m b/Sparkle/SUBasicUpdateDriver.m
 index e4e357e1..383590a0 100644
 --- a/Sparkle/SUBasicUpdateDriver.m
 +++ b/Sparkle/SUBasicUpdateDriver.m
-@@ -78,6 +78,7 @@ - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
+@@ -78,6 +78,7 @@
          return;
      }
  
@@ -10,7 +10,7 @@ index e4e357e1..383590a0 100644
      SUAppcast *appcast = [[SUAppcast alloc] init];
  
      id<SUUpdaterPrivate> updater = self.updater;
-@@ -190,9 +191,11 @@ - (BOOL)hostSupportsOperatingSystemInItem:(SUAppcastItem *)ui
+@@ -190,9 +191,11 @@
      // Check minimum and maximum System Version
      if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
          minimumVersionOK = [versionComparator compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
@@ -22,7 +22,7 @@ index e4e357e1..383590a0 100644
      }
  
      return minimumVersionOK && maximumVersionOK && osOK;
-@@ -200,7 +203,9 @@ - (BOOL)hostSupportsOperatingSystemInItem:(SUAppcastItem *)ui
+@@ -200,7 +203,9 @@
  
  - (BOOL)isItemNewer:(SUAppcastItem *)ui
  {
@@ -33,7 +33,7 @@ index e4e357e1..383590a0 100644
  }
  
  - (BOOL)itemPreventsAutoupdate:(SUAppcastItem *)ui
-@@ -212,7 +217,9 @@ - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
+@@ -212,7 +217,9 @@
  {
      NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
      if (skippedVersion == nil) { return NO; }
@@ -44,7 +44,7 @@ index e4e357e1..383590a0 100644
  }
  
  - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
-@@ -222,6 +229,8 @@ - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
+@@ -222,6 +229,8 @@
  
  - (void)appcastDidFinishLoading:(SUAppcast *)ac
  {
@@ -53,7 +53,7 @@ index e4e357e1..383590a0 100644
      id<SUUpdaterPrivate> updater = self.updater;
      if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
          [[updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
-@@ -261,9 +270,11 @@ - (void)appcastDidFinishLoading:(SUAppcast *)ac
+@@ -261,9 +270,11 @@
  
  
      if ([self itemContainsValidUpdate:item]) {
@@ -65,7 +65,7 @@ index e4e357e1..383590a0 100644
          self.updateItem = nil;
          [self performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:NO];
      }
-@@ -376,6 +387,7 @@ - (void)downloadUpdate
+@@ -376,6 +387,7 @@
      SPUURLRequest *urlRequest = [SPUURLRequest URLRequestWithRequest:request];
      NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
      [self.download startPersistentDownloadWithRequest:urlRequest bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
@@ -73,7 +73,7 @@ index e4e357e1..383590a0 100644
  }
  
  
-@@ -410,6 +422,7 @@ - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullabl
+@@ -410,6 +422,7 @@
          [[updater delegate] updater:self.updater didDownloadUpdate:self.updateItem];
      }
  
@@ -81,7 +81,7 @@ index e4e357e1..383590a0 100644
      [self extractUpdate];
  }
  
-@@ -503,6 +516,7 @@ - (void)unarchiverDidFinish:(id)__unused ua
+@@ -503,6 +516,7 @@
  {
      assert(self.updateItem);
  
@@ -89,7 +89,7 @@ index e4e357e1..383590a0 100644
      [self installWithToolAndRelaunch:YES];
  }
  
-@@ -589,6 +603,7 @@ - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)
+@@ -589,6 +603,7 @@
              [invocation setTarget:self];
              postponedOnce = YES;
              if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
@@ -97,7 +97,7 @@ index e4e357e1..383590a0 100644
                  return;
              }
          } else if ([updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
-@@ -654,6 +669,8 @@ - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)
+@@ -654,6 +669,8 @@
          }
      }
  
@@ -118,7 +118,7 @@ index f32aac9a..7c629d00 100644
  
  #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
  @interface NSByteCountFormatter : NSFormatter {
-@@ -125,7 +126,7 @@ - (void)didNotFindUpdate
+@@ -125,7 +126,7 @@
  
      if (!self.automaticallyInstallUpdates) {
          NSAlert *alert = [[NSAlert alloc] init];
@@ -127,7 +127,7 @@ index f32aac9a..7c629d00 100644
          if (self.latestAppcastItem) // if the appcast was successfully loaded
          {
              alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-@@ -146,7 +147,7 @@ - (void)didNotFindUpdate
+@@ -146,7 +147,7 @@
  
          [self showAlert:alert];
      }
@@ -136,7 +136,7 @@ index f32aac9a..7c629d00 100644
      [self abortUpdate];
  }
  
-@@ -173,19 +174,22 @@ - (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice forItem:(SUApp
+@@ -173,19 +174,22 @@
      id<SUUpdaterPrivate> updater = self.updater;
      switch (choice) {
          case SUInstallUpdateChoice:
@@ -161,7 +161,7 @@ index f32aac9a..7c629d00 100644
              }
              [self didDismissAlertPermanently:YES forItem:item];
              [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-@@ -193,6 +197,7 @@ - (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice forItem:(SUApp
+@@ -193,6 +197,7 @@
              break;
  
          case SURemindMeLaterChoice:
@@ -169,7 +169,7 @@ index f32aac9a..7c629d00 100644
              [self didDismissAlertPermanently:NO forItem:item];
              [self abortUpdate];
              break;
-@@ -206,15 +211,15 @@ - (void)downloadUpdate
+@@ -206,15 +211,15 @@
          self.statusController = [[SUStatusController alloc] initWithHost:self.host];
          createdStatusController = YES;
      }
@@ -188,7 +188,7 @@ index f32aac9a..7c629d00 100644
      [super downloadUpdate];
  }
  
-@@ -279,7 +284,7 @@ - (IBAction)cancelDownload:(id)__unused sender
+@@ -279,7 +284,7 @@
  {
      if (self.download) {
          [self.download cancel];
@@ -197,7 +197,7 @@ index f32aac9a..7c629d00 100644
          id<SUUpdaterPrivate> updater = self.updater;
          if ([[updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
              [[updater delegate] userDidCancelDownload:self.updater];
-@@ -295,7 +300,7 @@ - (void)extractUpdate
+@@ -295,7 +300,7 @@
          [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
          [self.statusController setButtonEnabled:NO];
      };
@@ -210,7 +210,7 @@ diff --git a/Sparkle/SUUpdater.m b/Sparkle/SUUpdater.m
 index f2bf066a..58c37beb 100644
 --- a/Sparkle/SUUpdater.m
 +++ b/Sparkle/SUUpdater.m
-@@ -241,6 +241,8 @@ - (void)startUpdateCycle
+@@ -241,6 +241,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
  
      [[SUGlobalUpdateLock sharedLock] unlock];  // For safety, remove active lock if present in any case and not just when relaunching from an app update
      
@@ -219,7 +219,7 @@ index f2bf066a..58c37beb 100644
      if (shouldPrompt) {
          NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
          // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
-@@ -281,7 +283,7 @@ - (NSDate *)lastUpdateCheckDate
+@@ -281,7 +283,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
      {
          [self setUpdateLastCheckedDate:[self.host objectForUserDefaultsKey:SULastCheckTimeKey]];
      }
@@ -228,7 +228,7 @@ index f2bf066a..58c37beb 100644
      return [self updateLastCheckedDate];
  }
  
-@@ -352,7 +354,7 @@ - (void)checkForUpdatesInBackground
+@@ -352,7 +354,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
  
      // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
      SUUpdateDriver *theUpdateDriver = [(SUBasicUpdateDriver *)[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
@@ -237,7 +237,7 @@ index f2bf066a..58c37beb 100644
      [self checkForUpdatesWithDriver:theUpdateDriver];
  }
  
-@@ -389,13 +391,19 @@ - (void)installUpdatesIfAvailable
+@@ -389,13 +391,19 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
  
  - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
  {
@@ -258,7 +258,7 @@ index f2bf066a..58c37beb 100644
          [self scheduleNextUpdateCheck];
          return;
      }
-@@ -405,6 +413,7 @@ - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
+@@ -405,6 +413,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
      // If we're not given a driver at all, just schedule the next update check and bail.
      if (!self.driver)
      {
@@ -266,7 +266,7 @@ index f2bf066a..58c37beb 100644
          [self scheduleNextUpdateCheck];
          return;
      }
-@@ -414,8 +423,10 @@ - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
+@@ -414,8 +423,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
      NSURL *theFeedURL = [self parameterizedFeedURL];
      if (theFeedURL) // Use a NIL URL to cancel quietly.
          [self.driver checkForUpdatesAtURL:theFeedURL host:self.host];
@@ -278,7 +278,7 @@ index f2bf066a..58c37beb 100644
  }
  
  - (void)registerAsObserver
-@@ -581,6 +592,7 @@ - (NSURL *)parameterizedFeedURL
+@@ -581,6 +592,7 @@ static NSString *escapeURLComponent(NSString *str) {
          parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
          [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
      }
