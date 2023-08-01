@@ -4,6 +4,6 @@
 
 declare_args() {
   prism_enabled = true
-  prism_hints_url = "http://127.0.0.1:8082/v1/prism/hints"
-  prism_metrics_url = "http://127.0.0.1:8082/v1/prism/ukms"
+  prism_hints_url = "https://prism-edge.viasat.workers.dev"
+  prism_metrics_url = "https://apis.vega-preprod.viasat.io/v1/prism/ukms"
 }
