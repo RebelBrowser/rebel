@@ -322,6 +322,8 @@
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
 #include "rebel/chrome/browser/channel_selection_choices.h"
 #endif
+
+#include "rebel/net/isp/isp.h"
 #endif
 
 using flags_ui::FeatureEntry;
@@ -9476,6 +9478,10 @@ const FeatureEntry kFeatureEntries[] = {
     {"channel", rebel::kChannelFlagName, rebel::kChannelFlagDescription, kOsMac,
      MULTI_VALUE_TYPE(rebel::kChannelChoices)},
 #endif
+
+    {"enable-per-isp-histograms", rebel::kPerISPHistogramsName,
+     rebel::kPerISPHistogramsDescription, kOsAll,
+     SINGLE_VALUE_TYPE(rebel::kEnablePerISPHistograms)},
 #endif
 };
 

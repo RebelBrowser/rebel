@@ -52,6 +52,8 @@ if (is_apple) {
   import("//base/time/buildflags/buildflags.gni")
 }
 
+import("//rebel/sources.gni")
+
 declare_args() {
   # Indicates if the Location object contains the source code information
   # (file, function, line). False means only the program counter (and currently
@@ -1010,6 +1012,10 @@ component("base") {
       "files/file_path_watcher_inotify.cc",
       "files/file_path_watcher_inotify.h",
     ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_base_sources, ".", "//rebel")
   }
 
   all_dependent_configs = []

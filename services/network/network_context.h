@@ -80,6 +80,8 @@
 #include "services/network/public/mojom/ct_log_info.mojom-forward.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 namespace base {
 class UnguessableToken;
 }  // namespace base
@@ -107,6 +109,12 @@ class DomainReliabilityMonitor;
 namespace url_matcher {
 class URLMatcher;
 }
+
+#if BUILDFLAG(REBEL_BROWSER)
+namespace rebel {
+class ISPWatcher;
+}  // namespace rebel
+#endif
 
 namespace network {
 class CertVerifierWithTrustAnchors;
@@ -934,6 +942,11 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) NetworkContext
       http_cache_file_operations_factory_;
 
   const CacheTransparencySettings cache_transparency_settings_;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  void InititalizeRebelISPWatcher();
+  std::unique_ptr<rebel::ISPWatcher> rebel_isp_watcher_;
+#endif
 
   base::WeakPtrFactory<NetworkContext> weak_factory_{this};
 };
