@@ -26,6 +26,8 @@ if (is_android) {
   import("//build/config/ios/bundle_data_from_filelist.gni")
 }
 
+import("//rebel/sources.gni")
+
 # Android:
 # The way the cache uses mmap() is inefficient on some Android devices. If
 # this flag is set, we hackily avoid using mmap() in the disk cache. We are
@@ -1064,6 +1066,10 @@ component("net") {
 
   if (is_posix || is_fuchsia) {
     sources += [ "base/net_errors_posix.cc" ]
+  }
+
+  if (is_rebel_based) {
+    sources += rebase_path(rebel_net_sources, ".", "//rebel")
   }
 
   defines = []

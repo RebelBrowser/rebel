@@ -177,6 +177,10 @@
 #include "base/android/application_status_listener.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/services/network/isp_watcher.h"
+#endif
+
 namespace network {
 
 namespace {
@@ -557,6 +561,10 @@ NetworkContext::NetworkContext(
         base::MakeRefCounted<MojoBackendFileOperationsFactory>(
             std::move(params_->http_cache_file_operations_factory));
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+  InititalizeRebelISPWatcher();
+#endif
 }
 
 NetworkContext::NetworkContext(
@@ -599,6 +607,10 @@ NetworkContext::NetworkContext(
   acam_preflight_spec_conformant_ = base::FeatureList::IsEnabled(
       network::features::
           kAccessControlAllowMethodsInCORSPreflightSpecConformant);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  InititalizeRebelISPWatcher();
+#endif
 }
 
 NetworkContext::~NetworkContext() {
@@ -2801,5 +2813,16 @@ void NetworkContext::CreateTrustedUrlLoaderFactoryForNetworkService(
   CreateURLLoaderFactory(std::move(url_loader_factory_pending_receiver),
                          std::move(url_loader_factory_params));
 }
+
+#if BUILDFLAG(REBEL_BROWSER)
+void NetworkContext::InititalizeRebelISPWatcher() {
+  mojo::Remote<network::mojom::URLLoaderFactory> url_loader_factory;
+  CreateTrustedUrlLoaderFactoryForNetworkService(
+      url_loader_factory.BindNewPipeAndPassReceiver());
+
+  rebel_isp_watcher_ =
+      std::make_unique<rebel::ISPWatcher>(std::move(url_loader_factory));
+}
+#endif
 
 }  // namespace network

@@ -31,6 +31,12 @@
 #include "url/scheme_host_port.h"
 #include "url/url_constants.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/base/metrics/histogram_macros.h"
+#include "rebel/net/isp/isp.h"
+#endif
+
 namespace net {
 
 namespace {
@@ -415,6 +421,18 @@ int TransportConnectJob::DoTransportConnectComplete(int result) {
     // `HandleSubJobComplete` should have called `SetSocket`.
     DCHECK(socket());
     base::TimeTicks now = base::TimeTicks::Now();
+#if BUILDFLAG(REBEL_BROWSER)
+    base::TimeDelta total_duration = now - connect_timing_.domain_lookup_start;
+    UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+        rebel::PerISPHistogramName(
+            "Net.DNS_Resolution_And_TCP_Connection_Latency2"),
+        total_duration, base::Milliseconds(1), base::Minutes(10), 100);
+
+    base::TimeDelta connect_duration = now - connect_timing_.connect_start;
+    UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+        rebel::PerISPHistogramName("Net.TCP_Connection_Latency"),
+        connect_duration, base::Milliseconds(1), base::Minutes(10), 100);
+#else
     base::TimeDelta total_duration = now - connect_timing_.domain_lookup_start;
     UMA_HISTOGRAM_CUSTOM_TIMES("Net.DNS_Resolution_And_TCP_Connection_Latency2",
                                total_duration, base::Milliseconds(1),
@@ -423,6 +441,7 @@ int TransportConnectJob::DoTransportConnectComplete(int result) {
     base::TimeDelta connect_duration = now - connect_timing_.connect_start;
     UMA_HISTOGRAM_CUSTOM_TIMES("Net.TCP_Connection_Latency", connect_duration,
                                base::Milliseconds(1), base::Minutes(10), 100);
+#endif    
   } else {
     // Don't try the next route if entering suspend mode.
     if (result != ERR_NETWORK_IO_SUSPENDED) {

@@ -4,6 +4,10 @@
 
 import("//rebel/rebel.gni")
 
+rebel_base_sources = [
+  "base/metrics/histogram_macros.h"
+]
+
 rebel_build_sources = [
   "build/buildflag.h",
 ]
@@ -181,9 +185,16 @@ rebel_ios_web_favicon_sources = [
   "ios/web/favicon/resources/touch_icon_utils.ts",
 ]
 
+rebel_net_sources = [
+  "net/isp/isp.cc",
+  "net/isp/isp.h",
+]
+
 rebel_services_network_public_cpp_sources = [
   "services/network/data_fetcher.cc",
   "services/network/data_fetcher.h",
+  "services/network/isp_watcher.cc",
+  "services/network/isp_watcher.h",
   "services/network/remote_ntp_api_allow_list.cc",
   "services/network/remote_ntp_api_allow_list.h",
   "services/network/remote_ntp_modem_data.cc",

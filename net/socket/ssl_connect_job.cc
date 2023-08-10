@@ -37,6 +37,12 @@
 #include "third_party/boringssl/src/include/openssl/pool.h"
 #include "third_party/boringssl/src/include/openssl/ssl.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/base/metrics/histogram_macros.h"
+#include "rebel/net/isp/isp.h"
+#endif
+
 namespace net {
 
 namespace {
@@ -515,6 +521,16 @@ int SSLConnectJob::DoSSLConnectComplete(int result) {
     DCHECK(!connect_timing_.ssl_start.is_null());
     base::TimeDelta connect_duration =
         connect_timing_.ssl_end - connect_timing_.ssl_start;
+#if BUILDFLAG(REBEL_BROWSER)
+    UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+        rebel::PerISPHistogramName("Net.SSL_Connection_Latency_2"),
+        connect_duration, base::Milliseconds(1), base::Minutes(1), 100);
+    if (is_ech_capable) {
+      UMA_HISTOGRAM_CUSTOM_TIMES_DYNAMIC(
+          rebel::PerISPHistogramName("Net.SSL_Connection_Latency_ECH"),
+          connect_duration, base::Milliseconds(1), base::Minutes(1), 100);
+    }
+#else
     UMA_HISTOGRAM_CUSTOM_TIMES("Net.SSL_Connection_Latency_2", connect_duration,
                                base::Milliseconds(1), base::Minutes(1), 100);
     if (is_ech_capable) {
@@ -522,6 +538,7 @@ int SSLConnectJob::DoSSLConnectComplete(int result) {
                                  connect_duration, base::Milliseconds(1),
                                  base::Minutes(1), 100);
     }
+#endif
 
     SSLInfo ssl_info;
     bool has_ssl_info = ssl_socket_->GetSSLInfo(&ssl_info);

@@ -60,6 +60,11 @@
 #include "media/capture/capture_switches.h"
 #endif
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/net/isp/isp.h"
+#endif
+
 namespace content {
 
 UtilityMainThreadFactoryFunction g_utility_main_thread_factory = nullptr;
@@ -321,6 +326,9 @@ bool UtilityProcessHost::StartProcess() {
 #endif
 #if BUILDFLAG(IS_CHROMEOS_LACROS)
       switches::kEnableResourcesFileSharing,
+#endif
+#if BUILDFLAG(REBEL_BROWSER)
+      rebel::kEnablePerISPHistograms,
 #endif
     };
     cmd_line->CopySwitchesFrom(browser_command_line, kSwitchNames,

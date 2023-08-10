@@ -30,6 +30,11 @@
 #include "ui/base/page_transition_types.h"
 #include "ui/events/blink/blink_features.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/net/isp/isp.h"
+#endif
+
 namespace {
 
 // Used to generate a unique id when emitting the "Long Navigation to First
@@ -597,9 +602,16 @@ void UmaPageLoadMetricsObserver::OnFirstContentfulPaintInPage(
         }
         break;
       case LOAD_TYPE_NEW_NAVIGATION:
+#if BUILDFLAG(REBEL_BROWSER)
+        PAGE_LOAD_HISTOGRAM_DYNAMIC(
+            rebel::PerISPHistogramName(
+                internal::kHistogramLoadTypeFirstContentfulPaintNewNavigation),
+            timing.paint_timing->first_contentful_paint.value());
+#else
         PAGE_LOAD_HISTOGRAM(
             internal::kHistogramLoadTypeFirstContentfulPaintNewNavigation,
             timing.paint_timing->first_contentful_paint.value());
+#endif
         break;
       case LOAD_TYPE_NONE:
         NOTREACHED();
