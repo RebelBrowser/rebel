@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 
+#include "build/branding_buildflags.h"
 #include "base/command_line.h"
 #include "base/metrics/histogram_macros.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
@@ -104,6 +105,14 @@ network::mojom::RequestDestination GetDestination(
       return network::mojom::RequestDestination::kStyle;
     case optimization_guide::proto::RESOURCE_TYPE_SCRIPT:
       return network::mojom::RequestDestination::kScript;
+#if BUILDFLAG(REBEL_BROWSER)
+    case optimization_guide::proto::RESOURCE_TYPE_IMAGE:
+      return network::mojom::RequestDestination::kImage;
+    case optimization_guide::proto::RESOURCE_TYPE_FONT:
+      return network::mojom::RequestDestination::kFont;
+    case optimization_guide::proto::RESOURCE_TYPE_MEDIA:
+      return network::mojom::RequestDestination::kVideo;
+#endif
   }
 }
 

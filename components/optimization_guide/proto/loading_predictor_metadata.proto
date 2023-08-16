@@ -19,6 +19,12 @@ enum ResourceType {
   // An external script, maps to ResourceType::kScript in the Chromium
   // repository.
   RESOURCE_TYPE_SCRIPT = 2;
+  // The following resource types are added by Viasat.
+  // These resource type are not currently used by prefetch loading
+  // They are used by Prism edge worker to generate 103 early hints
+  RESOURCE_TYPE_IMAGE = 3;
+  RESOURCE_TYPE_FONT = 4;
+  RESOURCE_TYPE_MEDIA = 5;
 }
 
 // Metadata about a subresource present on a page.
