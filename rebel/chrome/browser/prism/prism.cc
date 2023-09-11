@@ -53,16 +53,36 @@ void InitializeCommandLineForPrism() {
   auto& command_line = *base::CommandLine::ForCurrentProcess();
 
   if (IsPrismHintingEnabled()) {
-    std::set<base::StringPiece> enabled_features = {
+    base::StringPiece kPrismFeatures[] = {
         features::kLoadingPredictorPrefetch.name,
         features::kLoadingPredictorUseOptimizationGuide.name,
     };
 
-    auto current_enabled_features =
+    auto enabled_features_flag =
         command_line.GetSwitchValueASCII(switches::kEnableFeatures);
-    for (const auto& feature :
-         base::FeatureList::SplitFeatureListString(current_enabled_features)) {
-      enabled_features.insert(feature);
+    auto enabled_features =
+        base::FeatureList::SplitFeatureListString(enabled_features_flag);
+
+    for (auto const& prism_feature : kPrismFeatures) {
+      bool feature_already_enabled = false;
+
+      for (auto enabled_feature : enabled_features) {
+        // Features with parameterized values will be of the form:
+        // --enable-features="LoadingPredictorPrefetch:subresource_type/css"
+        if (auto index = enabled_feature.find(':');
+            index != base::StringPiece::npos) {
+          enabled_feature = enabled_feature.substr(0, index);
+        }
+
+        if (enabled_feature == prism_feature) {
+          feature_already_enabled = true;
+          break;
+        }
+      }
+
+      if (!feature_already_enabled) {
+        enabled_features.push_back(prism_feature);
+      }
     }
 
     std::string enabled = JoinCSVList(enabled_features);
