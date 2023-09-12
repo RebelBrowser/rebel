@@ -73,7 +73,14 @@ const base::FeatureParam<PrefetchSubresourceType>::Option
     kPrefetchSubresourceTypeParamOptions[] = {
         {PrefetchSubresourceType::kAll, "all"},
         {PrefetchSubresourceType::kCss, "css"},
-        {PrefetchSubresourceType::kJsAndCss, "js_css"}};
+        {PrefetchSubresourceType::kJs, "js"},
+        {PrefetchSubresourceType::kJsAndCss, "js_css"},
+        {PrefetchSubresourceType::kImg, "img"},
+        {PrefetchSubresourceType::kFont, "font"},
+        {PrefetchSubresourceType::kVdo, "video"},
+        {PrefetchSubresourceType::kCssFont, "css_font"},
+        {PrefetchSubresourceType::kCssFontJs, "css_font_js"},
+        {PrefetchSubresourceType::kCssFontJsImg, "css_font_js_img"}};
 
 const base::FeatureParam<PrefetchSubresourceType>
     kLoadingPredictorPrefetchSubresourceType{
