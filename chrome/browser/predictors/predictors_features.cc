@@ -70,6 +70,7 @@ BASE_FEATURE(kLoadingPredictorPrefetch,
              kLoadingPredictorPrefetchDefaultFeatureState);
 
 const base::FeatureParam<PrefetchSubresourceType>::Option
+#if BUILDFLAG(REBEL_BROWSER)
     kPrefetchSubresourceTypeParamOptions[] = {
         {PrefetchSubresourceType::kAll, "all"},
         {PrefetchSubresourceType::kCss, "css"},
@@ -81,7 +82,12 @@ const base::FeatureParam<PrefetchSubresourceType>::Option
         {PrefetchSubresourceType::kCssFont, "css_font"},
         {PrefetchSubresourceType::kCssFontJs, "css_font_js"},
         {PrefetchSubresourceType::kCssFontJsImg, "css_font_js_img"}};
-
+#else
+    kPrefetchSubresourceTypeParamOptions[] = {
+        {PrefetchSubresourceType::kAll, "all"},
+        {PrefetchSubresourceType::kCss, "css"},
+        {PrefetchSubresourceType::kJsAndCss, "js_css"}};
+#endif
 const base::FeatureParam<PrefetchSubresourceType>
     kLoadingPredictorPrefetchSubresourceType{
         &kLoadingPredictorPrefetch, "subresource_type",

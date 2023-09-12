@@ -122,11 +122,14 @@ bool ShouldPrefetchDestination(network::mojom::RequestDestination destination) {
       return true;
     case features::PrefetchSubresourceType::kCss:
       return destination == network::mojom::RequestDestination::kStyle;
+#if BUILDFLAG(REBEL_BROWSER)
     case features::PrefetchSubresourceType::kJs:
       return destination == network::mojom::RequestDestination::kScript;
+#endif
     case features::PrefetchSubresourceType::kJsAndCss:
       return destination == network::mojom::RequestDestination::kScript ||
              destination == network::mojom::RequestDestination::kStyle;
+#if BUILDFLAG(REBEL_BROWSER)
     case features::PrefetchSubresourceType::kImg:
       return destination == network::mojom::RequestDestination::kImage;
     case features::PrefetchSubresourceType::kFont:
@@ -146,6 +149,7 @@ bool ShouldPrefetchDestination(network::mojom::RequestDestination destination) {
              destination == network::mojom::RequestDestination::kScript ||
              destination == network::mojom::RequestDestination::kImage;
   }
+#endif
   NOTREACHED();
   return false;
 }
