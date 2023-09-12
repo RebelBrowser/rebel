@@ -7,6 +7,7 @@
 
 #include "base/feature_list.h"
 #include "base/metrics/field_trial_params.h"
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
 
 namespace features {
 
@@ -27,8 +28,12 @@ BASE_DECLARE_FEATURE(kLoadingPredictorUseOptimizationGuide);
 
 BASE_DECLARE_FEATURE(kLoadingPredictorPrefetch);
 
+#if BUILDFLAG(REBEL_BROWSER)
 enum class PrefetchSubresourceType { kAll, kCss, kJs, kJsAndCss, 
     kImg, kFont, kVdo, kCssFont, kCssFontJs, kCssFontJsImg };
+#else
+enum class PrefetchSubresourceType { kAll, kCss, kJsAndCss };
+#endif
 
 extern const base::FeatureParam<PrefetchSubresourceType>
     kLoadingPredictorPrefetchSubresourceType;

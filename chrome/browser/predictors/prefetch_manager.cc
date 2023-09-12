@@ -212,6 +212,14 @@ blink::mojom::ResourceType GetResourceType(
       return blink::mojom::ResourceType::kScript;
     case network::mojom::RequestDestination::kStyle:
       return blink::mojom::ResourceType::kStylesheet;
+#if BUILDFLAG(REBEL_BROWSER)
+    case network::mojom::RequestDestination::kImage:
+      return blink::mojom::ResourceType::kImage;
+    case network::mojom::RequestDestination::kFont:
+      return blink::mojom::ResourceType::kFontResource;
+    case network::mojom::RequestDestination::kVideo:
+      return blink::mojom::ResourceType::kMedia;
+#endif
     default:
       NOTREACHED() << destination;
   }
