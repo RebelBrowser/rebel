@@ -139,6 +139,9 @@ bool ShouldPrefetchDestination(network::mojom::RequestDestination destination) {
     case features::PrefetchSubresourceType::kCssFont:
       return destination == network::mojom::RequestDestination::kStyle ||
              destination == network::mojom::RequestDestination::kFont;
+    case features::PrefetchSubresourceType::kCssImg:
+      return destination == network::mojom::RequestDestination::kStyle ||
+             destination == network::mojom::RequestDestination::kImage;
     case features::PrefetchSubresourceType::kCssFontJs:
       return destination == network::mojom::RequestDestination::kStyle ||
              destination == network::mojom::RequestDestination::kFont ||

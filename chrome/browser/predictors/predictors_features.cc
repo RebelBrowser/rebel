@@ -80,6 +80,7 @@ const base::FeatureParam<PrefetchSubresourceType>::Option
         {PrefetchSubresourceType::kFont, "font"},
         {PrefetchSubresourceType::kVdo, "video"},
         {PrefetchSubresourceType::kCssFont, "css_font"},
+        {PrefetchSubresourceType::kCssImg, "css_img"},
         {PrefetchSubresourceType::kCssFontJs, "css_font_js"},
         {PrefetchSubresourceType::kCssFontJsImg, "css_font_js_img"}};
 #else
