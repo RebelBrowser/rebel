@@ -27,7 +27,8 @@ BASE_DECLARE_FEATURE(kLoadingPredictorUseOptimizationGuide);
 
 BASE_DECLARE_FEATURE(kLoadingPredictorPrefetch);
 
-enum class PrefetchSubresourceType { kAll, kCss, kJsAndCss };
+enum class PrefetchSubresourceType { kAll, kCss, kJs, kJsAndCss, 
+    kImg, kFont, kVdo, kCssFont, kCssFontJs, kCssFontJsImg };
 
 extern const base::FeatureParam<PrefetchSubresourceType>
     kLoadingPredictorPrefetchSubresourceType;

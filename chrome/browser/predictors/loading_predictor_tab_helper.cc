@@ -117,27 +117,34 @@ network::mojom::RequestDestination GetDestination(
 }
 
 bool ShouldPrefetchDestination(network::mojom::RequestDestination destination) {
-
-  printf("Debin: %s:%s:%d: get destination %d !!! \n",
-    __FILE__, __FUNCTION__, __LINE__, destination);
-
-  printf("Debin: %s:%s:%d: get prefetch subresource type %d !!! \n",
-    __FILE__, __FUNCTION__, __LINE__, features::kLoadingPredictorPrefetchSubresourceType.Get());
-
   switch (features::kLoadingPredictorPrefetchSubresourceType.Get()) {
     case features::PrefetchSubresourceType::kAll:
-      printf("Debin: %s:%s:%d: get prefetch subresource type kAll !!! \n",
-        __FILE__, __FUNCTION__, __LINE__);
       return true;
     case features::PrefetchSubresourceType::kCss:
-      printf("Debin: %s:%s:%d: get prefetch subresource type kCss!!!\n",
-        __FILE__, __FUNCTION__, __LINE__);
       return destination == network::mojom::RequestDestination::kStyle;
+    case features::PrefetchSubresourceType::kJs:
+      return destination == network::mojom::RequestDestination::kScript;
     case features::PrefetchSubresourceType::kJsAndCss:
-      printf("Debin: %s:%s:%d: get prefetch subresource type kJsAndCss!!!\n",
-        __FILE__, __FUNCTION__, __LINE__);
       return destination == network::mojom::RequestDestination::kScript ||
              destination == network::mojom::RequestDestination::kStyle;
+    case features::PrefetchSubresourceType::kImg:
+      return destination == network::mojom::RequestDestination::kImage;
+    case features::PrefetchSubresourceType::kFont:
+      return destination == network::mojom::RequestDestination::kFont;
+    case features::PrefetchSubresourceType::kVdo:
+      return destination == network::mojom::RequestDestination::kVideo;
+    case features::PrefetchSubresourceType::kCssFont:
+      return destination == network::mojom::RequestDestination::kStyle ||
+             destination == network::mojom::RequestDestination::kFont;
+    case features::PrefetchSubresourceType::kCssFontJs:
+      return destination == network::mojom::RequestDestination::kStyle ||
+             destination == network::mojom::RequestDestination::kFont ||
+             destination == network::mojom::RequestDestination::kScript;
+    case features::PrefetchSubresourceType::kCssFontJsImg:
+      return destination == network::mojom::RequestDestination::kStyle ||
+             destination == network::mojom::RequestDestination::kFont ||
+             destination == network::mojom::RequestDestination::kScript ||
+             destination == network::mojom::RequestDestination::kImage;
   }
   NOTREACHED();
   return false;
@@ -250,10 +257,6 @@ LoadingPredictorTabHelper::LoadingPredictorTabHelper(
   Profile* profile =
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
   auto* predictor = LoadingPredictorFactory::GetForProfile(profile);
-
-  printf("Tom: kLoadingPredictorPrefetchSubresourceType %u ^^^^^^^^^ \n", 
-    (unsigned)features::kLoadingPredictorPrefetchSubresourceType.Get());
-
   if (predictor)
     predictor_ = predictor->GetWeakPtr();
   if (base::FeatureList::IsEnabled(
