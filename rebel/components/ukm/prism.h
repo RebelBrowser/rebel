@@ -12,6 +12,7 @@ class Report;
 namespace rebel {
 
 bool IsPrismHintingEnabled();
+bool ShouldPrismPreconnectOnly();
 
 void AddViasatMetricsToReport(ukm::Report& report);
 
