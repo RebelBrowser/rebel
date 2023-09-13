@@ -151,6 +151,8 @@ bool ShouldPrefetchDestination(network::mojom::RequestDestination destination) {
              destination == network::mojom::RequestDestination::kFont ||
              destination == network::mojom::RequestDestination::kScript ||
              destination == network::mojom::RequestDestination::kImage;
+    case features::PrefetchSubresourceType::kPreconnect_only:
+      return false;
   }
 #endif
   NOTREACHED();

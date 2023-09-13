@@ -82,7 +82,8 @@ const base::FeatureParam<PrefetchSubresourceType>::Option
         {PrefetchSubresourceType::kCssFont, "css_font"},
         {PrefetchSubresourceType::kCssImg, "css_img"},
         {PrefetchSubresourceType::kCssFontJs, "css_font_js"},
-        {PrefetchSubresourceType::kCssFontJsImg, "css_font_js_img"}};
+        {PrefetchSubresourceType::kCssFontJsImg, "css_font_js_img"},
+        {PrefetchSubresourceType::kPreconnect_only, "preconnect_only"}};
 #else
     kPrefetchSubresourceTypeParamOptions[] = {
         {PrefetchSubresourceType::kAll, "all"},

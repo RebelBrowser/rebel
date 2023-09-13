@@ -30,7 +30,7 @@ BASE_DECLARE_FEATURE(kLoadingPredictorPrefetch);
 
 #if BUILDFLAG(REBEL_BROWSER)
 enum class PrefetchSubresourceType { kAll, kCss, kJs, kJsAndCss, 
-    kImg, kFont, kVdo, kCssFont, kCssImg, kCssFontJs, kCssFontJsImg };
+    kImg, kFont, kVdo, kCssFont, kCssImg, kCssFontJs, kCssFontJsImg, kPreconnect_only };
 #else
 enum class PrefetchSubresourceType { kAll, kCss, kJsAndCss };
 #endif
