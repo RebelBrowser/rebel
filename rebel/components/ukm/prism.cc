@@ -22,6 +22,7 @@ namespace rebel {
 
 namespace {
 constexpr const char kPrismHintsDisabled[] = "prism-hints-disabled";
+constexpr const char kPrismPreconnectOnly[] = "prism-preconnect-only";
 constexpr const char kPrismTestLabel[] = "prism-test-label";
 }  // namespace
 
@@ -36,6 +37,11 @@ bool IsPrismHintingEnabled() {
 #else
   return false;
 #endif
+}
+
+bool ShouldPrismPreconnectOnly() {
+  auto& command_line = *base::CommandLine::ForCurrentProcess();
+  return command_line.HasSwitch(kPrismPreconnectOnly);
 }
 
 void AddViasatMetricsToReport(ukm::Report& report) {

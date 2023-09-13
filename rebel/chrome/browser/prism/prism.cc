@@ -53,17 +53,20 @@ void InitializeCommandLineForPrism() {
   auto& command_line = *base::CommandLine::ForCurrentProcess();
 
   if (IsPrismHintingEnabled()) {
-    base::StringPiece kPrismFeatures[] = {
-        features::kLoadingPredictorPrefetch.name,
+    std::vector<base::StringPiece> prism_features{
         features::kLoadingPredictorUseOptimizationGuide.name,
     };
+
+    if (!ShouldPrismPreconnectOnly()) {
+      prism_features.push_back(features::kLoadingPredictorPrefetch.name);
+    }
 
     auto enabled_features_flag =
         command_line.GetSwitchValueASCII(switches::kEnableFeatures);
     auto enabled_features =
         base::FeatureList::SplitFeatureListString(enabled_features_flag);
 
-    for (auto const& prism_feature : kPrismFeatures) {
+    for (auto const& prism_feature : prism_features) {
       bool feature_already_enabled = false;
 
       for (auto enabled_feature : enabled_features) {
