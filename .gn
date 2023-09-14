@@ -74,6 +74,7 @@ default_args = {
   chrome_pgo_phase = 0
   disable_fieldtrial_testing_config = true
   enable_nacl = false
+  enable_reporting = false
   ffmpeg_branding = "Chrome"
   proprietary_codecs = true
 }
