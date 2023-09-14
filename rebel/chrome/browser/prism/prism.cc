@@ -18,6 +18,7 @@
 #include "chrome/browser/unified_consent/unified_consent_service_factory.h"
 #include "components/metrics/metrics_switches.h"
 #include "components/metrics_services_manager/metrics_services_manager.h"
+#include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/optimization_guide/core/optimization_guide_switches.h"
 #include "components/ukm/ukm_service.h"
 #include "components/unified_consent/unified_consent_service.h"
@@ -47,49 +48,67 @@ std::string JoinCSVList(const ContainerType& list) {
   return stream.str();
 }
 
+void AppendFeature(std::vector<base::StringPiece>& features,
+                   base::Feature const& feature_to_append) {
+  for (auto feature : features) {
+    // Features with parameterized values will be of the form:
+    // --enable-features="LoadingPredictorPrefetch:subresource_type/css"
+    if (auto index = feature.find(':'); index != base::StringPiece::npos) {
+      feature = feature.substr(0, index);
+    }
+
+    if (feature == feature_to_append.name) {
+      return;
+    }
+  }
+
+  features.push_back(feature_to_append.name);
+}
+
 }  // namespace
 
+// If Prism hinting is enabled, we:
+//   1. Enable LoadingPredictor use of Optimization Guide
+//   2. Enable Optimization Guide use of hinting
+//   3. If --prism-preconnect-only is on the command line:
+//        a. Disable LoadingPredictor use of prefetching
+//      Otherwise:
+//        b. Enable LoadingPredictor use of prefetching
+//   4. Set the Optimization Guide hints URL to Prism
+//
+// If Prism hinting is disabled, we:
+//   1. Disable LoadingPredictor use of Optimization Guide
+//   2. Disable LoadingPredictor use of prefetch
+//   3. Disable Optimization Guide use of hinting
+//
+// Regardless of whether Prism hinting is enabled, we:
+//   1. Disable Optimization Guide use of remote model fetching
+//   2. Set the UKM URL to Prism
 void InitializeCommandLineForPrism() {
   auto& command_line = *base::CommandLine::ForCurrentProcess();
 
+  auto enabled_features_flag =
+      command_line.GetSwitchValueASCII(switches::kEnableFeatures);
+  auto enabled_features =
+      base::FeatureList::SplitFeatureListString(enabled_features_flag);
+
+  auto disabled_features_flag =
+      command_line.GetSwitchValueASCII(switches::kDisableFeatures);
+  auto disabled_features =
+      base::FeatureList::SplitFeatureListString(disabled_features_flag);
+
   if (IsPrismHintingEnabled()) {
-    std::vector<base::StringPiece> prism_features{
-        features::kLoadingPredictorUseOptimizationGuide.name,
-    };
+    AppendFeature(enabled_features,
+                  features::kLoadingPredictorUseOptimizationGuide);
+    AppendFeature(
+        enabled_features,
+        optimization_guide::features::kRemoteOptimizationGuideFetching);
 
-    if (!ShouldPrismPreconnectOnly()) {
-      prism_features.push_back(features::kLoadingPredictorPrefetch.name);
+    if (ShouldPrismPreconnectOnly()) {
+      AppendFeature(disabled_features, features::kLoadingPredictorPrefetch);
+    } else {
+      AppendFeature(enabled_features, features::kLoadingPredictorPrefetch);
     }
-
-    auto enabled_features_flag =
-        command_line.GetSwitchValueASCII(switches::kEnableFeatures);
-    auto enabled_features =
-        base::FeatureList::SplitFeatureListString(enabled_features_flag);
-
-    for (auto const& prism_feature : prism_features) {
-      bool feature_already_enabled = false;
-
-      for (auto enabled_feature : enabled_features) {
-        // Features with parameterized values will be of the form:
-        // --enable-features="LoadingPredictorPrefetch:subresource_type/css"
-        if (auto index = enabled_feature.find(':');
-            index != base::StringPiece::npos) {
-          enabled_feature = enabled_feature.substr(0, index);
-        }
-
-        if (enabled_feature == prism_feature) {
-          feature_already_enabled = true;
-          break;
-        }
-      }
-
-      if (!feature_already_enabled) {
-        enabled_features.push_back(prism_feature);
-      }
-    }
-
-    std::string enabled = JoinCSVList(enabled_features);
-    command_line.AppendSwitchASCII(switches::kEnableFeatures, enabled);
 
     if (!command_line.HasSwitch(optimization_guide::switches::
                                     kOptimizationGuideServiceGetHintsURL)) {
@@ -97,6 +116,26 @@ void InitializeCommandLineForPrism() {
           optimization_guide::switches::kOptimizationGuideServiceGetHintsURL,
           kPrismHintsURL);
     }
+  } else {
+    AppendFeature(disabled_features, features::kLoadingPredictorPrefetch);
+    AppendFeature(disabled_features,
+                  features::kLoadingPredictorUseOptimizationGuide);
+    AppendFeature(
+        disabled_features,
+        optimization_guide::features::kRemoteOptimizationGuideFetching);
+  }
+
+  AppendFeature(
+      disabled_features,
+      optimization_guide::features::kOptimizationGuideModelDownloading);
+
+  if (!enabled_features.empty()) {
+    std::string enabled = JoinCSVList(enabled_features);
+    command_line.AppendSwitchASCII(switches::kEnableFeatures, enabled);
+  }
+  if (!disabled_features.empty()) {
+    std::string disabled = JoinCSVList(disabled_features);
+    command_line.AppendSwitchASCII(switches::kDisableFeatures, disabled);
   }
 
   if (!command_line.HasSwitch(metrics::switches::kUkmServerUrl)) {
