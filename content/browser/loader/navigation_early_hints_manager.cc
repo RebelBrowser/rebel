@@ -404,8 +404,12 @@ void NavigationEarlyHintsManager::HandleEarlyHints(
   // policies such as CSP are inconsistent among the first and following
   // responses. This behavior is specified by the step 19.5 of
   // https://html.spec.whatwg.org/multipage/browsing-the-web.html#create-navigation-params-by-fetching
-  if (was_first_early_hints_received_)
+  //printf("Debin_103_EH: %s:%s:%d: Received early hint for host: %s\n", __FILE__, __FUNCTION__, __LINE__, 
+  //  early_hints->headers->link_headers[0]->href.host().c_str());
+  if (was_first_early_hints_received_) {
+    //printf("Debin_103_EH: %s:%s:%d: was_first_early_hints_received_==true. Skip EH!!!!!\n", __FILE__, __FUNCTION__, __LINE__);
     return;
+  }
 
   was_first_early_hints_received_ = true;
 
@@ -414,10 +418,16 @@ void NavigationEarlyHintsManager::HandleEarlyHints(
 
   for (const auto& link : early_hints->headers->link_headers) {
     // TODO(crbug.com/671310): Support other `rel` attributes.
+    //printf("Debin_103_EH: %s:%s:%d: prepare early hint url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
+    //    link->href.spec().c_str());
     if (link->rel == network::mojom::LinkRelAttribute::kPreconnect) {
+    //  printf("Debin_103_EH: %s:%s:%d: Maybe preconnect early hint url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
+    //    link->href.spec().c_str());
       MaybePreconnect(link);
     } else if (link->rel == network::mojom::LinkRelAttribute::kPreload ||
                link->rel == network::mojom::LinkRelAttribute::kModulePreload) {
+    //  printf("Debin_103_EH: %s:%s:%d: Maybe preload early hint url: %s\n", __FILE__, __FUNCTION__, __LINE__,
+    //    link->href.spec().c_str());
       MaybePreloadHintedResource(link, request_for_navigation,
                                  early_hints->headers->content_security_policy,
                                  referrer_policy);
@@ -465,8 +475,11 @@ void NavigationEarlyHintsManager::MaybePreconnect(
     const network::mojom::LinkHeaderPtr& link) {
   was_resource_hints_received_ = true;
 
-  if (!ShouldHandleResourceHints(link))
+  if (!ShouldHandleResourceHints(link)) {
+  //printf("Debin_103_EH: %s:%s:%d url:%s: ShouldHandleResourceHints false !!!\n", 
+  //    __FILE__, __FUNCTION__, __LINE__, link->href.spec().c_str());
     return;
+  }
 
   PreconnectEntry entry(url::Origin::Create(link->href), link->cross_origin);
   if (preconnect_entries_.contains(entry))
@@ -481,6 +494,8 @@ void NavigationEarlyHintsManager::MaybePreconnect(
   network_context->PreconnectSockets(
       /*num_streams=*/1, link->href, allow_credentials,
       isolation_info_.network_anonymization_key());
+  //printf("Debin_103_EH: %s:%s:%d url:%s: allow_credentials: %d\n", 
+  //  __FILE__, __FUNCTION__, __LINE__, link->href.spec().c_str(), allow_credentials);
   preconnect_entries_.insert(std::move(entry));
 }
 
@@ -495,8 +510,11 @@ void NavigationEarlyHintsManager::MaybePreloadHintedResource(
 
   was_resource_hints_received_ = true;
 
-  if (!ShouldHandleResourceHints(link))
+  if (!ShouldHandleResourceHints(link)) {
+  //  printf("Debin_103_EH: %s:%s:%d url:%s: ShouldHandleResourceHints false !!!\n", 
+  //    __FILE__, __FUNCTION__, __LINE__, link->href.spec().c_str());
     return;
+  }
 
   // Step 2. If options's destination is not a destination, then return null.
   // https://html.spec.whatwg.org/multipage/semantics.html#create-a-link-request
@@ -506,8 +524,11 @@ void NavigationEarlyHintsManager::MaybePreloadHintedResource(
     return;
   }
 
-  if (!CheckContentSecurityPolicyForPreload(link, content_security_policies))
+  if (!CheckContentSecurityPolicyForPreload(link, content_security_policies)) {
+  //  printf("Debin_103_EH: %s:%s:%d url:%s: CheckContentSecurityPolicyForPreload false !!!\n", 
+  //    __FILE__, __FUNCTION__, __LINE__, link->href.spec().c_str());
     return;
+  }
 
   if (inflight_preloads_.contains(link->href) ||
       preloaded_resources_.contains(link->href)) {
@@ -531,8 +552,16 @@ void NavigationEarlyHintsManager::MaybePreloadHintedResource(
   request.load_flags = net::LOAD_NORMAL;
   request.resource_type =
       static_cast<int>(blink::mojom::ResourceType::kSubResource);
+
+  // Debin: set mode here: https://source.chromium.org/chromium/chromium/src/+/main:content/browser/loader/navigation_early_hints_manager.cc;drc=7972c3d25cbbd57b38bb275c36c105a7e03bcacb;l=162?q=content%2Fbrowser%2Floader%2Fnavigation_early_hints_manager.cc&ss=chromium%2Fchromium%2Fsrc    
   request.mode = CalculateRequestMode(link);
+  // Debin: request mode: out/Debug/gen/services/network/public/mojom/fetch_api.mojom-shared.h
+  //printf("Debin_103_EH: %s:%s:%d url:%s: request_mode:%d (SameOrigin:0, NoCors:1, Cors:2, kCorsWithForcedPreflight:3, kNavigate: 4) \n", 
+  //    __FILE__, __FUNCTION__, __LINE__, link->href.spec().c_str(), request.mode);
+
   request.credentials_mode = CalculateCredentialsMode(link);
+  //  printf("Debin_103_EH: %s:%s:%d url:%s: credentails_mode:%d \n", 
+  //    __FILE__, __FUNCTION__, __LINE__, link->href.spec().c_str(), request.credentials_mode);
 
   blink::network_utils::SetAcceptHeader(request.headers, request.destination);
 

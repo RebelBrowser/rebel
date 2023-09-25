@@ -98,6 +98,7 @@
 #include "services/network/url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 #include "url/origin.h"
+#include "build/branding_buildflags.h"
 
 #if BUILDFLAG(IS_ANDROID)
 #include "net/base/features.h"
@@ -2669,12 +2670,27 @@ void URLLoader::SetRequestCredentials(const GURL& url) {
       ShouldSendClientCertificates(request_credentials_mode_) &&
       coep_allow_credentials;
 
+  printf("Debin: %s:%s:%d, url: %s... coep_allow_credentials: %d... allow_credentials: %d ... allow_client_cert: %d... load_flags: 0x%x\n",
+     __FILE__, __FUNCTION__, __LINE__, 
+     url_request_->url().spec().c_str(),
+     coep_allow_credentials, allow_credentials, allow_client_certificates, url_request_->load_flags());
+
   // The decision not to include credentials is sticky. This is equivalent to
   // checking the tainted origin flag in the fetch specification.
   if (!allow_credentials)
     url_request_->set_allow_credentials(false);
   if (!allow_client_certificates)
     url_request_->set_send_client_certs(false);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (url_request_->load_flags() & net::LOAD_PREFETCH) {
+      url_request_->set_allow_credentials(url_request_->load_flags() & net::LOAD_VSAT_ALLOW_CREDENTIALS);
+      printf("Debin: %s:%s:%d, url: %s... load_flags: 0x%x , allow_creds=%d, set allow_cred FALSE !!!\n",
+        __FILE__, __FUNCTION__, __LINE__, 
+        url_request_->url().spec().c_str(),
+        url_request_->load_flags(), url_request_->allow_credentials());
+  }
+#endif
 
   // Contrary to Firefox or blink's cache, the HTTP cache doesn't distinguish
   // requests including user's credentials from the anonymous ones yet. See

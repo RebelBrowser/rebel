@@ -14,6 +14,7 @@
 #include "net/base/network_isolation_key.h"
 #include "net/base/schemeful_site.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
+#include "build/branding_buildflags.h"
 
 namespace base {
 class Value;
@@ -147,6 +148,12 @@ class NET_EXPORT NetworkAnonymizationKey {
     return nonce_;
   }
 
+#if BUILDFLAG(REBEL_BROWSER)
+  absl::optional<bool>allowCredentials() const { return allow_credentials_; }
+
+  void SetAllowCredentials(bool allow_credentials) { allow_credentials_ = allow_credentials; }
+#endif
+
   // Returns true if the NetworkAnonymizationKey has a triple keyed scheme. This
   // means the values of the NetworkAnonymizationKey are as follows:
   // `top_frame_site` -> the schemeful site of the top level page.
@@ -197,6 +204,11 @@ class NET_EXPORT NetworkAnonymizationKey {
 
   // for non-opaque origins.
   absl::optional<base::UnguessableToken> nonce_;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  // True if allow credentials
+  absl::optional<bool> allow_credentials_;
+#endif
 };
 
 }  // namespace net

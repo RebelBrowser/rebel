@@ -37,6 +37,10 @@ message Resource {
   // prefetched due to low confidence that this resource will actually be
   // fetched for the page load.
   optional bool preconnect_only = 3;
+  // Specifies the reasons why this resource was included
+  optional string reasons = 4;
+  // Specifies whether this resource will be fetched with allow-credentials or not
+  optional bool allow_credentials = 5;
 }
 
 // Optimization metadata associated with improving the loading predictor.
