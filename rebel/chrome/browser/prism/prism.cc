@@ -121,8 +121,8 @@ void InitializeCommandLineForPrism() {
     if (command_line.HasSwitch(kPrismHintSelection)) {
       auto hint_selection =
           command_line.GetSwitchValueASCII(kPrismHintSelection);
-      // if hint_selection is not empty, we will append it to the 
-      // optimization_guide_service_url as a query parameter
+      // append hint_selection to the optimization_guide_service_url as
+      // a query parameter
       // e.g. http://prism-edge.viasat.workers.dev?hint_selection=ALL_BUT_VHIGH
       if (!hint_selection.empty()) {
         auto optimization_guide_service_url =
