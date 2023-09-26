@@ -27,6 +27,7 @@
 #include "rebel/components/ukm/prism_buildflags.h"
 
 namespace rebel {
+constexpr const char kPrismHintSelection[] = "hint_selection";
 
 namespace {
 
@@ -115,6 +116,24 @@ void InitializeCommandLineForPrism() {
       command_line.AppendSwitchASCII(
           optimization_guide::switches::kOptimizationGuideServiceGetHintsURL,
           kPrismHintsURL);
+    }
+
+    if (command_line.HasSwitch(kPrismHintSelection)) {
+      auto hint_selection =
+          command_line.GetSwitchValueASCII(kPrismHintSelection);
+      // if hint_selection is not empty, we will append it to the 
+      // optimization_guide_service_url as a query parameter
+      // e.g. http://prism-edge.viasat.workers.dev?hint_selection=ALL_BUT_VHIGH
+      if (!hint_selection.empty()) {
+        auto optimization_guide_service_url =
+            command_line.GetSwitchValueASCII(
+                optimization_guide::switches::
+                    kOptimizationGuideServiceGetHintsURL);
+        command_line.AppendSwitchASCII(
+            optimization_guide::switches::
+                kOptimizationGuideServiceGetHintsURL,
+            optimization_guide_service_url + "?hint_selection=" + hint_selection);
+      }
     }
   } else {
     AppendFeature(disabled_features, features::kLoadingPredictorPrefetch);
