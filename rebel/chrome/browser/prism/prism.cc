@@ -10,6 +10,7 @@
 
 #include "base/base_switches.h"
 #include "base/command_line.h"
+#include "base/base64.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
@@ -125,14 +126,16 @@ void InitializeCommandLineForPrism() {
       // a query parameter
       // e.g. http://prism-edge.viasat.workers.dev?hint_selection=ALL_BUT_VHIGH
       if (!hint_selection.empty()) {
+        std::string base64coded_hint_selection;
         auto optimization_guide_service_url =
             command_line.GetSwitchValueASCII(
                 optimization_guide::switches::
                     kOptimizationGuideServiceGetHintsURL);
+        base::Base64Encode(hint_selection, &base64coded_hint_selection);
         command_line.AppendSwitchASCII(
             optimization_guide::switches::
                 kOptimizationGuideServiceGetHintsURL,
-            optimization_guide_service_url + "?hint_selection=" + hint_selection);
+            optimization_guide_service_url + "?hint_selection=" + base64coded_hint_selection);
       }
     }
   } else {
