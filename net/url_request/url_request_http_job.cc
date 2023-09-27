@@ -259,10 +259,6 @@ void URLRequestHttpJob::Start() {
       request_->isolation_info().network_isolation_key();
   request_info_.network_anonymization_key =
       request_->isolation_info().network_anonymization_key();
-  printf("DEbin-100: %s:%s:%d.. url: %s ... load_flag: 0x%x...allow_cred: %d ...request_info_.network_anonymization_key: %s \n", 
-    __FILE__, __FUNCTION__, __LINE__,
-    request_info_.url.spec().c_str(), request_->load_flags(), request()->allow_credentials(),
-    request_info_.network_anonymization_key.ToDebugString().c_str());
   request_info_.possibly_top_frame_origin =
       request_->isolation_info().top_frame_origin();
   request_info_.is_subframe_document_resource =
@@ -341,12 +337,9 @@ void URLRequestHttpJob::OnGotFirstPartySetCacheFilterMatchInfo(
   // Privacy mode could still be disabled in SetCookieHeaderAndStart if we are
   // going to send previously saved cookies.
   request_info_.privacy_mode = DeterminePrivacyMode();
-  //request_info_.privacy_mode = PRIVACY_MODE_ENABLED;
   request()->net_log().AddEventWithStringParams(
       NetLogEventType::COMPUTED_PRIVACY_MODE, "privacy_mode",
       PrivacyModeToDebugString(request_info_.privacy_mode));
-   printf("Debin-pm-103: %s:%s:%d.. COMPUTED_PRIVACY_MODE: %d \n", __FILE__, __FUNCTION__, __LINE__,
-    request_info_.privacy_mode);
 
   // Strip Referer from request_info_.extra_headers to prevent, e.g., plugins
   // from overriding headers that are controlled using other means. Otherwise a
@@ -409,21 +402,8 @@ int URLRequestHttpJob::NotifyConnectedCallback(
 }
 
 PrivacyMode URLRequestHttpJob::DeterminePrivacyMode() const {
-
-  printf("Debin-pm-102:%s:%s:%d.. url: %s... allow_creds: %d ...load_flag: 0x%x ... DeterminePrivacyMode: %s\n", __FILE__, __FUNCTION__, __LINE__,
-    request_info_.url.spec().c_str(), request()->allow_credentials(), request_->load_flags(),
-    request_info_.network_anonymization_key.ToDebugString().c_str());
-
-  #if BUILDFLAG(REBEL_BROWSER)
-  // if the request is prefetch, and hint told us not to allow_credentials, then set PRIVACY_MODE_ENABLED
+#if BUILDFLAG(REBEL_BROWSER)
   if (request_->load_flags() & LOAD_PREFETCH && !request_->allow_credentials()) {
-    printf("Debin-pm-103:%s:%s:%d...url: %s: load_flag: 0x%x allow_creds: %d...VIASAT set PRIVACY_MODE_ENABLED \n", 
-      __FILE__, __FUNCTION__, __LINE__, request_info_.url.spec().c_str(), request_->load_flags(), 
-      request()->allow_credentials());
-
-    // If the request is not cross-site, then we can send cookies.
-    // printf("Debin-pm: %s:%s:%d.. set_force_privacy_mode-2: %d !!!!----- \n", __FILE__, __FUNCTION__, __LINE__,
-    //   PRIVACY_MODE_ENABLED);
     return PRIVACY_MODE_ENABLED;
   }
 #endif
@@ -434,12 +414,6 @@ PrivacyMode URLRequestHttpJob::DeterminePrivacyMode() const {
 
     // TODO(https://crbug.com/775438): Client certs should always be
     // affirmatively omitted for these requests.
-
-    printf("Debin-pm-105: %s:%s:%d.. set_force_privacy_mode-0: %d \n", __FILE__, __FUNCTION__, __LINE__,
-      request()->send_client_certs()
-               ? PRIVACY_MODE_ENABLED
-               : PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS);
-
     return request()->send_client_certs()
                ? PRIVACY_MODE_ENABLED
                : PRIVACY_MODE_ENABLED_WITHOUT_CLIENT_CERTS;
@@ -456,22 +430,16 @@ PrivacyMode URLRequestHttpJob::DeterminePrivacyMode() const {
   if (request_->network_delegate()) {
     privacy_setting =
         request()->network_delegate()->ForcePrivacyMode(*request());
-    printf("Debin-pm: %s:%s:%d.. set_force_privacy_mode: %d \n", __FILE__, __FUNCTION__, __LINE__,
-      privacy_setting);
   }
   switch (privacy_setting) {
     case NetworkDelegate::PrivacySetting::kStateAllowed:
-       printf("Debin-pm: %s:%s:%d: PRIVACY_MODE_DISABLED\n", __FILE__, __FUNCTION__, __LINE__);
       return PRIVACY_MODE_DISABLED;
     case NetworkDelegate::PrivacySetting::kPartitionedStateAllowedOnly:
-    printf("Debin-pm: %s:%s:%d: PRIVACY_MODE_ENABLED_PARTITIONED_STATE_ALLOWED\n", __FILE__, __FUNCTION__, __LINE__);
       return PRIVACY_MODE_ENABLED_PARTITIONED_STATE_ALLOWED;
     case NetworkDelegate::PrivacySetting::kStateDisallowed:
-    printf("Debin-pm: %s:%s:%d: PRIVACY_MODE_ENABLED\n", __FILE__, __FUNCTION__, __LINE__);
       return PRIVACY_MODE_ENABLED;
   }
   NOTREACHED();
-  printf("Debin-pm: %s:%s:%d: PRIVACY_MODE_ENABLED\n", __FILE__, __FUNCTION__, __LINE__);
   return PRIVACY_MODE_ENABLED;
 }
 

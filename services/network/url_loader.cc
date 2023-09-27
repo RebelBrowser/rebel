@@ -2670,11 +2670,6 @@ void URLLoader::SetRequestCredentials(const GURL& url) {
       ShouldSendClientCertificates(request_credentials_mode_) &&
       coep_allow_credentials;
 
-  printf("Debin: %s:%s:%d, url: %s... coep_allow_credentials: %d... allow_credentials: %d ... allow_client_cert: %d... load_flags: 0x%x\n",
-     __FILE__, __FUNCTION__, __LINE__, 
-     url_request_->url().spec().c_str(),
-     coep_allow_credentials, allow_credentials, allow_client_certificates, url_request_->load_flags());
-
   // The decision not to include credentials is sticky. This is equivalent to
   // checking the tainted origin flag in the fetch specification.
   if (!allow_credentials)
@@ -2684,11 +2679,8 @@ void URLLoader::SetRequestCredentials(const GURL& url) {
 
 #if BUILDFLAG(REBEL_BROWSER)
   if (url_request_->load_flags() & net::LOAD_PREFETCH) {
-      url_request_->set_allow_credentials(url_request_->load_flags() & net::LOAD_VSAT_ALLOW_CREDENTIALS);
-      printf("Debin: %s:%s:%d, url: %s... load_flags: 0x%x , allow_creds=%d, set allow_cred FALSE !!!\n",
-        __FILE__, __FUNCTION__, __LINE__, 
-        url_request_->url().spec().c_str(),
-        url_request_->load_flags(), url_request_->allow_credentials());
+      url_request_->set_allow_credentials(url_request_->load_flags() &
+                        net::LOAD_VSAT_ALLOW_CREDENTIALS);
   }
 #endif
 

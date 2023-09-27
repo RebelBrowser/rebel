@@ -254,21 +254,17 @@ void PrefetchManager::PrefetchUrl(
   request.headers.SetHeader("Purpose", "prefetch");
 
   request.load_flags = net::LOAD_PREFETCH;
-  request.load_flags |= net::LOAD_DISABLE_CACHE;
+#if BUILDFLAG(REBEL_BROWSER)
+  DCHECK(job->network_anonymization_key.allowCredentials().has_value());
+
   if (job->network_anonymization_key.allowCredentials().has_value()) {
     if (job->network_anonymization_key.allowCredentials().value() == true) {
       request.load_flags |= net::LOAD_VSAT_ALLOW_CREDENTIALS;
-      printf("Debin: %s:%s:%d url: %s...set allow_cred load_flags: 0x%x\n", __FILE__, __FUNCTION__, __LINE__,
-              request.url.spec().c_str(), request.load_flags);
     } else {
       request.load_flags &= ~net::LOAD_VSAT_ALLOW_CREDENTIALS;
-      printf("Debin: %s:%s:%d url: %s... turn off allow_cred load_flags: 0x%x\n", __FILE__, __FUNCTION__, __LINE__, 
-      request.url.spec().c_str(), request.load_flags);
     }
-  } else {
-    printf("Debin: %s:%s:%d url: %s...NO allow creds value. IT SHOULD NOT HAPPEN !!!!\n", __FILE__, __FUNCTION__, __LINE__,
-     request.url.spec().c_str());
   }
+#endif
   request.destination = job->destination;
   request.resource_type =
       static_cast<int>(GetResourceType(request.destination));

@@ -206,7 +206,6 @@ class NET_EXPORT NetworkAnonymizationKey {
   absl::optional<base::UnguessableToken> nonce_;
 
 #if BUILDFLAG(REBEL_BROWSER)
-  // True if allow credentials
   absl::optional<bool> allow_credentials_;
 #endif
 };

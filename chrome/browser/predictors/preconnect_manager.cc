@@ -66,13 +66,7 @@ PreresolveJob::PreresolveJob(PreconnectRequest preconnect_request,
                     preconnect_request.num_sockets,
                     preconnect_request.allow_credentials,
                     std::move(preconnect_request.network_anonymization_key),
-                    info) {
-                      // print out preconnect_request.allow_credentials
-                    printf("Debin: %s:%s:%d: preconnect_request.allow_credentials: %d... url:%s\n", 
-                      __FILE__, __func__, __LINE__, preconnect_request.allow_credentials,
-                      preconnect_request.origin.GetURL().spec().c_str());
-                      // print out preconnect_request.network_anonymization_key
-                    }
+                    info) {}
 
 PreresolveJob::PreresolveJob(PreresolveJob&& other) = default;
 PreresolveJob::~PreresolveJob() = default;

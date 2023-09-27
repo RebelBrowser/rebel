@@ -555,32 +555,16 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
           GetDestination(subresource.resource_type());
       if (ShouldPrefetchDestination(destination)) {
         // TODO(falken): Detect duplicates.
-
-        printf("debin-98: %s:%s:%d: prefetched subresource_url: %s anon_key: %s allow_credentials: %d\n\n", 
-          __FILE__, __FUNCTION__, __LINE__, 
-          subresource_url.spec().c_str(),
-          network_anonymization_key.ToDebugString().c_str(),
-          allow_credentials);
-#if BUILDFLAG(REBEL_BROWSER)
-        predictors::PrefetchRequest prefetch_request(subresource_url, network_anonymization_key, destination);
-        prefetch_request.set_allow_credentials(allow_credentials);
-        prediction.prefetch_requests.emplace_back(prefetch_request);
-#else
         prediction.prefetch_requests.emplace_back(
             subresource_url, network_anonymization_key, destination);
-#endif
       }
     } else if (should_add_preconnects_to_prediction) {
       url::Origin subresource_origin = url::Origin::Create(subresource_url);
       if (subresource_origin == main_frame_origin) {
         // We are already connecting to the main frame origin by default, so
         // don't include this in the prediction.
-        printf("%s:%s:%d SKIPPED subresource_url: %s... origin: %s\n", __FILE__, __FUNCTION__, __LINE__, 
-          subresource_url.spec().c_str(), subresource_origin.GetURL().spec().c_str());
         continue;
       }
-      printf("%s:%s:%d preconnected subresource_url: %s... origin:%s \n", __FILE__, __FUNCTION__, __LINE__, 
-        subresource_url.spec().c_str(), subresource_origin.GetURL().spec().c_str());
       if (predicted_origins.find(subresource_origin) != predicted_origins.end())
         continue;
       predicted_origins.insert(subresource_origin);

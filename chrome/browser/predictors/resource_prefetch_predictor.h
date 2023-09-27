@@ -99,13 +99,6 @@ struct PrefetchRequest {
   GURL url;
   net::NetworkAnonymizationKey network_anonymization_key;
   network::mojom::RequestDestination destination;
-#if BUILDFLAG(REBEL_BROWSER)
-  bool allow_credentials = true;
-
-  void set_allow_credentials(bool allow_creds) {
-    allow_credentials = allow_creds;
-  }
-#endif
 };
 
 // Stores a result of pre* prediction. The |requests| vector is the main
