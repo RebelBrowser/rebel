@@ -98,6 +98,7 @@
 #include "services/network/url_loader_factory.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 #include "url/origin.h"
+#include "build/branding_buildflags.h"
 
 #if BUILDFLAG(IS_ANDROID)
 #include "net/base/features.h"
@@ -2675,6 +2676,13 @@ void URLLoader::SetRequestCredentials(const GURL& url) {
     url_request_->set_allow_credentials(false);
   if (!allow_client_certificates)
     url_request_->set_send_client_certs(false);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  if (url_request_->load_flags() & net::LOAD_PREFETCH) {
+      url_request_->set_allow_credentials(url_request_->load_flags() &
+                        net::LOAD_VSAT_ALLOW_CREDENTIALS);
+  }
+#endif
 
   // Contrary to Firefox or blink's cache, the HTTP cache doesn't distinguish
   // requests including user's credentials from the anonymous ones yet. See

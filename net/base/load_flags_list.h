@@ -103,3 +103,7 @@ LOAD_FLAG(RESTRICTED_PREFETCH, 1 << 15)
 // is considered privileged, and therefore this flag must only be set from a
 // trusted process.
 LOAD_FLAG(CAN_USE_RESTRICTED_PREFETCH, 1 << 16)
+
+// This is flag is added by Viasat, indicating if the request allows credentials
+LOAD_FLAG(VSAT_ALLOW_CREDENTIALS, 1 << 20)
+

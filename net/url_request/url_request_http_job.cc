@@ -402,6 +402,12 @@ int URLRequestHttpJob::NotifyConnectedCallback(
 }
 
 PrivacyMode URLRequestHttpJob::DeterminePrivacyMode() const {
+#if BUILDFLAG(REBEL_BROWSER)
+  if (request_->load_flags() & LOAD_PREFETCH && !request_->allow_credentials()) {
+    return PRIVACY_MODE_ENABLED;
+  }
+#endif
+
   if (!request()->allow_credentials()) {
     // |allow_credentials_| implies LOAD_DO_NOT_SAVE_COOKIES.
     DCHECK(request_->load_flags() & LOAD_DO_NOT_SAVE_COOKIES);

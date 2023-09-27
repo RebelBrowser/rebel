@@ -542,6 +542,10 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
   const auto lp_metadata = metadata.loading_predictor_metadata();
   for (const auto& subresource : lp_metadata->subresources()) {
     GURL subresource_url(subresource.url());
+#if BUILDFLAG(REBEL_BROWSER)
+    bool allow_credentials = subresource.allow_credentials();
+    network_anonymization_key.SetAllowCredentials(allow_credentials);
+#endif
     if (!subresource_url.is_valid())
       continue;
     predicted_subresources.push_back(subresource_url);
@@ -564,8 +568,14 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
       if (predicted_origins.find(subresource_origin) != predicted_origins.end())
         continue;
       predicted_origins.insert(subresource_origin);
+#if BUILDFLAG(REBEL_BROWSER)
+      predictors::PreconnectRequest preconnect_request(subresource_origin, 1, network_anonymization_key);
+      preconnect_request.set_allow_credentials(allow_credentials);
+      prediction.requests.emplace_back(preconnect_request);
+#else
       prediction.requests.emplace_back(subresource_origin, 1,
                                        network_anonymization_key);
+#endif
     }
   }
 

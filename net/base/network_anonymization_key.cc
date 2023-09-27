@@ -108,6 +108,14 @@ std::string NetworkAnonymizationKey::ToDebugString() const {
     str += " (with nonce " + nonce_->ToString() + ")";
   }
 
+#if BUILDFLAG(REBEL_BROWSER)
+  if (allowCredentials().has_value()) {
+    str += " (allow_credentials_ = " + std::to_string(allowCredentials().value()) + ")";
+  } else {
+    str += " (allow_credentials_ = nullopt)";
+  }
+#endif
+
   return str;
 }
 

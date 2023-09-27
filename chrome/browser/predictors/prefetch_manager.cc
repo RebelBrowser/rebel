@@ -254,6 +254,17 @@ void PrefetchManager::PrefetchUrl(
   request.headers.SetHeader("Purpose", "prefetch");
 
   request.load_flags = net::LOAD_PREFETCH;
+#if BUILDFLAG(REBEL_BROWSER)
+  DCHECK(job->network_anonymization_key.allowCredentials().has_value());
+
+  if (job->network_anonymization_key.allowCredentials().has_value()) {
+    if (job->network_anonymization_key.allowCredentials().value() == true) {
+      request.load_flags |= net::LOAD_VSAT_ALLOW_CREDENTIALS;
+    } else {
+      request.load_flags &= ~net::LOAD_VSAT_ALLOW_CREDENTIALS;
+    }
+  }
+#endif
   request.destination = job->destination;
   request.resource_type =
       static_cast<int>(GetResourceType(request.destination));
