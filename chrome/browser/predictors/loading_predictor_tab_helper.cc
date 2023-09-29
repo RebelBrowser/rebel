@@ -583,8 +583,10 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
     predicted_subresources.push_back(subresource_url);
     if (!subresource.preconnect_only() &&
         base::FeatureList::IsEnabled(features::kLoadingPredictorPrefetch)) {
+#if BUILDFLAG(REBEL_BROWSER)
       if (!subresource.has_resource_type())
         continue;
+#endif
       network::mojom::RequestDestination destination =
           GetDestination(subresource.resource_type());
       if (ShouldPrefetchDestination(destination)) {
