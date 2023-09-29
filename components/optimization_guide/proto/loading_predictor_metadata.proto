@@ -27,6 +27,13 @@ enum ResourceType {
   RESOURCE_TYPE_MEDIA = 5;
 }
 
+// The possible fetch priority values.
+enum FetchPriority {
+  FETCH_PRIORITY_AUTO = 0;
+  FETCH_PRIORITY_HIGH = 1;
+  FETCH_PRIORITY_LOW = 2;
+}
+
 // Metadata about a subresource present on a page.
 message Resource {
   // The full URL of the resource.
@@ -41,6 +48,8 @@ message Resource {
   optional string reasons = 4;
   // Specifies whether this resource will be fetched with allow-credentials or not
   optional bool allow_credentials = 5;
+  // Specifies the fetchPriority level when this resource is preloaded
+  optional FetchPriority fetch_priority = 6;
 }
 
 // Optimization metadata associated with improving the loading predictor.

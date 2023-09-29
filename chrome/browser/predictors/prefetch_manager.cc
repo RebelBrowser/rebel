@@ -33,6 +33,7 @@
 #if BUILDFLAG(REBEL_BROWSER)
 #include "rebel/chrome/browser/prism/prism.h"
 #include "rebel/components/ukm/prism_buildflags.h"
+#include "net/base/request_priority.h"
 #endif
 
 namespace predictors {
@@ -135,6 +136,9 @@ struct PrefetchJob {
     DCHECK(url.SchemeIsHTTPOrHTTPS());
     DCHECK(network_anonymization_key.IsFullyPopulated());
     info.OnJobCreated();
+#if BUILDFLAG(REBEL_BROWSER)
+    fetch_priority = prefetch_request.fetch_priority;
+#endif
   }
 
   ~PrefetchJob() {
@@ -153,6 +157,9 @@ struct PrefetchJob {
   // PrefetchJob lives until the URL load completes, so it can outlive the
   // PrefetchManager and therefore the PrefetchInfo.
   base::WeakPtr<PrefetchInfo> info;
+#if BUILDFLAG(REBEL_BROWSER)
+  net::RequestPriority fetch_priority;
+#endif
 };
 
 PrefetchStats::PrefetchStats(const GURL& url)
@@ -246,6 +253,10 @@ void PrefetchManager::PrefetchUrl(
   request.url = job->url;
   request.site_for_cookies = net::SiteForCookies::FromUrl(info.url);
   request.request_initiator = top_frame_origin;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  request.priority = job->fetch_priority;
+#endif
 
   // The prefetch can happen before the referrer policy is known, so use a
   // conservative one (no-referrer) by default.

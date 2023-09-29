@@ -35,6 +35,9 @@
 #include "url/origin.h"
 
 #include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+#if BUILDFLAG(REBEL_BROWSER)
+#include "net/base/request_priority.h"
+#endif
 
 class PredictorsHandler;
 class Profile;
@@ -99,6 +102,14 @@ struct PrefetchRequest {
   GURL url;
   net::NetworkAnonymizationKey network_anonymization_key;
   network::mojom::RequestDestination destination;
+#if BUILDFLAG(REBEL_BROWSER)
+  net::RequestPriority fetch_priority = net::RequestPriority::IDLE;
+
+  void set_fetch_priority(net::RequestPriority priority) {
+    fetch_priority = priority;
+  }
+#endif
+
 };
 
 // Stores a result of pre* prediction. The |requests| vector is the main
