@@ -116,6 +116,20 @@ network::mojom::RequestDestination GetDestination(
   }
 }
 
+#if BUILDFLAG(REBEL_BROWSER)
+net::RequestPriority GetFetchPriority(
+    optimization_guide::proto::FetchPriority fetch_priority) {
+  switch (fetch_priority) {
+    case optimization_guide::proto::FETCH_PRIORITY_AUTO:
+      return net::IDLE;
+    case optimization_guide::proto::FETCH_PRIORITY_LOW:
+      return net::LOWEST;
+    case optimization_guide::proto::FETCH_PRIORITY_HIGH:
+      return net::HIGHEST;
+  }
+}
+#endif
+
 bool ShouldPrefetchDestination(network::mojom::RequestDestination destination) {
   switch (features::kLoadingPredictorPrefetchSubresourceType.Get()) {
     case features::PrefetchSubresourceType::kAll:
@@ -543,7 +557,9 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
   for (const auto& subresource : lp_metadata->subresources()) {
     GURL subresource_url(subresource.url());
 #if BUILDFLAG(REBEL_BROWSER)
-    bool allow_credentials = subresource.allow_credentials();
+    bool allow_credentials = true;
+    if (subresource.has_allow_credentials())
+      allow_credentials = subresource.allow_credentials();
     network_anonymization_key.SetAllowCredentials(allow_credentials);
 #endif
     if (!subresource_url.is_valid())
@@ -555,8 +571,18 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
           GetDestination(subresource.resource_type());
       if (ShouldPrefetchDestination(destination)) {
         // TODO(falken): Detect duplicates.
+#if BUILDFLAG(REBEL_BROWSER)
+      predictors::PrefetchRequest prefetch_request(subresource_url, 
+                                      network_anonymization_key, destination);
+      net::RequestPriority fetch_priority = net::RequestPriority::IDLE;
+      if (subresource.has_fetch_priority())
+        fetch_priority = GetFetchPriority(subresource.fetch_priority());
+      prefetch_request.set_fetch_priority(fetch_priority);
+      prediction.prefetch_requests.emplace_back(prefetch_request);
+#else
         prediction.prefetch_requests.emplace_back(
             subresource_url, network_anonymization_key, destination);
+#endif
       }
     } else if (should_add_preconnects_to_prediction) {
       url::Origin subresource_origin = url::Origin::Create(subresource_url);
