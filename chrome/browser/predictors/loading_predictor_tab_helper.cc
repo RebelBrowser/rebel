@@ -118,14 +118,30 @@ network::mojom::RequestDestination GetDestination(
 
 #if BUILDFLAG(REBEL_BROWSER)
 net::RequestPriority GetFetchPriority(
-    optimization_guide::proto::FetchPriority fetch_priority) {
+    optimization_guide::proto::FetchPriority fetch_priority,
+    optimization_guide::proto::ResourceType type) {
   switch (fetch_priority) {
-    case optimization_guide::proto::FETCH_PRIORITY_AUTO:
-      return net::IDLE;
+    case optimization_guide::proto::FETCH_PRIORITY_HIGH:
+      switch (type) {
+        case optimization_guide::proto::RESOURCE_TYPE_CSS:
+          return net::HIGHEST;
+        default:
+          return net::MEDIUM;
+      }
     case optimization_guide::proto::FETCH_PRIORITY_LOW:
       return net::LOWEST;
-    case optimization_guide::proto::FETCH_PRIORITY_HIGH:
-      return net::HIGHEST;
+    case optimization_guide::proto::FETCH_PRIORITY_AUTO:
+      switch (type) {
+        case optimization_guide::proto::RESOURCE_TYPE_CSS:
+          return net::HIGHEST;
+        case optimization_guide::proto::RESOURCE_TYPE_FONT:
+        case optimization_guide::proto::RESOURCE_TYPE_SCRIPT:
+          return net::MEDIUM;
+        case optimization_guide::proto::RESOURCE_TYPE_IMAGE:
+          return net::LOWEST;
+        default:
+          return net::IDLE;
+      }
   }
 }
 #endif
@@ -567,6 +583,10 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
     predicted_subresources.push_back(subresource_url);
     if (!subresource.preconnect_only() &&
         base::FeatureList::IsEnabled(features::kLoadingPredictorPrefetch)) {
+#if BUILDFLAG(REBEL_BROWSER)
+      if (!subresource.has_resource_type())
+        continue;
+#endif
       network::mojom::RequestDestination destination =
           GetDestination(subresource.resource_type());
       if (ShouldPrefetchDestination(destination)) {
@@ -574,9 +594,10 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
 #if BUILDFLAG(REBEL_BROWSER)
       predictors::PrefetchRequest prefetch_request(subresource_url, 
                                       network_anonymization_key, destination);
-      net::RequestPriority fetch_priority = net::RequestPriority::IDLE;
-      if (subresource.has_fetch_priority())
-        fetch_priority = GetFetchPriority(subresource.fetch_priority());
+      net::RequestPriority fetch_priority =
+        GetFetchPriority(subresource.has_fetch_priority() ? 
+          subresource.fetch_priority() : optimization_guide::proto::FETCH_PRIORITY_AUTO,
+          subresource.resource_type());
       prefetch_request.set_fetch_priority(fetch_priority);
       prediction.prefetch_requests.emplace_back(prefetch_request);
 #else
