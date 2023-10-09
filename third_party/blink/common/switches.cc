@@ -4,6 +4,8 @@
 
 #include "third_party/blink/public/common/switches.h"
 
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
+
 namespace blink {
 namespace switches {
 
@@ -204,5 +206,9 @@ extern const char kSendMouseEventsDisabledFormControlsPolicy_ForceDisable[] =
 extern const char kSendMouseEventsDisabledFormControlsPolicy_ForceEnable[] =
     "1";
 
+// disable link preload for user preload
+#if BUILDFLAG(REBEL_BROWSER)
+const char kDisableUserPreload[] = "diasable-user-preload";
+#endif
 }  // namespace switches
 }  // namespace blink

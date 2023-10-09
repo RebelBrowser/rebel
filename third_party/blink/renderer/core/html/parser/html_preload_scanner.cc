@@ -80,6 +80,11 @@
 #include "third_party/blink/renderer/platform/wtf/cross_thread_copier_base.h"
 #include "third_party/blink/renderer/platform/wtf/cross_thread_copier_std.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/command_line.h"
+#include "third_party/blink/public/common/switches.h"
+#endif
+
 namespace blink {
 
 namespace {
@@ -638,6 +643,12 @@ class TokenPreloadScanner::StartTagScanner {
   }
 
   bool ShouldPreloadLink(absl::optional<ResourceType>& type) const {
+#if BUILDFLAG(REBEL_BROWSER)
+    if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+      return false;
+    }
+#endif
+
     if (link_is_style_sheet_) {
       return type_attribute_value_.empty() ||
              MIMETypeRegistry::IsSupportedStyleSheetMIMEType(
