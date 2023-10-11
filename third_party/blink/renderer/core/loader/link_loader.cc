@@ -114,7 +114,7 @@ Resource* LinkLoader::GetResourceForTesting() {
   return pending_preload_ ? pending_preload_->GetResourceForTesting() : nullptr;
 }
 
-
+#if BUILDFLAG(REBEL_BROWSER)
 // get LinkRelAttribute link type
 std::string getRelLinkType(const LinkLoadParameters& params) {
   if (params.rel.IsDNSPrefetch()) {
@@ -133,29 +133,21 @@ std::string getRelLinkType(const LinkLoadParameters& params) {
     return "unknown";
   }
 }
+#endif
 
 bool LinkLoader::LoadLink(const LinkLoadParameters& params,
                           Document& document) {
   if (!client_->ShouldLoadLink()) {
-    printf("Debin:%s:%s:%d... should NOT load link: url:%s type: %s\n", __FILE__, __FUNCTION__, __LINE__,
-      params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
     Abort();
     return false;
   }
+#if BUILDFLAG(REBEL_BROWSER)
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
     if (getRelLinkType(params) == "preload") {
-      printf("Debin-3.1:%s:%s:%d... disable user preload: url:%s type:%s\n", __FILE__, __FUNCTION__, __LINE__,
-        params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
       return false;
     }
-    // printf("Debin:%s:%s:%d... disable load link: url:%s type:%s\n", __FILE__, __FUNCTION__, __LINE__,
-    //   params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
-    //   return false;
-  } else if (getRelLinkType(params) == "preload") {
-    printf("Debin-3:%s:%s:%d...  load link: url:%s type:%s\n", __FILE__, __FUNCTION__, __LINE__,
-      params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
-   // return false;
   }
+#endif
 
   if (!pending_preload_ ||
       (params.reason != LinkLoadParameters::Reason::kMediaChange ||

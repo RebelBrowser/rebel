@@ -7741,8 +7741,6 @@ void Document::InitDNSPrefetch() {
   }
 #if BUILDFLAG(REBEL_BROWSER)
     if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
-      printf("Debin:%s:%s:%d, disablng dns_peing_dns_prefetch ^^^^^\n", 
-        __FILE__, __FUNCTION__, __LINE__);
       is_dns_prefetch_enabled_ = false;
     }
 #endif
