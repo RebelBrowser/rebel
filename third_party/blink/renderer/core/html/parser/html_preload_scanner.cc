@@ -245,6 +245,23 @@ class TokenPreloadScanner::StartTagScanner {
         PreloadRequest::kRequestTypePreload;
     absl::optional<ResourceType> type;
     if (ShouldPreconnect()) {
+#if BUILDFLAG(REBEL_BROWSER)
+      if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+        if (url_to_load_.Characters8() && tag_impl_->Characters8())
+          printf("Debin: %s:%s:%d:  skip preconnect ...url_to_load: %s, tag: %s\n", __FILE__, __FUNCTION__,
+            __LINE__,
+            reinterpret_cast<const char*>(url_to_load_.Characters8()),
+            reinterpret_cast<const char*>(tag_impl_->Characters8()));
+        return nullptr;
+      }
+      else {
+        if (url_to_load_.Characters8() && tag_impl_->Characters8())
+          printf("Debin: %s:%s:%d:  preconnect ...url_to_load: %s, tag: %s\n", __FILE__, __FUNCTION__,
+            __LINE__,
+            reinterpret_cast<const char*>(url_to_load_.Characters8()),
+            reinterpret_cast<const char*>(tag_impl_->Characters8()));
+      }
+#endif
       request_type = PreloadRequest::kRequestTypePreconnect;
     } else {
       if (IsLinkRelPreload()) {
@@ -257,8 +274,36 @@ class TokenPreloadScanner::StartTagScanner {
         type = ResourceType::kScript;
       }
       if (!ShouldPreload(type)) {
+#if 0
+        if (url_to_load_.Characters8() && tag_impl_->Characters8())
+          printf("Debin-100: %s:%s:%d:  Chromium skip preload ...url_to_load: %s, tag: %s, is_preload:%d \n", __FILE__, __FUNCTION__,
+            __LINE__,
+            reinterpret_cast<const char*>(url_to_load_.Characters8()),
+            reinterpret_cast<const char*>(tag_impl_->Characters8()),
+            IsLinkRelPreload());
+#endif
         return nullptr;
       }
+#if BUILDFLAG(REBEL_BROWSER)
+      if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+        if (url_to_load_.Characters8() && tag_impl_->Characters8()) {
+          if (IsLinkRelPreload()) {
+            printf("Debin-8: %s:%s:%d:  block preload ...url_to_load: %s, tag: %s, is_preload:%d !!!\n", __FILE__, __FUNCTION__,
+              __LINE__,
+              reinterpret_cast<const char*>(url_to_load_.Characters8()),
+              reinterpret_cast<const char*>(tag_impl_->Characters8()),
+              IsLinkRelPreload());
+              return nullptr;
+          } else {
+              printf("Debin-9: %s:%s:%d:  DO NOT BLOCK non-preload ...url_to_load: %s, tag: %s, is_preload:%d !!!\n", __FILE__, __FUNCTION__,
+                __LINE__,
+              reinterpret_cast<const char*>(url_to_load_.Characters8()),
+              reinterpret_cast<const char*>(tag_impl_->Characters8()),
+              IsLinkRelPreload());
+          }
+        }
+      }
+#endif
     }
 
     TextPosition position =
@@ -643,7 +688,8 @@ class TokenPreloadScanner::StartTagScanner {
   }
 
   bool ShouldPreloadLink(absl::optional<ResourceType>& type) const {
-#if BUILDFLAG(REBEL_BROWSER)
+#if 0
+//#if BUILDFLAG(REBEL_BROWSER)
     if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
       return false;
     }

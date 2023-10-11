@@ -144,6 +144,19 @@ Resource* PreloadRequest::Start(Document* document) {
   if (request_type_ == kRequestTypeLinkRelPreload)
     params.SetLinkPreload(true);
 
+  // if resource_type_ is kScript, we intentionally skip loading it
+  if (resource_type_ == ResourceType::kScript) {
+    // We intentionally ignore the returned value, because we don't resend
+    // the async request to the blocked script here.
+    printf("Debin-1: %s:%s:%d: not skip script. url: %s...initiator_info.name: %s, preload_check:%d\n", 
+      __FILE__, __FUNCTION__, __LINE__, 
+      url.GetString().Utf8().data(), initiator_info.name.Ascii().data(),
+      request_type_ == kRequestTypeLinkRelPreload);
+    //return nullptr;
+  }
+  // if (request_type_ == kRequestTypeLinkRelPreload ||
+  //     request_type_ == kRequestTypeLinkRelPrerender) {
+
   if (script_type_ == mojom::blink::ScriptType::kModule) {
     DCHECK_EQ(resource_type_, ResourceType::kScript);
     params.SetDecoderOptions(TextResourceDecoderOptions::CreateUTF8Decode());

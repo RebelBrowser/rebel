@@ -52,6 +52,11 @@
 #include "third_party/blink/renderer/platform/loader/subresource_integrity.h"
 #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/command_line.h"
+#include "third_party/blink/public/common/switches.h"
+#endif
+
 namespace blink {
 
 class WebPrescientNetworking;
@@ -109,11 +114,47 @@ Resource* LinkLoader::GetResourceForTesting() {
   return pending_preload_ ? pending_preload_->GetResourceForTesting() : nullptr;
 }
 
+
+// get LinkRelAttribute link type
+std::string getRelLinkType(const LinkLoadParameters& params) {
+  if (params.rel.IsDNSPrefetch()) {
+    return "dns-prefetch";
+  } else if (params.rel.IsPreconnect()) {
+    return "preconnect";
+  } else if (params.rel.IsLinkPreload()) {
+    return "preload";
+  } else if (params.rel.IsLinkPrefetch()) {
+    return "prefetch";
+  } else if (params.rel.IsLinkPrerender()) {
+    return "prerender";
+  } else if (params.rel.IsLinkNext()) {
+    return "next";
+  } else {
+    return "unknown";
+  }
+}
+
 bool LinkLoader::LoadLink(const LinkLoadParameters& params,
                           Document& document) {
   if (!client_->ShouldLoadLink()) {
+    printf("Debin:%s:%s:%d... should NOT load link: url:%s type: %s\n", __FILE__, __FUNCTION__, __LINE__,
+      params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
     Abort();
     return false;
+  }
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+    if (getRelLinkType(params) == "preload") {
+      printf("Debin-3.1:%s:%s:%d... disable user preload: url:%s type:%s\n", __FILE__, __FUNCTION__, __LINE__,
+        params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
+      return false;
+    }
+    // printf("Debin:%s:%s:%d... disable load link: url:%s type:%s\n", __FILE__, __FUNCTION__, __LINE__,
+    //   params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
+    //   return false;
+  } else if (getRelLinkType(params) == "preload") {
+    printf("Debin-3:%s:%s:%d...  load link: url:%s type:%s\n", __FILE__, __FUNCTION__, __LINE__,
+      params.href.GetString().Utf8().data(), getRelLinkType(params).c_str());
+   // return false;
   }
 
   if (!pending_preload_ ||

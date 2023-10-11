@@ -430,6 +430,18 @@ void PreloadHelper::PreloadIfNeeded(
     }
   }
 
+  // if resource_type is script, skip preload it
+  if (resource_type == ResourceType::kScript) {
+    String message = String("Debin: " + url.Host() + url.GetPath() +
+                     " because its resource type is script");
+    document.AddConsoleMessage(MakeGarbageCollected<ConsoleMessage>(
+        mojom::blink::ConsoleMessageSource::kOther,
+        mojom::blink::ConsoleMessageLevel::kWarning, message));
+    printf("Debin-2: %s:%s:%d hit but NOT skip url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
+      message.Ascii().data());      
+    //return;
+  }
+
   Resource* resource = PreloadHelper::StartPreload(resource_type.value(),
                                                    link_fetch_params, document);
   if (pending_preload)
@@ -727,6 +739,12 @@ void PreloadHelper::LoadLinksFromHeader(
       }
     }
 
+    printf("Debin-4: %s:%s:%d checking header: %s ... res_type: %s res_as:%s: isLinkPreload:%d, change_to_prefetch:%d, \n", 
+      __FILE__, __FUNCTION__, __LINE__,
+      params.href.GetString().Ascii().data(), params.type.Ascii().data(),
+      params.as.Ascii().data(),
+      params.rel.IsLinkPreload(), change_rel_to_prefetch);
+
     if (change_rel_to_prefetch)
       params.rel = LinkRelAttribute("prefetch");
 
@@ -744,6 +762,15 @@ void PreloadHelper::LoadLinksFromHeader(
           MakeGarbageCollected<PendingLinkPreload>(*document,
                                                    nullptr /* LinkLoader */);
       document->AddPendingLinkHeaderPreload(*pending_preload);
+      // preload except for link rel=preload with as=modulepreload
+      //if (params.rel.IsLinkPreload()) {
+
+    printf("Debin-5: %s:%s:%d checking header: %s ... res_type: %s res_as:%s: isLinkPreload:%d, change_to_prefetch:%d, \n", 
+      __FILE__, __FUNCTION__, __LINE__,
+      params.href.GetString().Ascii().data(), params.type.Ascii().data(),
+      params.as.Ascii().data(),
+      params.rel.IsLinkPreload(), change_rel_to_prefetch);
+      
       PreloadIfNeeded(params, *document, base_url, kLinkCalledFromHeader,
                       viewport_description, kNotParserInserted,
                       pending_preload);
