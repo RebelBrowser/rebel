@@ -80,6 +80,11 @@
 #include "third_party/blink/renderer/platform/wtf/cross_thread_copier_base.h"
 #include "third_party/blink/renderer/platform/wtf/cross_thread_copier_std.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/command_line.h"
+#include "third_party/blink/public/common/switches.h"
+#endif
+
 namespace blink {
 
 namespace {
@@ -240,6 +245,11 @@ class TokenPreloadScanner::StartTagScanner {
         PreloadRequest::kRequestTypePreload;
     absl::optional<ResourceType> type;
     if (ShouldPreconnect()) {
+#if BUILDFLAG(REBEL_BROWSER)
+      if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+        return nullptr;
+      }
+#endif
       request_type = PreloadRequest::kRequestTypePreconnect;
     } else {
       if (IsLinkRelPreload()) {
@@ -254,6 +264,13 @@ class TokenPreloadScanner::StartTagScanner {
       if (!ShouldPreload(type)) {
         return nullptr;
       }
+#if BUILDFLAG(REBEL_BROWSER)
+      if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+        if (IsLinkRelPreload()) {
+            return nullptr;
+          }
+      }
+#endif
     }
 
     TextPosition position =

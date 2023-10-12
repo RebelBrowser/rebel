@@ -363,6 +363,11 @@
 #include "third_party/blink/renderer/platform/wtf/text/string_buffer.h"
 #include "third_party/blink/renderer/platform/wtf/text/text_encoding_registry.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/command_line.h"
+#include "third_party/blink/public/common/switches.h"
+#endif
+
 #ifndef NDEBUG
 using WeakDocumentSet = blink::HeapHashSet<blink::WeakMember<blink::Document>>;
 static WeakDocumentSet& LiveDocumentSet();
@@ -7734,15 +7739,30 @@ void Document::InitDNSPrefetch() {
     if (!parent->IsDNSPrefetchEnabled())
       is_dns_prefetch_enabled_ = false;
   }
+#if BUILDFLAG(REBEL_BROWSER)
+    if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+      is_dns_prefetch_enabled_ = false;
+    }
+#endif
 }
 
 void Document::ParseDNSPrefetchControlHeader(
     const String& dns_prefetch_control) {
+#if BUILDFLAG(REBEL_BROWSER)
+    if (EqualIgnoringASCIICase(dns_prefetch_control, "on") &&
+      !have_explicitly_disabled_dns_prefetch_ &&
+      !base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+    is_dns_prefetch_enabled_ = true;
+    return;
+  }
+
+#else
   if (EqualIgnoringASCIICase(dns_prefetch_control, "on") &&
       !have_explicitly_disabled_dns_prefetch_) {
     is_dns_prefetch_enabled_ = true;
     return;
   }
+#endif
 
   is_dns_prefetch_enabled_ = false;
   have_explicitly_disabled_dns_prefetch_ = true;

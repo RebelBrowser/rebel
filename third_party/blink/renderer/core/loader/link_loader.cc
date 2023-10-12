@@ -52,6 +52,11 @@
 #include "third_party/blink/renderer/platform/loader/subresource_integrity.h"
 #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/command_line.h"
+#include "third_party/blink/public/common/switches.h"
+#endif
+
 namespace blink {
 
 class WebPrescientNetworking;
@@ -109,12 +114,40 @@ Resource* LinkLoader::GetResourceForTesting() {
   return pending_preload_ ? pending_preload_->GetResourceForTesting() : nullptr;
 }
 
+#if BUILDFLAG(REBEL_BROWSER)
+// get LinkRelAttribute link type
+std::string getRelLinkType(const LinkLoadParameters& params) {
+  if (params.rel.IsDNSPrefetch()) {
+    return "dns-prefetch";
+  } else if (params.rel.IsPreconnect()) {
+    return "preconnect";
+  } else if (params.rel.IsLinkPreload()) {
+    return "preload";
+  } else if (params.rel.IsLinkPrefetch()) {
+    return "prefetch";
+  } else if (params.rel.IsLinkPrerender()) {
+    return "prerender";
+  } else if (params.rel.IsLinkNext()) {
+    return "next";
+  } else {
+    return "unknown";
+  }
+}
+#endif
+
 bool LinkLoader::LoadLink(const LinkLoadParameters& params,
                           Document& document) {
   if (!client_->ShouldLoadLink()) {
     Abort();
     return false;
   }
+#if BUILDFLAG(REBEL_BROWSER)
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kDisableUserPreload)) {
+    if (getRelLinkType(params) == "preload") {
+      return false;
+    }
+  }
+#endif
 
   if (!pending_preload_ ||
       (params.reason != LinkLoadParameters::Reason::kMediaChange ||

@@ -6,6 +6,7 @@
 #define THIRD_PARTY_BLINK_PUBLIC_COMMON_SWITCHES_H_
 
 #include "third_party/blink/public/common/common_export.h"
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
 
 namespace blink {
 namespace switches {
@@ -28,6 +29,9 @@ BLINK_COMMON_EXPORT extern const char kDisablePreferCompositingToLCDText[];
 BLINK_COMMON_EXPORT extern const char kDisableRGBA4444Textures[];
 BLINK_COMMON_EXPORT extern const char kDisableThreadedScrolling[];
 BLINK_COMMON_EXPORT extern const char kDisableZeroCopy[];
+#if BUILDFLAG(REBEL_BROWSER)
+BLINK_COMMON_EXPORT extern const char kDisableUserPreload[];
+#endif
 BLINK_COMMON_EXPORT extern const char kDumpRuntimeCallStats[];
 BLINK_COMMON_EXPORT extern const char
     kEnableGpuMemoryBufferCompositorResources[];

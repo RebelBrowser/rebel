@@ -64,6 +64,7 @@
 #include "base/tracing/protos/chrome_track_event.pbzero.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
+#include "build/branding_buildflags.h"  // Needed for REBEL_BROWSER.
 #include "cc/base/switches.h"
 #include "components/attribution_reporting/os_support.mojom.h"
 #include "components/discardable_memory/public/mojom/discardable_shared_memory_manager.mojom.h"
@@ -3423,6 +3424,9 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
     blink::switches::kDisableRGBA4444Textures,
     blink::switches::kDisableThreadedScrolling,
     blink::switches::kDisableThrottleNonVisibleCrossOriginIframes,
+#if BUILDFLAG(REBEL_BROWSER)
+    blink::switches::kDisableUserPreload,
+#endif
     blink::switches::kEnableLowResTiling,
     blink::switches::kEnablePreferCompositingToLCDText,
     blink::switches::kEnableRGBA4444Textures,
