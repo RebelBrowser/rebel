@@ -28,7 +28,7 @@
 #include "rebel/components/ukm/prism_buildflags.h"
 
 namespace rebel {
-constexpr const char kPrismHintSelection[] = "hint_selection";
+constexpr const char kPrismHintSelection[] = "hint-selection";
 
 namespace {
 

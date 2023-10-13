@@ -208,7 +208,7 @@ extern const char kSendMouseEventsDisabledFormControlsPolicy_ForceEnable[] =
 
 // disable link preload for user preload
 #if BUILDFLAG(REBEL_BROWSER)
-const char kDisableUserPreload[] = "disable-user-preload";
+const char kDisableUserPreload[] = "link-hints-disabled";
 #endif
 }  // namespace switches
 }  // namespace blink

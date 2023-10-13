@@ -567,19 +567,26 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
   net::SchemefulSite main_frame_site = net::SchemefulSite(main_frame_url);
   net::NetworkAnonymizationKey network_anonymization_key(main_frame_site,
                                                          main_frame_site);
+
+#if BUILDFLAG(REBEL_BROWSER)
+  std::set<std::pair<url::Origin, bool>> predicate_origin_with_allow_credentials;
+#else                                                       
   std::set<url::Origin> predicted_origins;
+#endif
   std::vector<GURL> predicted_subresources;
   const auto lp_metadata = metadata.loading_predictor_metadata();
   for (const auto& subresource : lp_metadata->subresources()) {
     GURL subresource_url(subresource.url());
+      if (!subresource_url.is_valid())
+        continue;
+
 #if BUILDFLAG(REBEL_BROWSER)
     bool allow_credentials = true;
     if (subresource.has_allow_credentials())
       allow_credentials = subresource.allow_credentials();
     network_anonymization_key.SetAllowCredentials(allow_credentials);
 #endif
-    if (!subresource_url.is_valid())
-      continue;
+
     predicted_subresources.push_back(subresource_url);
     if (!subresource.preconnect_only() &&
         base::FeatureList::IsEnabled(features::kLoadingPredictorPrefetch)) {
@@ -612,9 +619,17 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
         // don't include this in the prediction.
         continue;
       }
+#if BUILDFLAG(REBEL_BROWSER)
+      if (predicate_origin_with_allow_credentials.find(std::make_pair(subresource_origin, allow_credentials)) 
+          != predicate_origin_with_allow_credentials.end())
+        continue;
+      predicate_origin_with_allow_credentials.insert(std::make_pair(subresource_origin, allow_credentials));
+#else
       if (predicted_origins.find(subresource_origin) != predicted_origins.end())
         continue;
       predicted_origins.insert(subresource_origin);
+#endif
+
 #if BUILDFLAG(REBEL_BROWSER)
       predictors::PreconnectRequest preconnect_request(subresource_origin, 1, network_anonymization_key);
       preconnect_request.set_allow_credentials(allow_credentials);
