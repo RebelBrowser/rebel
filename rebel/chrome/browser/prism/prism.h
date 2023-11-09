@@ -16,6 +16,8 @@ void InitializeProfileForPrism(Profile&);
 
 OptimizationGuideLogger::LogMessageBuilder OptimizationGuideLogger(Profile*);
 
+extern const char kAllowHintsForLocalHostAndIp[];
+
 }  // namespace rebel
 
 #endif  // REBEL_CHROME_BROWSER_PRISM_PRISM_H_
