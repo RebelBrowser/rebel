@@ -29,6 +29,7 @@
 
 namespace rebel {
 constexpr const char kPrismHintSelection[] = "hint-selection";
+constexpr const char kAllowHintsForLocalHostAndIp[] = "allow-hints-for-localhost-and-ip";
 
 namespace {
 

@@ -36,6 +36,10 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "rebel/chrome/browser/prism/prism.h"
+#endif
+
 namespace optimization_guide {
 
 namespace {
@@ -443,6 +447,11 @@ void HintsFetcher::OnURLLoadComplete(
 // valid and can be included in a hints fetch.
 std::vector<GURL> HintsFetcher::GetSizeLimitedURLsForFetching(
     const std::vector<GURL>& urls) const {
+#if BUILDFLAG(REBEL_BROWSER)
+  bool allow_localhost_and_ips = 
+       base::CommandLine::ForCurrentProcess()->HasSwitch(
+           rebel::kAllowHintsForLocalHostAndIp);
+#endif
   std::vector<GURL> valid_urls;
   for (size_t i = 0; i < urls.size(); i++) {
     if (valid_urls.size() >=
@@ -459,6 +468,13 @@ std::vector<GURL> HintsFetcher::GetSizeLimitedURLsForFetching(
                         " URL:", urls[i].possibly_invalid_spec()}));
       break;
     }
+#if BUILDFLAG(REBEL_BROWSER)
+    if (allow_localhost_and_ips &&
+        (net::IsLocalhost(urls[i]) || urls[i].HostIsIPAddress())) {
+      valid_urls.push_back(urls[i]);
+      continue;
+    }
+#endif
     if (IsValidURLForURLKeyedHint(urls[i])) {
       valid_urls.push_back(urls[i]);
     } else {
