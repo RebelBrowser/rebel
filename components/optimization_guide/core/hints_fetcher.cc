@@ -459,13 +459,7 @@ std::vector<GURL> HintsFetcher::GetSizeLimitedURLsForFetching(
                         " URL:", urls[i].possibly_invalid_spec()}));
       break;
     }
-#if BUILDFLAG(REBEL_BROWSER)
-    // This change is to allow WPT to fetch hints for localhost (127.0.0.0/orange.html) so that 
-    // connection between Rebel and OGS hint server can be established early.
-    if (IsValidURLForURLKeyedHint(urls[i]) || net::IsLocalhost(urls[i]) || urls[i].HostIsIPAddress()) {
-#else
     if (IsValidURLForURLKeyedHint(urls[i])) {
-#endif // BUILDFLAG(REBEL_BROWSER)
       valid_urls.push_back(urls[i]);
     } else {
       OPTIMIZATION_GUIDE_LOG(
