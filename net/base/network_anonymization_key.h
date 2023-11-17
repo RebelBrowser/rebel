@@ -149,7 +149,7 @@ class NET_EXPORT NetworkAnonymizationKey {
   }
 
 #if BUILDFLAG(REBEL_BROWSER)
-  absl::optional<bool>allowCredentials() const { return allow_credentials_; }
+  absl::optional<bool> allowCredentials() const { return allow_credentials_; }
 
   void SetAllowCredentials(bool allow_credentials) { allow_credentials_ = allow_credentials; }
 #endif
