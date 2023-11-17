@@ -31,6 +31,11 @@
 #include "services/network/public/mojom/fetch_api.mojom.h"
 #include "third_party/blink/public/mojom/loader/resource_load_info.mojom.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/values.h"
+#include "base/json/json_writer.h"
+#endif
+
 using content::BrowserThread;
 
 namespace predictors {
@@ -117,6 +122,23 @@ network::mojom::RequestDestination GetDestination(
 }
 
 #if BUILDFLAG(REBEL_BROWSER)
+std::string GetResourceTypeString(optimization_guide::proto::ResourceType type) {
+  switch (type) {
+    case optimization_guide::proto::RESOURCE_TYPE_UNKNOWN:
+      return "unknown";
+    case optimization_guide::proto::RESOURCE_TYPE_CSS:
+      return "css";
+    case optimization_guide::proto::RESOURCE_TYPE_SCRIPT:
+      return "script";
+    case optimization_guide::proto::RESOURCE_TYPE_IMAGE:
+      return "image";
+    case optimization_guide::proto::RESOURCE_TYPE_FONT:
+      return "font";
+    case optimization_guide::proto::RESOURCE_TYPE_MEDIA:
+      return "media";
+  }
+}
+
 net::RequestPriority GetFetchPriority(
     optimization_guide::proto::FetchPriority fetch_priority,
     optimization_guide::proto::ResourceType type) {
@@ -142,6 +164,18 @@ net::RequestPriority GetFetchPriority(
         default:
           return net::IDLE;
       }
+  }
+}
+
+std::string GetFetchPriorityString(
+    optimization_guide::proto::FetchPriority fetch_priority) {
+  switch (fetch_priority) {
+    case optimization_guide::proto::FETCH_PRIORITY_HIGH:
+      return "high";
+    case optimization_guide::proto::FETCH_PRIORITY_LOW:
+      return "low";
+    case optimization_guide::proto::FETCH_PRIORITY_AUTO:
+      return "auto";
   }
 }
 #endif
@@ -270,6 +304,16 @@ void LoadingPredictorTabHelper::PageData::
   document_holder->page_data_ = std::move(navigation_holder->page_data_);
   document_holder->page_data_->document_page_data_holder_ =
       document_holder->weak_factory_.GetWeakPtr();
+
+#if BUILDFLAG(REBEL_BROWSER)
+  // send hints to DevTools console log
+  if (render_frame_host.GetLastCommittedURL().is_valid()) {
+        render_frame_host.AddMessageToConsole(
+        blink::mojom::ConsoleMessageLevel::kInfo, 
+        document_holder->page_data_->last_optimization_guide_prediction_->
+          preconnect_prediction.hints_for_logging);
+    }
+#endif
 
   NavigationPageDataHolder::DeleteForNavigationHandle(navigation_handle);
 }
@@ -570,6 +614,8 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
 
 #if BUILDFLAG(REBEL_BROWSER)
   std::set<std::pair<url::Origin, bool>> predicate_origin_with_allow_credentials;
+  // This is to save the origin hint list so that we can show it in DevTools console log.
+  base::Value::List origin_hint_list;
 #else                                                       
   std::set<url::Origin> predicted_origins;
 #endif
@@ -581,6 +627,16 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
         continue;
 
 #if BUILDFLAG(REBEL_BROWSER)
+    base::Value::Dict origin_hint;
+    origin_hint.Set("url", subresource.url());
+    origin_hint.Set("resource_type", GetResourceTypeString(subresource.resource_type()));
+    origin_hint.Set("preconnect_only", subresource.preconnect_only() ? "true" : "false");
+    origin_hint.Set("reason", subresource.reasons());
+    origin_hint.Set("allow_credentials", subresource.allow_credentials() ? "true" : "false");
+    origin_hint.Set("fetch_priority", subresource.has_fetch_priority() ? 
+      GetFetchPriorityString(subresource.fetch_priority()) : "");
+    origin_hint_list.Append(std::move(origin_hint));
+
     bool allow_credentials = true;
     if (subresource.has_allow_credentials())
       allow_credentials = subresource.allow_credentials();
@@ -640,6 +696,37 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
 #endif
     }
   }
+
+#if BUILDFLAG(REBEL_BROWSER)
+    base::Value::Dict hints_dict;
+    hints_dict.Set("root_url", main_frame_url.spec());
+    hints_dict.Set("origin_hints", std::move(origin_hint_list));
+    // generate "actually hints" for devtools console log
+    base::Value::List actually_preconnect_list;
+    base::Value::List actually_prefetch_list;
+    // generate "actually preconnect"
+    for (const auto& request : prediction.requests) {
+      base::Value::Dict actually_preconnect;
+      actually_preconnect.Set("origin", request.origin.host());
+      actually_preconnect.Set("allow_credentials", request.allow_credentials ? "true" : "false");
+      actually_preconnect_list.Append(std::move(actually_preconnect));
+    }
+    // generate "actually prefetch" 
+    for (const auto& request : prediction.prefetch_requests) {
+      base::Value::Dict actually_prefetch;
+      actually_prefetch.Set("url", request.url.spec());
+      actually_prefetch.Set("allow_credentials", 
+        request.network_anonymization_key.allowCredentials().value() ? "true" : "false");
+      actually_prefetch.Set("fetch_priority", net::RequestPriorityToString(request.fetch_priority));
+      actually_prefetch_list.Append(std::move(actually_prefetch));
+    }
+
+    hints_dict.Set("actual_preconnect_hints", std::move(actually_preconnect_list));
+    hints_dict.Set("actual_prefetch_hints", std::move(actually_prefetch_list));
+    std::string hints_json;
+    base::JSONWriter::Write(hints_dict, &hints_json);
+    prediction.hints_for_logging = hints_json;
+#endif
 
   page_data->last_optimization_guide_prediction_->preconnect_prediction =
       prediction;

@@ -128,6 +128,11 @@ struct PreconnectPrediction {
   std::string host;
   std::vector<PreconnectRequest> requests;
   std::vector<PrefetchRequest> prefetch_requests;
+#if BUILDFLAG(REBEL_BROWSER)
+  // this log includes both original hints and the actual hints used by the browser
+  // the log will be output to Devtool console 
+  std::string hints_for_logging;
+#endif
 };
 
 // Stores a result of a prediction from the optimization guide.
