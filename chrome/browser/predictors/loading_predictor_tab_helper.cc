@@ -307,9 +307,14 @@ void LoadingPredictorTabHelper::PageData::
 
 #if BUILDFLAG(REBEL_BROWSER)
   // send hints to DevTools console log
-  if (render_frame_host.GetLastCommittedURL().is_valid()) {
+
+  if (render_frame_host.GetParent() == nullptr &&
+        render_frame_host.GetLastCommittedURL().is_valid() && 
+        document_holder->page_data_->last_optimization_guide_prediction_->
+          preconnect_prediction.hints_for_logging.size() > 0) {
+  
         render_frame_host.AddMessageToConsole(
-        blink::mojom::ConsoleMessageLevel::kInfo, 
+        blink::mojom::ConsoleMessageLevel::kWarning, 
         document_holder->page_data_->last_optimization_guide_prediction_->
           preconnect_prediction.hints_for_logging);
     }
