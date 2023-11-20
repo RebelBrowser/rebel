@@ -615,7 +615,7 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
 #if BUILDFLAG(REBEL_BROWSER)
   std::set<std::pair<url::Origin, bool>> predicate_origin_with_allow_credentials;
   // This is to save the origin hint list so that we can show it in DevTools console log.
-  base::Value::List origin_hint_list;
+  base::Value::List snappi_hint_list;
 #else                                                       
   std::set<url::Origin> predicted_origins;
 #endif
@@ -635,7 +635,7 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
     origin_hint.Set("allow_credentials", subresource.allow_credentials() ? "true" : "false");
     origin_hint.Set("fetch_priority", subresource.has_fetch_priority() ? 
       GetFetchPriorityString(subresource.fetch_priority()) : "");
-    origin_hint_list.Append(std::move(origin_hint));
+    snappi_hint_list.Append(std::move(origin_hint));
 
     bool allow_credentials = true;
     if (subresource.has_allow_credentials())
@@ -700,29 +700,8 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
 #if BUILDFLAG(REBEL_BROWSER)
     base::Value::Dict hints_dict;
     hints_dict.Set("root_url", main_frame_url.spec());
-    hints_dict.Set("origin_hints", std::move(origin_hint_list));
-    // generate "actually hints" for devtools console log
-    base::Value::List actually_preconnect_list;
-    base::Value::List actually_prefetch_list;
-    // generate "actually preconnect"
-    for (const auto& request : prediction.requests) {
-      base::Value::Dict actually_preconnect;
-      actually_preconnect.Set("origin", request.origin.host());
-      actually_preconnect.Set("allow_credentials", request.allow_credentials ? "true" : "false");
-      actually_preconnect_list.Append(std::move(actually_preconnect));
-    }
-    // generate "actually prefetch" 
-    for (const auto& request : prediction.prefetch_requests) {
-      base::Value::Dict actually_prefetch;
-      actually_prefetch.Set("url", request.url.spec());
-      actually_prefetch.Set("allow_credentials", 
-        request.network_anonymization_key.allowCredentials().value() ? "true" : "false");
-      actually_prefetch.Set("fetch_priority", net::RequestPriorityToString(request.fetch_priority));
-      actually_prefetch_list.Append(std::move(actually_prefetch));
-    }
+    hints_dict.Set("snappi_hints", std::move(snappi_hint_list));
 
-    hints_dict.Set("actual_preconnect_hints", std::move(actually_preconnect_list));
-    hints_dict.Set("actual_prefetch_hints", std::move(actually_prefetch_list));
     std::string hints_json;
     base::JSONWriter::Write(hints_dict, &hints_json);
     prediction.hints_for_logging = hints_json;
