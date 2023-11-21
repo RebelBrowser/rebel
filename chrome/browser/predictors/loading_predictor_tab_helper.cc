@@ -308,15 +308,22 @@ void LoadingPredictorTabHelper::PageData::
 #if BUILDFLAG(REBEL_BROWSER)
   // send hints to DevTools console log
 
-  if (render_frame_host.GetParent() == nullptr &&
-        render_frame_host.GetLastCommittedURL().is_valid() && 
-        document_holder->page_data_->last_optimization_guide_prediction_->
-          preconnect_prediction.hints_for_logging.size() > 0) {
-  
+  if (render_frame_host.GetParent() == nullptr && 
+      document_holder->page_data_->last_optimization_guide_prediction_ &&
+      render_frame_host.GetLastCommittedURL().is_valid() && 
+      document_holder->page_data_->last_optimization_guide_prediction_->
+        preconnect_prediction.hints_for_logging.size()>0) {
+
+        // send hints to DevTools console log
         render_frame_host.AddMessageToConsole(
-        blink::mojom::ConsoleMessageLevel::kWarning, 
+          blink::mojom::ConsoleMessageLevel::kWarning, 
+          document_holder->page_data_->last_optimization_guide_prediction_->
+            preconnect_prediction.hints_for_logging);
+
+        // clear hints_for_logging so that LoadingPredictorTabHelper::ResourceLoadComplete()
+        // won't send the same hints to DevTools console log again.
         document_holder->page_data_->last_optimization_guide_prediction_->
-          preconnect_prediction.hints_for_logging);
+        preconnect_prediction.hints_for_logging.clear();
     }
 #endif
 
@@ -485,6 +492,22 @@ void LoadingPredictorTabHelper::ResourceLoadComplete(
   auto* page_data = PageData::GetForDocument(*render_frame_host);
   if (!page_data)
     return;
+
+#if BUILDFLAG(REBEL_BROWSER)
+  // If snappi hints come later than TransferFromNavigationHandleToDocument(), then 
+  // TransferFromNavigationHandleToDocument won't have a chance to send snappi hints to Devtool console.
+  // In that case, we send snappi hints to Devtool console here.
+  if (render_frame_host &&  page_data->last_optimization_guide_prediction_ &&
+        page_data->last_optimization_guide_prediction_->preconnect_prediction.hints_for_logging.size()>0) {
+        render_frame_host->AddMessageToConsole(
+          blink::mojom::ConsoleMessageLevel::kInfo, 
+          page_data->last_optimization_guide_prediction_->
+            preconnect_prediction.hints_for_logging);
+
+        page_data->last_optimization_guide_prediction_->
+            preconnect_prediction.hints_for_logging.clear();
+    }
+#endif
 
   predictor_->loading_data_collector()->RecordResourceLoadComplete(
       page_data->navigation_id_, resource_load_info);
