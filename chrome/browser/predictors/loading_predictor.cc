@@ -217,6 +217,9 @@ bool LoadingPredictor::OnNavigationStarted(NavigationId navigation_id,
   if (shutdown_)
     return true;
 
+  printf("Debin:%s:%s:%d Url: %s\n",
+    __FILE__, __FUNCTION__, __LINE__, main_frame_url.spec().c_str());
+
   loading_data_collector()->RecordStartNavigation(
       navigation_id, ukm_source_id, main_frame_url, creation_time);
   CleanupAbandonedHintsAndNavigations(navigation_id);
@@ -232,6 +235,10 @@ void LoadingPredictor::OnNavigationFinished(NavigationId navigation_id,
                                             bool is_error_page) {
   if (shutdown_)
     return;
+
+  printf("Debin:%s:%s:%d odl_Url: %s... new_url: %s\n",
+    __FILE__, __FUNCTION__, __LINE__, old_main_frame_url.spec().c_str(),
+    new_main_frame_url.spec().c_str());
 
   loading_data_collector()->RecordFinishNavigation(
       navigation_id, old_main_frame_url, new_main_frame_url, is_error_page);

@@ -16,6 +16,10 @@
 #include "content/public/browser/web_contents_user_data.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/time/time.h"
+#endif
+
 namespace content {
 class NavigationHandle;
 }  // namespace content
@@ -64,6 +68,14 @@ class LoadingPredictorTabHelper
       network::mojom::RequestDestination request_destination) override;
   void DocumentOnLoadCompletedInPrimaryMainFrame() override;
 
+  void DidStartLoading() override;
+  void DidStopLoading() override;
+  void LoadProgressChanged(double progress) override;
+
+  void PrimaryPageChanged(content::Page& page) override;
+  void RenderFrameCreated(content::RenderFrameHost* render_frame_host) override;
+  void ReadyToCommitNavigation(content::NavigationHandle* navigation_handle) override;
+
   // Used by LoadingPredictorPageLoadMetricsObserver.
   void RecordFirstContentfulPaint(content::RenderFrameHost* render_frame_host,
                                   base::TimeTicks first_contentful_paint);
@@ -108,6 +120,10 @@ class LoadingPredictorTabHelper
     absl::optional<OptimizationGuidePrediction>
         last_optimization_guide_prediction_;
 
+#if BUILDFLAG(REBEL_BROWSER)
+    base::Time navigation_commit_ready_time_ = base::Time::Min();
+    base::Time snappi_hint_received_time_ = base::Time::Min();
+#endif
     // Stores weak ptrs to the document and navigation page data holders, in
     // order to determine the current state of the navigation.
     base::WeakPtr<DocumentPageDataHolder> document_page_data_holder_;
