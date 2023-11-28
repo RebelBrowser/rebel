@@ -68,14 +68,9 @@ class LoadingPredictorTabHelper
       network::mojom::RequestDestination request_destination) override;
   void DocumentOnLoadCompletedInPrimaryMainFrame() override;
 
-  void DidStartLoading() override;
-  void DidStopLoading() override;
-  void LoadProgressChanged(double progress) override;
-
-  void PrimaryPageChanged(content::Page& page) override;
-  void RenderFrameCreated(content::RenderFrameHost* render_frame_host) override;
+#if BUILDFLAG(REBEL_BROWSER)
   void ReadyToCommitNavigation(content::NavigationHandle* navigation_handle) override;
-
+#endif
   // Used by LoadingPredictorPageLoadMetricsObserver.
   void RecordFirstContentfulPaint(content::RenderFrameHost* render_frame_host,
                                   base::TimeTicks first_contentful_paint);

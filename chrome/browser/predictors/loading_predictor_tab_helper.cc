@@ -307,50 +307,6 @@ void LoadingPredictorTabHelper::PageData::
   document_holder->page_data_->document_page_data_holder_ =
       document_holder->weak_factory_.GetWeakPtr();
 
-#if BUILDFLAG(REBEL_BROWSER)
-  // send hints to DevTools console log
-#if 0  // testing......
-  if (render_frame_host.GetParent() == nullptr && 
-      document_holder->page_data_->last_optimization_guide_prediction_ &&
-      render_frame_host.GetLastCommittedURL().is_valid() && 
-      document_holder->page_data_->last_optimization_guide_prediction_->
-        preconnect_prediction.hints_for_logging.size()>0) {
-
-        // send hints to DevTools console log
-        render_frame_host.AddMessageToConsole(
-          blink::mojom::ConsoleMessageLevel::kInfo, 
-          document_holder->page_data_->last_optimization_guide_prediction_->
-            preconnect_prediction.hints_for_logging);
-
-        // send snappi_hint_received_time_ to DevTools console log
-        base::Value::Dict hint_received_time_dict;
-        if (document_holder->page_data_->snappi_hint_received_time_ != base::Time::Min() &&
-            document_holder->page_data_->navigation_commit_ready_time_ != base::Time::Min()) {
-          hint_received_time_dict.Set("snappi_hint3_received_time",
-            std::to_string((document_holder->page_data_->snappi_hint_received_time_ - 
-            document_holder->page_data_->navigation_commit_ready_time_).InMilliseconds()));
-        } else {
-          hint_received_time_dict.Set("snappi_hint3_received_time", "N/A");
-        }
-
-        std::string hint_received_time_json;
-        base::JSONWriter::Write(hint_received_time_dict, &hint_received_time_json);
-        render_frame_host.AddMessageToConsole(
-          blink::mojom::ConsoleMessageLevel::kInfo, 
-          hint_received_time_json);
-
-        // clear hints_for_logging so that LoadingPredictorTabHelper::ResourceLoadComplete()
-        // won't send the same hints to DevTools console log again.
-        document_holder->page_data_->last_optimization_guide_prediction_->
-        preconnect_prediction.hints_for_logging.clear();
-        document_holder->page_data_->snappi_hint_received_time_ = base::Time::Min();
-        document_holder->page_data_->navigation_commit_ready_time_ = base::Time::Min();
-
-        printf("Debin:%s:%s:%d Log hints on Devtool for url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
-          render_frame_host.GetLastCommittedURL().spec().c_str());
-    }
-#endif // testing ...
-#endif
 
   NavigationPageDataHolder::DeleteForNavigationHandle(navigation_handle);
 }
@@ -390,62 +346,18 @@ LoadingPredictorTabHelper::LoadingPredictorTabHelper(
 
 LoadingPredictorTabHelper::~LoadingPredictorTabHelper() = default;
 
-void LoadingPredictorTabHelper::DidStartLoading() {
-  //printf("Debin:%s:%s:%d No url\n", __FILE__, __FUNCTION__, __LINE__);
-}
-
-void LoadingPredictorTabHelper::DidStopLoading() {
-  // printf("Debin:%s:%s:%d No url\n", __FILE__, __FUNCTION__, __LINE__);
-}
-
-void LoadingPredictorTabHelper::LoadProgressChanged(double progress) {
-  // printf("Debin:%s:%s:%d No Url progress: %f\n",
-  //   __FILE__, __FUNCTION__, __LINE__, progress);
-}
-
-void LoadingPredictorTabHelper::PrimaryPageChanged(content::Page& page) {
-  if (page.IsPrimary() && page.GetManifestUrl().has_value()) {
-    printf("Debin:%s:%s:%d Url: %s \n", __FILE__, __FUNCTION__, __LINE__,
-      page.GetManifestUrl().value().spec().c_str());;
-  }
-}
-
-void LoadingPredictorTabHelper::RenderFrameCreated(
-    content::RenderFrameHost* render_frame_host) {
-      if ( render_frame_host && render_frame_host->GetParent() == nullptr) {
-        printf("Debin:%s:%s:%d Url: %s \n", __FILE__, __FUNCTION__, __LINE__,
-          render_frame_host->GetLastCommittedURL().spec().c_str());;
-      }
-}
-
+#if BUILDFLAG(REBEL_BROWSER)
 void LoadingPredictorTabHelper::ReadyToCommitNavigation(
     content::NavigationHandle* navigation_handle) {
-      // if url is main frame url, then we can get the url here.
       if (navigation_handle && navigation_handle->IsInPrimaryMainFrame() &&
           navigation_handle->GetURL().is_valid()) {
-            // content::RenderFrameHost* render_frame_host = navigation_handle->GetRenderFrameHost();
-            // if (render_frame_host && render_frame_host->GetParent() == nullptr) {
-            //   auto* page_data = PageData::GetForDocument(*render_frame_host);
-            //   if (!page_data) {
-            //     printf("Debin:%s:%s:%d page_data is empty for url:%s \n", __FILE__, __FUNCTION__, __LINE__,
-            //       navigation_handle->GetURL().spec().c_str());;
-            //     return;
-            //   }
             auto* page_data = PageData::GetForNavigationHandle(*navigation_handle);
-            if (!page_data) {
-                printf("Debin:%s:%s:%d page_data is empty for url:%s \n", __FILE__, __FUNCTION__, __LINE__,
-                  navigation_handle->GetURL().spec().c_str());;
+            if (!page_data)
                 return;
-              }
             page_data->navigation_commit_ready_time_ = base::Time::Now();
-            printf("Debin:%s:%s:%d set nav_commit_ready_time for url:%s \n", __FILE__, __FUNCTION__, __LINE__,
-                navigation_handle->GetURL().spec().c_str());;
-      } else {
-        // if (navigation_handle->GetURL().is_valid())
-        //   printf("Debin:%s:%s:%d set nav_commit_ready_time for url:%s IsInPrimaryMainFrame: %d\n", __FILE__, __FUNCTION__, __LINE__,
-        //         navigation_handle->GetURL().spec().c_str(), navigation_handle->IsInPrimaryMainFrame() );;
       }
 }
+#endif
 
 void LoadingPredictorTabHelper::DidStartNavigation(
     content::NavigationHandle* navigation_handle) {
@@ -457,9 +369,6 @@ void LoadingPredictorTabHelper::DidStartNavigation(
   if (!IsHandledNavigation(navigation_handle))
     return;
 
-  printf("Debin:%s:%s:%d url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
-    navigation_handle->GetURL().spec().c_str());
-  
   PageData& page_data = PageData::CreateForNavigationHandle(*navigation_handle);
 
   page_data.has_local_preconnect_predictions_for_current_navigation_ =
@@ -543,9 +452,6 @@ void LoadingPredictorTabHelper::DidFinishNavigation(
   if (!IsHandledNavigation(navigation_handle))
     return;
 
-  printf("Debin:%s:%s:%d url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
-    navigation_handle->GetURL().spec().c_str());
-
   auto* page_data = PageData::GetForNavigationHandle(*navigation_handle);
   // PageData may not be created in DidStartNavigation if IsHandledNavigation()
   // changes after the start of the navigation.
@@ -613,8 +519,6 @@ void LoadingPredictorTabHelper::ResourceLoadComplete(
             preconnect_prediction.hints_for_logging.clear();
         page_data->snappi_hint_received_time_ = base::Time::Min();
         page_data->navigation_commit_ready_time_ = base::Time::Min();
-        printf("Debin: %s:%s:%d Log hints on Devtool for url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
-          render_frame_host->GetLastCommittedURL().spec().c_str());
     }
 #endif
 
@@ -748,9 +652,6 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
   net::SchemefulSite main_frame_site = net::SchemefulSite(main_frame_url);
   net::NetworkAnonymizationKey network_anonymization_key(main_frame_site,
                                                          main_frame_site);
-
-printf("Debin:%s:%s:%d url: %s\n", __FILE__, __FUNCTION__, __LINE__, 
-    main_frame_url.spec().c_str());
 
 #if BUILDFLAG(REBEL_BROWSER)
   std::set<std::pair<url::Origin, bool>> predicate_origin_with_allow_credentials;
