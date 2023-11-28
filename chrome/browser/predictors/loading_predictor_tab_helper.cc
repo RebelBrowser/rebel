@@ -34,6 +34,8 @@
 #if BUILDFLAG(REBEL_BROWSER)
 #include "base/values.h"
 #include "base/json/json_writer.h"
+#include "base/command_line.h"
+#include "rebel/chrome/browser/prism/prism.h"
 #endif
 
 using content::BrowserThread;
@@ -305,27 +307,6 @@ void LoadingPredictorTabHelper::PageData::
   document_holder->page_data_->document_page_data_holder_ =
       document_holder->weak_factory_.GetWeakPtr();
 
-#if BUILDFLAG(REBEL_BROWSER)
-  // send hints to DevTools console log
-
-  if (render_frame_host.GetParent() == nullptr && 
-      document_holder->page_data_->last_optimization_guide_prediction_ &&
-      render_frame_host.GetLastCommittedURL().is_valid() && 
-      document_holder->page_data_->last_optimization_guide_prediction_->
-        preconnect_prediction.hints_for_logging.size()>0) {
-
-        // send hints to DevTools console log
-        render_frame_host.AddMessageToConsole(
-          blink::mojom::ConsoleMessageLevel::kWarning, 
-          document_holder->page_data_->last_optimization_guide_prediction_->
-            preconnect_prediction.hints_for_logging);
-
-        // clear hints_for_logging so that LoadingPredictorTabHelper::ResourceLoadComplete()
-        // won't send the same hints to DevTools console log again.
-        document_holder->page_data_->last_optimization_guide_prediction_->
-        preconnect_prediction.hints_for_logging.clear();
-    }
-#endif
 
   NavigationPageDataHolder::DeleteForNavigationHandle(navigation_handle);
 }
@@ -364,6 +345,19 @@ LoadingPredictorTabHelper::LoadingPredictorTabHelper(
 }
 
 LoadingPredictorTabHelper::~LoadingPredictorTabHelper() = default;
+
+#if BUILDFLAG(REBEL_BROWSER)
+void LoadingPredictorTabHelper::ReadyToCommitNavigation(
+    content::NavigationHandle* navigation_handle) {
+      if (navigation_handle && navigation_handle->IsInPrimaryMainFrame() &&
+          navigation_handle->GetURL().is_valid()) {
+            auto* page_data = PageData::GetForNavigationHandle(*navigation_handle);
+            if (!page_data)
+                return;
+            page_data->navigation_commit_ready_time_ = base::Time::Now();
+      }
+}
+#endif
 
 void LoadingPredictorTabHelper::DidStartNavigation(
     content::NavigationHandle* navigation_handle) {
@@ -504,8 +498,27 @@ void LoadingPredictorTabHelper::ResourceLoadComplete(
           page_data->last_optimization_guide_prediction_->
             preconnect_prediction.hints_for_logging);
 
+          // send snappi_hint_received_time_ to DevTools console log
+          base::Value::Dict hint_received_time_dict;
+          if (page_data->snappi_hint_received_time_ != base::Time::Min() &&
+              page_data->navigation_commit_ready_time_ != base::Time::Min()) {
+            hint_received_time_dict.Set("snappi_hints_received_time",
+              std::to_string((page_data->snappi_hint_received_time_ - 
+              page_data->navigation_commit_ready_time_).InMilliseconds()));
+          } else {
+            hint_received_time_dict.Set("snappi_hints_received_time", "N/A");
+          }
+
+          std::string hint_received_time_json;
+          base::JSONWriter::Write(hint_received_time_dict, &hint_received_time_json);
+          render_frame_host->AddMessageToConsole(
+            blink::mojom::ConsoleMessageLevel::kInfo, 
+            hint_received_time_json);
+
         page_data->last_optimization_guide_prediction_->
             preconnect_prediction.hints_for_logging.clear();
+        page_data->snappi_hint_received_time_ = base::Time::Min();
+        page_data->navigation_commit_ready_time_ = base::Time::Min();
     }
 #endif
 
@@ -730,9 +743,18 @@ void LoadingPredictorTabHelper::OnOptimizationGuideDecision(
     hints_dict.Set("root_url", main_frame_url.spec());
     hints_dict.Set("snappi_hints", std::move(snappi_hint_list));
 
+    std::string hint_selection = "";
+    auto* command_line = base::CommandLine::ForCurrentProcess();
+    if (command_line->HasSwitch(rebel::kPrismHintSelection)) {
+        hint_selection = command_line->GetSwitchValueASCII(rebel::kPrismHintSelection);
+    }
+    hints_dict.Set("hint_selection", hint_selection);
+
     std::string hints_json;
     base::JSONWriter::Write(hints_dict, &hints_json);
     prediction.hints_for_logging = hints_json;
+
+    page_data->snappi_hint_received_time_ = base::Time::Now();
 #endif
 
   page_data->last_optimization_guide_prediction_->preconnect_prediction =

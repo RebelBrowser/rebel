@@ -17,6 +17,7 @@ void InitializeProfileForPrism(Profile&);
 OptimizationGuideLogger::LogMessageBuilder OptimizationGuideLogger(Profile*);
 
 extern const char kAllowHintsForLocalHostAndIp[];
+extern const char kPrismHintSelection[];
 
 }  // namespace rebel
 
