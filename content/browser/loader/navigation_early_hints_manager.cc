@@ -36,6 +36,11 @@
 #include "third_party/blink/public/mojom/loader/resource_load_info.mojom-shared.h"
 #include "url/origin.h"
 
+#if BUILDFLAG(REBEL_BROWSER)
+#include "base/command_line.h"
+#include "third_party/blink/public/common/switches.h"
+#endif
+
 namespace content {
 
 namespace {
@@ -400,6 +405,12 @@ NavigationEarlyHintsManager::~NavigationEarlyHintsManager() = default;
 void NavigationEarlyHintsManager::HandleEarlyHints(
     network::mojom::EarlyHintsPtr early_hints,
     const network::ResourceRequest& request_for_navigation) {
+#if BUILDFLAG(REBEL_BROWSER)
+    if (base::CommandLine::ForCurrentProcess()->HasSwitch(blink::switches::kDisableUserPreload)) {
+      return;
+    }
+#endif
+
   // Ignore the second and subsequent responses to avoid situations where
   // policies such as CSP are inconsistent among the first and following
   // responses. This behavior is specified by the step 19.5 of
