@@ -34,6 +34,7 @@
 #include "rebel/chrome/browser/prism/prism.h"
 #include "rebel/components/ukm/prism_buildflags.h"
 #include "net/base/request_priority.h"
+#include "third_party/blink/common/loader/network_utils.cc"
 #endif
 
 namespace predictors {
@@ -266,6 +267,8 @@ void PrefetchManager::PrefetchUrl(
 
   request.load_flags = net::LOAD_PREFETCH;
 #if BUILDFLAG(REBEL_BROWSER)
+  blink::network_utils::SetAcceptHeader(request.headers, job->destination);
+
   DCHECK(job->network_anonymization_key.allowCredentials().has_value());
 
   if (job->network_anonymization_key.allowCredentials().has_value()) {
