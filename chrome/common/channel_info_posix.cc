@@ -143,7 +143,7 @@ std::string GetDesktopName(base::Environment* env) {
       return "google-chrome.desktop";
   }
 #elif BUILDFLAG(REBEL_BROWSER)
-  return REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME_PATH) ".desktop";
+  return REBEL_STRING_BUILDFLAG(REBEL_BROWSER_NAME) ".desktop";
 #else  // BUILDFLAG(CHROMIUM_BRANDING)
   // Allow $CHROME_DESKTOP to override the built-in value, so that development
   // versions can set themselves as the default without interfering with

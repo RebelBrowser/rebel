@@ -94,7 +94,7 @@ bool GetDefaultUserDataDirectory(base::FilePath* result) {
 #elif BUILDFLAG(GOOGLE_CHROME_BRANDING)
   std::string data_dir_basename = "google-chrome";
 #elif BUILDFLAG(REBEL_BROWSER)
-  std::string data_dir_basename = BUILDFLAG(REBEL_BROWSER_NAME_PATH);
+  std::string data_dir_basename = BUILDFLAG(REBEL_BROWSER_NAME);
 #else
   std::string data_dir_basename = "chromium";
 #endif
