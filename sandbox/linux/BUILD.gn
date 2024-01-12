@@ -11,6 +11,8 @@ if (is_android) {
   import("//build/config/android/rules.gni")
 }
 
+import("//rebel/rebel.gni")
+
 declare_args() {
   compile_suid_client = is_linux || is_chromeos
 
@@ -296,6 +298,10 @@ if (is_linux || is_chromeos) {
       "suid/process_util_linux.c",
       "suid/sandbox.c",
     ]
+
+    if (is_rebel_based) {
+      output_name = "${rebel_browser_name}_sandbox"
+    }
 
     cflags = [
       # For ULLONG_MAX

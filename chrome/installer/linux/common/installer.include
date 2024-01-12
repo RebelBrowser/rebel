@@ -399,6 +399,13 @@ stage_install_common() {
     exit 1
   fi
 
+#if BUILDFLAG(REBEL_BROWSER)
+  # Rebel: The iteration below may contain files with spaces in their name,
+  # which by default results in the `for` loop seeing the space-separated parts
+  # of those files as separate files.
+  IFS=$'\n'
+#endif
+
   # Verify file permissions.
   for file in $(find "${STAGEDIR}" -mindepth 1); do
     local actual_perms=$(stat -c "%a" "${file}")

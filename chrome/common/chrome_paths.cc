@@ -64,7 +64,7 @@ const base::FilePath::CharType kFilepathSinglePrefExtensions[] =
     FILE_PATH_LITERAL("/usr/share/google-chrome/extensions");
 #elif BUILDFLAG(REBEL_BROWSER)
     FILE_PATH_LITERAL("/usr/share/" REBEL_STRING_BUILDFLAG(
-        REBEL_BROWSER_NAME_PATH) "/extensions");
+        REBEL_BROWSER_NAME) "/extensions");
 #else
     FILE_PATH_LITERAL("/usr/share/chromium/extensions");
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -617,7 +617,7 @@ bool PathProvider(int key, base::FilePath* result) {
           FILE_PATH_LITERAL("/etc/opt/chrome/native-messaging-hosts"));
 #elif BUILDFLAG(REBEL_BROWSER)
       cur = base::FilePath(FILE_PATH_LITERAL("/etc/" REBEL_STRING_BUILDFLAG(
-          REBEL_BROWSER_NAME_PATH) "/native-messaging-hosts"));
+          REBEL_BROWSER_NAME) "/native-messaging-hosts"));
 #else
       cur = base::FilePath(
           FILE_PATH_LITERAL("/etc/chromium/native-messaging-hosts"));

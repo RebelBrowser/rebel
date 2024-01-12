@@ -1884,6 +1884,10 @@ if (is_linux || is_chromeos) {
     extract_symbols("chrome_symbols") {
       binary = "$root_out_dir/chrome"
 
+      if (is_rebel_based) {
+        binary = "$root_out_dir/$rebel_browser_name"
+      }
+
       if (current_cpu == "x86") {
         # GYP used "ia32" so keep that naming for back-compat.
         symbol_file = "$root_out_dir/chrome.breakpad.ia32"
