@@ -4,14 +4,9 @@
 
 #include "rebel/chrome/renderer/ntp/remote_ntp.h"
 
-#include "base/functional/bind.h"
-#include "base/strings/utf_string_conversions.h"
 #include "content/public/renderer/render_frame.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
-#include "third_party/blink/public/common/associated_interfaces/associated_interface_registry.h"
-#include "third_party/blink/public/web/web_document.h"
-#include "third_party/blink/public/web/web_local_frame.h"
 #include "url/gurl.h"
 
 #include "rebel/chrome/renderer/ntp/remote_ntp_extension.h"
@@ -133,47 +128,12 @@ void RemoteNtp::OpenAutocompleteMatch(uint32_t index,
                                             ctrl_key, meta_key, shift_key);
 }
 
-const rebel::RemoteNtpBackgroundCollectionList&
-RemoteNtp::GetBackgroundCollections() const {
-  return background_collections_;
-}
-
-const rebel::RemoteNtpBackgroundImageMap& RemoteNtp::GetBackgroundImages()
-    const {
-  return background_images_;
-}
-
 const rebel::mojom::RemoteNtpThemePtr& RemoteNtp::GetTheme() const {
   return theme_;
 }
 
-void RemoteNtp::LoadBackgroundCollections() {
-  remote_ntp_router_->LoadBackgroundCollections();
-}
-
-void RemoteNtp::LoadBackgroundImages(const std::string& collection_id) {
-  remote_ntp_router_->LoadBackgroundImages(collection_id);
-}
-
-void RemoteNtp::SetBackgroundImage(const std::string& collection_id,
-                                   rebel::mojom::BackgroundImagePtr image) {
-  remote_ntp_router_->SetBackgroundImage(collection_id, std::move(image));
-}
-
-void RemoteNtp::SelectLocalBackgroundImage() {
-  remote_ntp_router_->SelectLocalBackgroundImage();
-}
-
-void RemoteNtp::PreviewColor(SkColor color) {
-  remote_ntp_router_->PreviewColor(color);
-}
-
-void RemoteNtp::RevertColor() {
-  remote_ntp_router_->RevertColor();
-}
-
-void RemoteNtp::CommitColor() {
-  remote_ntp_router_->CommitColor();
+void RemoteNtp::ShowOrHideCustomizeMenu() {
+  remote_ntp_router_->ShowOrHideCustomizeMenu();
 }
 
 const rebel::RemoteNtpWiFiStatusList& RemoteNtp::GetWiFiStatus() const {
@@ -212,33 +172,6 @@ void RemoteNtp::AutocompleteResultChanged(
 
   if (can_run_js_in_renderframe_) {
     RemoteNtpExtension::DispatchAutocompleteResultChanged(
-        render_frame()->GetWebFrame());
-  }
-}
-
-void RemoteNtp::BackgroundCollectionsChanged(
-    rebel::RemoteNtpBackgroundCollectionList collections) {
-  background_collections_ = std::move(collections);
-
-  if (can_run_js_in_renderframe_) {
-    RemoteNtpExtension::DispatchBackgroundCollectionsChanged(
-        render_frame()->GetWebFrame());
-  }
-}
-
-void RemoteNtp::BackgroundImagesChanged(
-    rebel::RemoteNtpBackgroundImageMap images) {
-  background_images_ = std::move(images);
-
-  if (can_run_js_in_renderframe_) {
-    RemoteNtpExtension::DispatchBackgroundImagesChanged(
-        render_frame()->GetWebFrame());
-  }
-}
-
-void RemoteNtp::LocalBackgroundImageSelected() {
-  if (can_run_js_in_renderframe_) {
-    RemoteNtpExtension::DispatchLocalBackgroundImageSelected(
         render_frame()->GetWebFrame());
   }
 }

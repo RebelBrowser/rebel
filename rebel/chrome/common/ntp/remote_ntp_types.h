@@ -7,8 +7,6 @@
 
 #include <vector>
 
-#include "base/containers/flat_map.h"
-
 #include "rebel/chrome/common/ntp/remote_ntp.mojom-forward.h"
 
 // Mojo doesn't support type aliases, so long type names used by RemoteNTP are
@@ -16,16 +14,6 @@
 namespace rebel {
 
 using RemoteNtpTileList = std::vector<rebel::mojom::RemoteNtpTilePtr>;
-
-using RemoteNtpBackgroundCollectionList =
-    std::vector<rebel::mojom::BackgroundCollectionPtr>;
-
-using RemoteNtpBackgroundImageList =
-    std::vector<rebel::mojom::BackgroundImagePtr>;
-
-using RemoteNtpBackgroundImageMap =
-    base::flat_map<std::string, RemoteNtpBackgroundImageList>;
-
 using RemoteNtpWiFiStatusList = std::vector<rebel::mojom::WiFiStatusPtr>;
 
 }  // namespace rebel

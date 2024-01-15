@@ -14,9 +14,7 @@
 #include "components/favicon_base/favicon_url_parser.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
-#include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_context.h"
-#include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/notification_service.h"
 #include "content/public/browser/notification_types.h"
@@ -26,6 +24,7 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
 #if !BUILDFLAG(IS_ANDROID)
+#include "chrome/browser/ui/webui/new_tab_page/untrusted_source.h"
 #include "chrome/browser/ui/webui/theme_source.h"
 #endif
 
@@ -79,6 +78,8 @@ RemoteNtpServiceImpl::RemoteNtpServiceImpl(Profile* profile)
 #if !BUILDFLAG(IS_ANDROID)
   content::URLDataSource::Add(profile_,
                               std::make_unique<ThemeSource>(profile_));
+  content::URLDataSource::Add(profile_,
+                              std::make_unique<UntrustedSource>(profile_));
 #endif
 }
 
@@ -238,28 +239,6 @@ void RemoteNtpServiceImpl::Shutdown() {
 #endif
 
   RemoteNtpService::Shutdown();
-}
-
-void RemoteNtpServiceImpl::FetchBackgroundCollections() {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->FetchBackgroundCollections();
-#endif
-}
-
-void RemoteNtpServiceImpl::FetchBackgroundImages(
-    const std::string& collection_id) {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->FetchBackgroundImages(collection_id);
-#endif
-}
-
-void RemoteNtpServiceImpl::StoreBackgroundImage(
-    const std::string& collection_id,
-    rebel::mojom::BackgroundImagePtr image) {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->StoreBackgroundImage(collection_id,
-                                                   std::move(image));
-#endif
 }
 
 rebel::mojom::RemoteNtpThemePtr RemoteNtpServiceImpl::CreateTheme() {

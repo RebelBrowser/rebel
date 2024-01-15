@@ -12,7 +12,6 @@
 #include "base/memory/raw_ptr.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_search_provider.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
-#include "rebel/chrome/browser/ntp/remote_ntp_theme_delegate.h"
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_router.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom-forward.h"
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
@@ -29,7 +28,6 @@ class Profile;
 namespace rebel {
 
 class RemoteNtpBridge;
-class RemoteNtpThemeProvider;
 
 // This is the browser-side, per-tab implementation of the RemoteNTP API.
 class RemoteNtpTabHelper
@@ -37,7 +35,6 @@ class RemoteNtpTabHelper
       public content::WebContentsUserData<RemoteNtpTabHelper>,
       public rebel::RemoteNtpRouter::Delegate,
       public rebel::RemoteNtpSearchProvider::Delegate,
-      public rebel::RemoteNtpThemeDelegate,
       public rebel::RemoteNtpService::Observer {
  public:
   ~RemoteNtpTabHelper() override;
@@ -84,29 +81,15 @@ class RemoteNtpTabHelper
                                bool ctrl_key,
                                bool meta_key,
                                bool shift_key) override;
-  void OnLoadBackgroundCollections() override;
-  void OnLoadBackgroundImages(const std::string& collection_id) override;
-  void OnSetBackgroundImage(const std::string& collection_id,
-                            rebel::mojom::BackgroundImagePtr image) override;
-  void OnSelectLocalBackgroundImage() override;
-  void OnPreviewColor(SkColor color) override;
-  void OnRevertColor() override;
-  void OnCommitColor() override;
+  void OnShowOrHideCustomizeMenu() override;
   void OnUpdateWiFiStatus() override;
 
   // Overriden from rebel::RemoteNtpSearchProvider::Delegate:
   void OnAutocompleteResultChanged(
       rebel::mojom::AutocompleteResultPtr result) override;
 
-  // Overriden from rebel::RemoteNtpThemeDelegate:
-  void OnLocalBackgroundImageSelected() override;
-
   // Overridden from rebel::RemoteNtpService::Observer:
   void OnNtpTilesChanged(const rebel::RemoteNtpTileList& ntp_tiles) override;
-  void OnBackgroundCollectionsChanged(
-      const rebel::RemoteNtpBackgroundCollectionList& collections) override;
-  void OnBackgroundImagesChanged(
-      const rebel::RemoteNtpBackgroundImageMap& images) override;
   void OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) override;
   void OnWiFiStatusChanged(
       const rebel::RemoteNtpWiFiStatusList& status) override;
@@ -119,8 +102,6 @@ class RemoteNtpTabHelper
 
 #if BUILDFLAG(IS_ANDROID)
   raw_ptr<rebel::RemoteNtpBridge> remote_ntp_bridge_;
-#else
-  std::unique_ptr<rebel::RemoteNtpThemeProvider> remote_ntp_theme_provider_;
 #endif
 
   friend class content::WebContentsUserData<RemoteNtpTabHelper>;

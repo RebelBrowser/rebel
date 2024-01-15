@@ -13,7 +13,6 @@
 #include "content/public/renderer/render_frame_observer_tracker.h"
 #include "mojo/public/cpp/bindings/associated_receiver.h"
 #include "mojo/public/cpp/bindings/associated_remote.h"
-#include "third_party/skia/include/core/SkColor.h"
 
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
@@ -61,18 +60,8 @@ class RemoteNtp : public content::RenderFrameObserver,
                              bool meta_key,
                              bool shift_key);
 
-  const rebel::RemoteNtpBackgroundCollectionList& GetBackgroundCollections()
-      const;
-  const rebel::RemoteNtpBackgroundImageMap& GetBackgroundImages() const;
   const rebel::mojom::RemoteNtpThemePtr& GetTheme() const;
-  void LoadBackgroundCollections();
-  void LoadBackgroundImages(const std::string& collection_id);
-  void SetBackgroundImage(const std::string& collection_id,
-                          rebel::mojom::BackgroundImagePtr image);
-  void SelectLocalBackgroundImage();
-  void PreviewColor(SkColor color);
-  void RevertColor();
-  void CommitColor();
+  void ShowOrHideCustomizeMenu();
 
   const rebel::RemoteNtpWiFiStatusList& GetWiFiStatus() const;
   void UpdateWiFiStatus();
@@ -90,11 +79,6 @@ class RemoteNtp : public content::RenderFrameObserver,
   void NtpTilesChanged(rebel::RemoteNtpTileList tiles) override;
   void AutocompleteResultChanged(
       rebel::mojom::AutocompleteResultPtr result) override;
-  void BackgroundCollectionsChanged(
-      rebel::RemoteNtpBackgroundCollectionList collections) override;
-  void BackgroundImagesChanged(
-      rebel::RemoteNtpBackgroundImageMap images) override;
-  void LocalBackgroundImageSelected() override;
   void ThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) override;
   void WiFiStatusChanged(rebel::RemoteNtpWiFiStatusList status) override;
 
@@ -119,8 +103,6 @@ class RemoteNtp : public content::RenderFrameObserver,
 
   rebel::mojom::AutocompleteResultPtr autocomplete_result_;
 
-  rebel::RemoteNtpBackgroundCollectionList background_collections_;
-  rebel::RemoteNtpBackgroundImageMap background_images_;
   rebel::mojom::RemoteNtpThemePtr theme_;
 
   rebel::RemoteNtpWiFiStatusList wifi_status_;

@@ -108,12 +108,15 @@
       </customize-chrome-appearance>
     </div>
     <hr class="sp-cards-separator">
+<if expr="not _rebel_based">
+  <!-- Rebel: Our NTP does not allow customizing shortcuts through this page. -->
     <div id="shortcuts" class="section sp-card">
       <sp-heading hide-back-button>
         <h2 slot="heading">$i18n{shortcutsHeader}</h2>
       </sp-heading>
       <customize-chrome-shortcuts></customize-chrome-shortcuts>
     </div>
+</if>
     <template is="dom-if" if="[[modulesEnabled_]]">
       <hr class="sp-cards-separator">
       <div id="modules" class="section sp-card">

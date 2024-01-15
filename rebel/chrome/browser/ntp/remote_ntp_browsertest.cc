@@ -15,6 +15,8 @@
 #include "base/threading/thread_restrictions.h"
 #include "chrome/browser/extensions/extension_browsertest.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/search/background/ntp_custom_background_service.h"
+#include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/themes/test/theme_service_changed_waiter.h"
 #include "chrome/browser/themes/theme_service.h"
@@ -480,12 +482,7 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpTest, RemoteNtpApiExposesStaticFunctions) {
       {"rebel.search.stopAutocomplete", ""},
       {"rebel.search.openAutocompleteMatch",
        "0, \"https://a.com\", false, false, false, false, false"},
-      {"rebel.theme.loadBackgroundCollections", ""},
-      {"rebel.theme.loadBackgroundImages", "\"a\""},
-      {"rebel.theme.setBackgroundImage", "\"a\", \"b\", \"c\", \"d\", \"e\""},
-      {"rebel.theme.previewColor", "[0, 0, 0, 0]"},
-      {"rebel.theme.revertColor", ""},
-      {"rebel.theme.commitColor", ""},
+      {"rebel.theme.showOrHideCustomizeMenu", ""},
   };
 
   for (const TestCase& test_case : test_cases) {
@@ -1482,13 +1479,12 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, SetBackgroundImage) {
   const std::string attribution_line_2("Attribution 2");
   const GURL attribution_url("https://viasat.com");
 
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.setBackgroundImage(\"%s\","
-                         " \"%s\", \"%s\", \"%s\", \"%s\")",
-                         collection_id.c_str(), image_url.spec().c_str(),
-                         attribution_line_1.c_str(), attribution_line_2.c_str(),
-                         attribution_url.spec().c_str())));
+  auto* background_service =
+      NtpCustomBackgroundServiceFactory::GetForProfile(browser()->profile());
+  background_service->AddValidBackdropUrlForTesting(image_url);
+  background_service->SetCustomBackgroundInfo(
+      image_url, image_url, attribution_line_1, attribution_line_2,
+      attribution_url, collection_id);
 
   observer.WaitForBackgroundImage(image_url);
 
@@ -1511,23 +1507,20 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ResetBackgroundImageToDefault) {
   const std::string attribution_line_2("Attribution 2");
   const GURL attribution_url("https://viasat.com");
 
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.setBackgroundImage(\"%s\","
-                         " \"%s\", \"%s\", \"%s\", \"%s\")",
-                         collection_id.c_str(), image_url.spec().c_str(),
-                         attribution_line_1.c_str(), attribution_line_2.c_str(),
-                         attribution_url.spec().c_str())));
+  auto* background_service =
+      NtpCustomBackgroundServiceFactory::GetForProfile(browser()->profile());
+  background_service->AddValidBackdropUrlForTesting(image_url);
+  background_service->SetCustomBackgroundInfo(
+      image_url, image_url, attribution_line_1, attribution_line_2,
+      attribution_url, collection_id);
+
   observer.WaitForBackgroundImage(image_url);
 
   ValidateBackground(active_tab, collection_id, image_url, "center center",
                      "no-repeat", attribution_line_1, attribution_line_2,
                      attribution_url, GURL());
 
-  // Reset the background image to its default values
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      "rebel.theme.setBackgroundImage(\"\", \"\", \"\", \"\", \"\")"));
+  background_service->ResetCustomBackgroundInfo();
   observer.WaitForBackgroundImage(GURL());
 
   ValidateBackground(active_tab, "", GURL(), "", "", "", "", GURL(), GURL());
@@ -1546,41 +1539,18 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, InvalidBackgroundImage) {
   const std::string attribution_line_2("Attribution 2");
   const GURL attribution_url("https://viasat.com");
 
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.setBackgroundImage(\"%s\","
-                         " \"%s\", \"%s\", \"%s\", \"%s\")",
-                         collection_id.c_str(), image_url.spec().c_str(),
-                         attribution_line_1.c_str(), attribution_line_2.c_str(),
-                         attribution_url.spec().c_str())));
+  auto* background_service =
+      NtpCustomBackgroundServiceFactory::GetForProfile(browser()->profile());
+  background_service->SetCustomBackgroundInfo(
+      image_url, image_url, attribution_line_1, attribution_line_2,
+      attribution_url, collection_id);
+
   observer.WaitForBackgroundImage(image_url);
 
   ValidateBackground(active_tab, "", GURL(), "", "", "", "", GURL(), GURL());
 }
 
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorPreview) {
-  rebel::RemoteNtpService* remote_ntp_service =
-      rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
-  TestRemoteNtpServiceObserver observer(remote_ntp_service);
-
-  content::WebContents* active_tab = OpenNewTab();
-
-  const SkColor color = SkColorSetARGB(1, 2, 3, 4);
-
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.previewColor([%u, %u, %u, %u])",
-                         SkColorGetR(color), SkColorGetG(color),
-                         SkColorGetB(color), SkColorGetA(color))));
-  observer.WaitForThemeColor(0);
-
-  EXPECT_EQ(0, content::EvalJs(active_tab, "ntpColors.colorId"));
-  ValidateColor(active_tab, "ntpColors.color", color);
-  ValidateColor(active_tab, "ntpColors.colorDark");
-  ValidateColor(active_tab, "ntpColors.colorLight");
-}
-
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorExplicitRevert) {
+IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, SetColor) {
   rebel::RemoteNtpService* remote_ntp_service =
       rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
   TestRemoteNtpServiceObserver observer(remote_ntp_service);
@@ -1590,29 +1560,19 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorExplicitRevert) {
   // Set a valid theme color
   const SkColor color = SkColorSetARGB(1, 2, 3, 4);
 
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.previewColor([%u, %u, %u, %u])",
-                         SkColorGetR(color), SkColorGetG(color),
-                         SkColorGetB(color), SkColorGetA(color))));
+  auto* theme_service =
+      ThemeServiceFactory::GetForProfile(browser()->profile());
+  theme_service->BuildAutogeneratedThemeFromColor(color);
+
   observer.WaitForThemeColor(0);
 
   EXPECT_EQ(0, content::EvalJs(active_tab, "ntpColors.colorId"));
   ValidateColor(active_tab, "ntpColors.color", color);
   ValidateColor(active_tab, "ntpColors.colorDark");
   ValidateColor(active_tab, "ntpColors.colorLight");
-
-  // Reset the background image to its default values
-  EXPECT_TRUE(content::ExecJs(active_tab, "rebel.theme.revertColor()"));
-  observer.WaitForThemeColor(-1);
-
-  EXPECT_EQ(-1, content::EvalJs(active_tab, "ntpColors.colorId"));
-  ValidateColor(active_tab, "ntpColors.color", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorDark", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorLight", SK_ColorTRANSPARENT);
 }
 
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorImplicitRevert) {
+IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ResetColorToDefault) {
   rebel::RemoteNtpService* remote_ntp_service =
       rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
   TestRemoteNtpServiceObserver observer(remote_ntp_service);
@@ -1622,11 +1582,10 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorImplicitRevert) {
   // Set a valid theme color
   const SkColor color = SkColorSetARGB(1, 2, 3, 4);
 
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.previewColor([%u, %u, %u, %u])",
-                         SkColorGetR(color), SkColorGetG(color),
-                         SkColorGetB(color), SkColorGetA(color))));
+  auto* theme_service =
+      ThemeServiceFactory::GetForProfile(browser()->profile());
+  theme_service->BuildAutogeneratedThemeFromColor(color);
+
   observer.WaitForThemeColor(0);
 
   EXPECT_EQ(0, content::EvalJs(active_tab, "ntpColors.colorId"));
@@ -1634,93 +1593,7 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorImplicitRevert) {
   ValidateColor(active_tab, "ntpColors.colorDark");
   ValidateColor(active_tab, "ntpColors.colorLight");
 
-  // Open a new tab and close the original
-  content::WebContents* new_tab = OpenNewTab();
-  active_tab->Close();
-
-  EXPECT_TRUE(content::ExecJs(new_tab, "rebel.theme.revertColor()"));
-  observer.WaitForThemeColor(-1);
-
-  EXPECT_EQ(-1, content::EvalJs(new_tab, "ntpColors.colorId"));
-  ValidateColor(new_tab, "ntpColors.color", SK_ColorTRANSPARENT);
-  ValidateColor(new_tab, "ntpColors.colorDark", SK_ColorTRANSPARENT);
-  ValidateColor(new_tab, "ntpColors.colorLight", SK_ColorTRANSPARENT);
-}
-
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ColorCommit) {
-  rebel::RemoteNtpService* remote_ntp_service =
-      rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
-  TestRemoteNtpServiceObserver observer(remote_ntp_service);
-
-  content::WebContents* active_tab = OpenNewTab();
-
-  // Set a valid theme color
-  const SkColor color = SkColorSetARGB(1, 2, 3, 4);
-
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.previewColor([%u, %u, %u, %u])",
-                         SkColorGetR(color), SkColorGetG(color),
-                         SkColorGetB(color), SkColorGetA(color))));
-  observer.WaitForThemeColor(0);
-
-  EXPECT_EQ(0, content::EvalJs(active_tab, "ntpColors.colorId"));
-  ValidateColor(active_tab, "ntpColors.color", color);
-  ValidateColor(active_tab, "ntpColors.colorDark");
-  ValidateColor(active_tab, "ntpColors.colorLight");
-
-  // Commit the theme color
-  EXPECT_TRUE(content::ExecJs(active_tab, "rebel.theme.commitColor()"));
-
-  // Open a new tab and close the original
-  content::WebContents* new_tab = OpenNewTab();
-  active_tab->Close();
-
-  observer.WaitForThemeColor(0);
-
-  EXPECT_EQ(0, content::EvalJs(new_tab, "ntpColors.colorId"));
-  ValidateColor(new_tab, "ntpColors.color", color);
-  ValidateColor(new_tab, "ntpColors.colorDark");
-  ValidateColor(new_tab, "ntpColors.colorLight");
-}
-
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, InvalidColor) {
-  rebel::RemoteNtpService* remote_ntp_service =
-      rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
-  TestRemoteNtpServiceObserver observer(remote_ntp_service);
-
-  content::WebContents* active_tab = OpenNewTab();
-
-  // Bad type
-  EXPECT_TRUE(content::ExecJs(active_tab, "rebel.theme.previewColor(\"0\")"));
-  observer.WaitForThemeColor(-1);
-
-  EXPECT_EQ(-1, content::EvalJs(active_tab, "ntpColors.colorId"));
-  ValidateColor(active_tab, "ntpColors.color", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorDark", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorLight", SK_ColorTRANSPARENT);
-
-  // Empty array
-  EXPECT_TRUE(content::ExecJs(active_tab, "rebel.theme.previewColor([])"));
-  observer.WaitForThemeColor(-1);
-
-  EXPECT_EQ(-1, content::EvalJs(active_tab, "ntpColors.colorId"));
-  ValidateColor(active_tab, "ntpColors.color", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorDark", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorLight", SK_ColorTRANSPARENT);
-
-  // Wrong array size
-  EXPECT_TRUE(content::ExecJs(active_tab, "rebel.theme.previewColor([1, 2])"));
-  observer.WaitForThemeColor(-1);
-
-  EXPECT_EQ(-1, content::EvalJs(active_tab, "ntpColors.colorId"));
-  ValidateColor(active_tab, "ntpColors.color", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorDark", SK_ColorTRANSPARENT);
-  ValidateColor(active_tab, "ntpColors.colorLight", SK_ColorTRANSPARENT);
-
-  // Wrong type in array
-  EXPECT_TRUE(content::ExecJs(active_tab,
-                              "rebel.theme.previewColor([0, 0, 0, \"0\"])"));
+  theme_service->UseDefaultTheme();
   observer.WaitForThemeColor(-1);
 
   EXPECT_EQ(-1, content::EvalJs(active_tab, "ntpColors.colorId"));
@@ -1761,80 +1634,6 @@ IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, ThirdPartyThemeWithAttribution) {
 
   ValidateBackground(active_tab, "", image_url, "center center", "no-repeat",
                      "", "", GURL(), attribution_image_url);
-}
-
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest, BackgroundImageOverridesThirdParty) {
-  rebel::RemoteNtpService* remote_ntp_service =
-      rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
-  TestRemoteNtpServiceObserver observer(remote_ntp_service);
-
-  content::WebContents* active_tab = OpenNewTab();
-
-  const std::string collection_id("Viasat");
-  const GURL image_url("https://viasat.com/logo.png");
-  const std::string attribution_line_1("Attribution 1");
-  const std::string attribution_line_2("Attribution 2");
-  const GURL attribution_url("https://viasat.com");
-
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.setBackgroundImage(\"%s\","
-                         " \"%s\", \"%s\", \"%s\", \"%s\")",
-                         collection_id.c_str(), image_url.spec().c_str(),
-                         attribution_line_1.c_str(), attribution_line_2.c_str(),
-                         attribution_url.spec().c_str())));
-  observer.WaitForBackgroundImage(image_url);
-
-  ASSERT_NO_FATAL_FAILURE(InstallTheme("theme", "camo theme"));
-  observer.WaitForBackgroundImage(image_url);
-
-  ValidateBackground(active_tab, collection_id, image_url, "center center",
-                     "no-repeat", attribution_line_1, attribution_line_2,
-                     attribution_url, GURL());
-}
-
-IN_PROC_BROWSER_TEST_F(RemoteNtpThemeTest,
-                       ResetBackgroundImageToDefaultRestoresThirdParty) {
-  rebel::RemoteNtpService* remote_ntp_service =
-      rebel::RemoteNtpServiceFactory::GetForProfile(browser()->profile());
-  TestRemoteNtpServiceObserver observer(remote_ntp_service);
-
-  content::WebContents* active_tab = OpenNewTab();
-
-  // Set the background image to a valid background
-  const std::string collection_id("Viasat");
-  const GURL image_url("https://viasat.com/logo.png");
-  const std::string attribution_line_1("Attribution 1");
-  const std::string attribution_line_2("Attribution 2");
-  const GURL attribution_url("https://viasat.com");
-
-  const GURL thid_party_image_url(
-      "chrome-search://theme/IDR_THEME_NTP_BACKGROUND");
-
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      base::StringPrintf("rebel.theme.setBackgroundImage(\"%s\","
-                         " \"%s\", \"%s\", \"%s\", \"%s\")",
-                         collection_id.c_str(), image_url.spec().c_str(),
-                         attribution_line_1.c_str(), attribution_line_2.c_str(),
-                         attribution_url.spec().c_str())));
-  observer.WaitForBackgroundImage(image_url);
-
-  ASSERT_NO_FATAL_FAILURE(InstallTheme("theme", "camo theme"));
-  observer.WaitForBackgroundImage(image_url);
-
-  ValidateBackground(active_tab, collection_id, image_url, "center center",
-                     "no-repeat", attribution_line_1, attribution_line_2,
-                     attribution_url, GURL());
-
-  // Reset the background image to its default values
-  EXPECT_TRUE(content::ExecJs(
-      active_tab,
-      "rebel.theme.setBackgroundImage(\"\", \"\", \"\", \"\", \"\")"));
-  observer.WaitForBackgroundImage(thid_party_image_url);
-
-  ValidateBackground(active_tab, "", thid_party_image_url, "center center",
-                     "no-repeat", "", "", GURL(), GURL());
 }
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)

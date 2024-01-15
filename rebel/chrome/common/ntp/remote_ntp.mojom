@@ -42,20 +42,6 @@ struct AutocompleteResult {
   array<AutocompleteMatch> matches;
 };
 
-struct BackgroundCollection {
-  string collection_id;
-  string collection_name;
-  url.mojom.Url preview_image_url;
-};
-
-struct BackgroundImage {
-  url.mojom.Url image_url;
-  url.mojom.Url thumbnail_url;
-  string attribution_line_1;
-  string attribution_line_2;
-  url.mojom.Url attribution_url;
-};
-
 struct RemoteNtpTheme {
   // System theme settings.
   bool dark_mode_enabled;
@@ -130,13 +116,7 @@ interface RemoteNtp {
                         bool meta_key,
                         bool shift_key);
 
-  LoadBackgroundCollections();
-  LoadBackgroundImages(string collection_id);
-  SetBackgroundImage(string collection_id, BackgroundImage? background_image);
-  SelectLocalBackgroundImage();
-  PreviewColor(uint32 color);
-  RevertColor();
-  CommitColor();
+  ShowOrHideCustomizeMenu();
 
   UpdateWiFiStatus();
 };
@@ -148,11 +128,6 @@ interface RemoteNtpClient {
   AutocompleteResultChanged(AutocompleteResult result);
 
   ThemeChanged(RemoteNtpTheme theme);
-  BackgroundCollectionsChanged(
-      array<BackgroundCollection> background_collections);
-  BackgroundImagesChanged(
-      map<string, array<BackgroundImage>> background_images);
-  LocalBackgroundImageSelected();
 
   WiFiStatusChanged(array<WiFiStatus> status);
 };

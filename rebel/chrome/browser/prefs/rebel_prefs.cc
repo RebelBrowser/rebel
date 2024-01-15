@@ -15,8 +15,6 @@
 #include "components/ntp_tiles/custom_links_manager_impl.h"
 #else
 #include "components/ntp_tiles/popular_sites_impl.h"
-
-#include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
 #endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
@@ -47,7 +45,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   ntp_tiles::CustomLinksManagerImpl::RegisterProfilePrefs(registry);
 #else
   ntp_tiles::PopularSitesImpl::RegisterProfilePrefs(registry);
-  rebel::RemoteNtpThemeProvider::RegisterProfilePrefs(registry);
 #endif
 }
 
