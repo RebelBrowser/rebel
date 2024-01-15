@@ -22,6 +22,7 @@
 #include "rebel/chrome/browser/ntp/remote_ntp_service_impl.h"
 #endif
 
+#include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_prefs.h"
 #include "rebel/grit/rebel_resources.h"
 #include "rebel/services/network/remote_ntp_api_allow_list.h"
@@ -156,8 +157,6 @@ void RemoteNtpService::OnNewTabPageOpened() {
     NotifyAboutNtpTiles();
   }
 
-  NotifyAboutBackgroundCollections();
-  NotifyAboutBackgroundImages();
   NotifyAboutTheme();
 }
 
@@ -180,28 +179,6 @@ void RemoteNtpService::EditCustomTile(const GURL& old_tile_url,
   if (most_visited_) {
     most_visited_->UpdateCustomLink(old_tile_url, new_tile_url, new_tile_title);
   }
-}
-
-void RemoteNtpService::LoadBackgroundCollections() {
-  if (background_collections_.empty()) {
-    FetchBackgroundCollections();
-  } else {
-    NotifyAboutBackgroundCollections();
-  }
-}
-
-void RemoteNtpService::LoadBackgroundImages(const std::string& collection_id) {
-  if (background_images_.find(collection_id) == background_images_.end()) {
-    FetchBackgroundImages(collection_id);
-  } else {
-    NotifyAboutBackgroundImages();
-  }
-}
-
-void RemoteNtpService::SetBackgroundImage(
-    const std::string& collection_id,
-    rebel::mojom::BackgroundImagePtr image) {
-  StoreBackgroundImage(collection_id, std::move(image));
 }
 
 void RemoteNtpService::SetDarkModeEnabled(bool dark_mode_enabled) {
@@ -250,19 +227,6 @@ void RemoteNtpService::OnURLsAvailable(
 
 void RemoteNtpService::OnIconMadeAvailable(const GURL& site_url) {}
 
-void RemoteNtpService::OnBackgroundCollectionsAvailable(
-    rebel::RemoteNtpBackgroundCollectionList collections) {
-  background_collections_ = std::move(collections);
-  NotifyAboutBackgroundCollections();
-}
-
-void RemoteNtpService::OnBackgroundImagesAvailable(
-    const std::string& collection,
-    rebel::RemoteNtpBackgroundImageList images) {
-  background_images_[collection] = std::move(images);
-  NotifyAboutBackgroundImages();
-}
-
 void RemoteNtpService::OnThemeUpdated() {
   theme_ = CreateTheme();
   NotifyAboutTheme();
@@ -291,18 +255,6 @@ void RemoteNtpService::OnIconLoadComplete(const GURL& origin, bool successful) {
 void RemoteNtpService::NotifyAboutNtpTiles() {
   for (Observer& observer : observers_) {
     observer.OnNtpTilesChanged(ntp_tiles_);
-  }
-}
-
-void RemoteNtpService::NotifyAboutBackgroundCollections() {
-  for (Observer& observer : observers_) {
-    observer.OnBackgroundCollectionsChanged(background_collections_);
-  }
-}
-
-void RemoteNtpService::NotifyAboutBackgroundImages() {
-  for (Observer& observer : observers_) {
-    observer.OnBackgroundImagesChanged(background_images_);
   }
 }
 

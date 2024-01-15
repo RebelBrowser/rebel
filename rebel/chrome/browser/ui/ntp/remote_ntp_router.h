@@ -10,7 +10,6 @@
 #include "base/memory/raw_ptr.h"
 #include "content/public/browser/web_contents_observer.h"
 #include "mojo/public/cpp/bindings/associated_receiver.h"
-#include "third_party/skia/include/core/SkColor.h"
 
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
@@ -59,29 +58,8 @@ class RemoteNtpRouter : public content::WebContentsObserver,
                                          bool meta_key,
                                          bool shift_key) = 0;
 
-    // Called when the RemoteNTP wants the list of backgrounds collections.
-    virtual void OnLoadBackgroundCollections() = 0;
-
-    // Called when the RemoteNTP wants the images of a background collection.
-    virtual void OnLoadBackgroundImages(const std::string& collection_id) = 0;
-
-    // Called when the RemoteNTP wants to set the background image.
-    virtual void OnSetBackgroundImage(
-        const std::string& collection_id,
-        rebel::mojom::BackgroundImagePtr image) = 0;
-
-    // Called when the RemoteNTP wants to select a local image as the
-    // background image.
-    virtual void OnSelectLocalBackgroundImage() = 0;
-
-    // Called when the RemoteNTP wants to preview a color theme.
-    virtual void OnPreviewColor(SkColor color) = 0;
-
-    // Called when the RemoteNTP wants to revert a color theme.
-    virtual void OnRevertColor() = 0;
-
-    // Called when the RemoteNTP wants to commit a color theme.
-    virtual void OnCommitColor() = 0;
+    // Called when the RemoteNTP wants to show the Customize Chrome panel.
+    virtual void OnShowOrHideCustomizeMenu() = 0;
 
     // Called when the RemoteNTP wants to retrieve the device's WiFi status.
     virtual void OnUpdateWiFiStatus() = 0;
@@ -115,11 +93,6 @@ class RemoteNtpRouter : public content::WebContentsObserver,
   void SendNtpTilesChanged(const rebel::RemoteNtpTileList& ntp_tiles);
   void SendAutocompleteResultChanged(
       rebel::mojom::AutocompleteResultPtr result);
-  void SendBackgroundCollectionsChanged(
-      const rebel::RemoteNtpBackgroundCollectionList& collections);
-  void SendBackgroundImagesChanged(
-      const rebel::RemoteNtpBackgroundImageMap& images);
-  void SendLocalBackgroundImageSelected();
   void SendThemeChanged(rebel::mojom::RemoteNtpThemePtr theme);
   void SendWiFiStatusChanged(const rebel::RemoteNtpWiFiStatusList& status);
 
@@ -145,14 +118,7 @@ class RemoteNtpRouter : public content::WebContentsObserver,
                              bool ctrl_key,
                              bool meta_key,
                              bool shift_key) override;
-  void LoadBackgroundCollections() override;
-  void LoadBackgroundImages(const std::string& collection_id) override;
-  void SetBackgroundImage(const std::string& collection_id,
-                          rebel::mojom::BackgroundImagePtr image) override;
-  void SelectLocalBackgroundImage() override;
-  void PreviewColor(SkColor color) override;
-  void RevertColor() override;
-  void CommitColor() override;
+  void ShowOrHideCustomizeMenu() override;
   void UpdateWiFiStatus() override;
 
   rebel::mojom::RemoteNtpClient* remote_ntp_client() const {

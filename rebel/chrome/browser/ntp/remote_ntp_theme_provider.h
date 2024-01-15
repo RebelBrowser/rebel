@@ -8,63 +8,30 @@
 #include <string>
 
 #include "base/memory/raw_ptr.h"
-#include "base/memory/scoped_refptr.h"
-#include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
-#include "chrome/browser/search/background/ntp_background_service.h"
-#include "chrome/browser/search/background/ntp_background_service_observer.h"
+#include "chrome/browser/search/background/ntp_custom_background_service.h"
+#include "chrome/browser/search/background/ntp_custom_background_service_observer.h"
 #include "chrome/browser/themes/theme_service_observer.h"
-#include "third_party/skia/include/core/SkColor.h"
 #include "ui/native_theme/native_theme.h"
 #include "ui/native_theme/native_theme_observer.h"
-#include "ui/shell_dialogs/select_file_dialog.h"
 
 #include "rebel/chrome/common/ntp/remote_ntp.mojom-forward.h"
 
-class PrefRegistrySimple;
-class PrefService;
 class Profile;
 class ThemeService;
 
 class RemoteNtpThemeTest;
 
-namespace base {
-class FilePath;
-}  // namespace base
-
-namespace chrome_colors {
-class ChromeColorsService;
-}  // namespace chrome_colors
-
-namespace content {
-class WebContents;
-}  // namespace content
-
 namespace rebel {
 
 class RemoteNtpThemeDelegate;
 
-class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
+class RemoteNtpThemeProvider : public NtpCustomBackgroundServiceObserver,
                                public ThemeServiceObserver,
-                               public ui::NativeThemeObserver,
-                               public ui::SelectFileDialog::Listener {
+                               public ui::NativeThemeObserver {
  public:
   RemoteNtpThemeProvider(RemoteNtpThemeDelegate* delegate, Profile* profile);
   ~RemoteNtpThemeProvider() override;
-
-  static void RegisterProfilePrefs(PrefRegistrySimple* registry);
-
-  void FetchBackgroundCollections();
-  void FetchBackgroundImages(const std::string& collection_id);
-  void StoreBackgroundImage(const std::string& collection_id,
-                            rebel::mojom::BackgroundImagePtr image);
-  void SelectLocalBackgroundImage(content::WebContents* tab);
-
-  void PreviewColor(content::WebContents* tab, SkColor color);
-  void RevertColor(content::WebContents* tab);
-  void CommitColor();
-  void ApplyColorToTheme(content::WebContents* tab,
-                         rebel::mojom::RemoteNtpTheme* theme);
 
   rebel::mojom::RemoteNtpThemePtr CreateTheme();
 
@@ -76,22 +43,13 @@ class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
 
   void SetExtensionThemeDetails(const std::string& theme_id,
                                 rebel::mojom::RemoteNtpTheme* theme);
-  void StoreLocalBackgroundImage(bool copy_result);
 
   // Overridden from ui::NativeThemeObserver:
   void OnNativeThemeUpdated(ui::NativeTheme* native_theme) override;
 
-  // Overridden from ui::SelectFileDialog::Listener:
-  void FileSelected(const base::FilePath& path,
-                    int index,
-                    void* params) override;
-  void FileSelectionCanceled(void* params) override;
-
-  // Overridden from NtpBackgroundServiceObserver:
-  void OnCollectionInfoAvailable() override;
-  void OnCollectionImagesAvailable() override;
-  void OnNextCollectionImageAvailable() override;
-  void OnNtpBackgroundServiceShuttingDown() override;
+  // Overridden from NtpCustomBackgroundServiceObserver:
+  void OnCustomBackgroundImageUpdated() override;
+  void OnNtpCustomBackgroundServiceShuttingDown() override;
 
   // Overridden from ThemeServiceObserver:
   void OnThemeChanged() override;
@@ -101,24 +59,18 @@ class RemoteNtpThemeProvider : public NtpBackgroundServiceObserver,
   raw_ptr<RemoteNtpThemeDelegate> delegate_;
 
   raw_ptr<Profile> profile_;
-  raw_ptr<PrefService> pref_service_;
 
   base::ScopedObservation<ui::NativeTheme, ui::NativeThemeObserver>
       theme_observer_;
   raw_ptr<ui::NativeTheme> native_theme_;
   bool dark_mode_enabled_;
 
-  base::ScopedObservation<NtpBackgroundService, NtpBackgroundServiceObserver>
-      background_service_observer_;
-  raw_ptr<NtpBackgroundService> background_service_;
+  base::ScopedObservation<NtpCustomBackgroundService,
+                          NtpCustomBackgroundServiceObserver>
+      custom_background_service_observer_;
+  raw_ptr<NtpCustomBackgroundService> custom_background_service_;
 
   raw_ptr<ThemeService> theme_service_;
-
-  scoped_refptr<ui::SelectFileDialog> select_file_dialog_;
-
-  raw_ptr<chrome_colors::ChromeColorsService> chrome_colors_service_;
-
-  base::WeakPtrFactory<RemoteNtpThemeProvider> weak_factory_;
 };
 
 }  // namespace rebel

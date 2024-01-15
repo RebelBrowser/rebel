@@ -16,6 +16,7 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_finder.h"
+#include "chrome/browser/ui/side_panel/customize_chrome/customize_chrome_tab_helper.h"
 #include "chrome/browser/ui/singleton_tabs.h"
 #include "ui/base/window_open_disposition_utils.h"
 #endif
@@ -25,8 +26,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "rebel/chrome/browser/android/ntp/remote_ntp_bridge.h"
-#else
-#include "rebel/chrome/browser/ntp/remote_ntp_theme_provider.h"
 #endif
 
 namespace rebel {
@@ -40,11 +39,6 @@ RemoteNtpTabHelper::RemoteNtpTabHelper(content::WebContents* web_contents)
   if (remote_ntp_service_) {
     remote_ntp_service_->AddObserver(this);
   }
-
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_ =
-      std::make_unique<rebel::RemoteNtpThemeProvider>(this, profile());
-#endif
 }
 
 RemoteNtpTabHelper::~RemoteNtpTabHelper() {
@@ -77,6 +71,13 @@ void RemoteNtpTabHelper::NavigationEntryCommitted(
       web_contents()->GetPrimaryMainFrame()->GetProcess();
 
   if (process_host && remote_ntp_service_) {
+#if !BUILDFLAG(IS_ANDROID)
+    auto* customize_chrome_tab_helper =
+        CustomizeChromeTabHelper::FromWebContents(web_contents());
+    customize_chrome_tab_helper->CreateAndRegisterEntry();
+    customize_chrome_tab_helper->SetCallback(base::DoNothing());
+#endif
+
     int process_id = process_host->GetID();
 
     if (remote_ntp_service_->IsRemoteNtpProcess(process_id) ||
@@ -106,7 +107,9 @@ void RemoteNtpTabHelper::DidStartNavigation(
 
   if (process_host && remote_ntp_service_ &&
       remote_ntp_service_->IsRemoteNtpProcess(process_host->GetID())) {
-    remote_ntp_theme_provider_->RevertColor(web_contents());
+    auto* customize_chrome_tab_helper =
+        CustomizeChromeTabHelper::FromWebContents(web_contents());
+    customize_chrome_tab_helper->DeregisterEntry();
   }
 #endif
 }
@@ -118,7 +121,9 @@ void RemoteNtpTabHelper::WebContentsDestroyed() {
 
   if (process_host && remote_ntp_service_ &&
       remote_ntp_service_->IsRemoteNtpProcess(process_host->GetID())) {
-    remote_ntp_theme_provider_->RevertColor(web_contents());
+    auto* customize_chrome_tab_helper =
+        CustomizeChromeTabHelper::FromWebContents(web_contents());
+    customize_chrome_tab_helper->DeregisterEntry();
   }
 #endif
 }
@@ -204,48 +209,19 @@ void RemoteNtpTabHelper::OnOpenAutocompleteMatch(uint32_t index,
 #endif
 }
 
-void RemoteNtpTabHelper::OnLoadBackgroundCollections() {
-  if (remote_ntp_service_) {
-    remote_ntp_service_->LoadBackgroundCollections();
+void RemoteNtpTabHelper::OnShowOrHideCustomizeMenu() {
+#if !BUILDFLAG(IS_ANDROID)
+  if (!remote_ntp_service_) {
+    return;
   }
-}
 
-void RemoteNtpTabHelper::OnLoadBackgroundImages(
-    const std::string& collection_id) {
-  if (remote_ntp_service_) {
-    remote_ntp_service_->LoadBackgroundImages(collection_id);
-  }
-}
+  auto* customize_chrome_tab_helper =
+      CustomizeChromeTabHelper::FromWebContents(web_contents());
 
-void RemoteNtpTabHelper::OnSetBackgroundImage(
-    const std::string& collection_id,
-    rebel::mojom::BackgroundImagePtr image) {
-  if (remote_ntp_service_) {
-    remote_ntp_service_->SetBackgroundImage(collection_id, std::move(image));
-  }
-}
+  auto visible = !customize_chrome_tab_helper->IsCustomizeChromeEntryShowing();
 
-void RemoteNtpTabHelper::OnSelectLocalBackgroundImage() {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->SelectLocalBackgroundImage(web_contents());
-#endif
-}
-
-void RemoteNtpTabHelper::OnPreviewColor(SkColor color) {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->PreviewColor(web_contents(), color);
-#endif
-}
-
-void RemoteNtpTabHelper::OnRevertColor() {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->RevertColor(nullptr);
-#endif
-}
-
-void RemoteNtpTabHelper::OnCommitColor() {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->CommitColor();
+  customize_chrome_tab_helper->SetCustomizeChromeSidePanelVisible(
+      visible, CustomizeChromeSection::kUnspecified);
 #endif
 }
 
@@ -266,30 +242,12 @@ void RemoteNtpTabHelper::OnAutocompleteResultChanged(
   remote_ntp_router_.SendAutocompleteResultChanged(std::move(result));
 }
 
-void RemoteNtpTabHelper::OnLocalBackgroundImageSelected() {
-  remote_ntp_router_.SendLocalBackgroundImageSelected();
-}
-
 void RemoteNtpTabHelper::OnNtpTilesChanged(
     const rebel::RemoteNtpTileList& ntp_tiles) {
   remote_ntp_router_.SendNtpTilesChanged(ntp_tiles);
 }
 
-void RemoteNtpTabHelper::OnBackgroundCollectionsChanged(
-    const rebel::RemoteNtpBackgroundCollectionList& collections) {
-  remote_ntp_router_.SendBackgroundCollectionsChanged(collections);
-}
-
-void RemoteNtpTabHelper::OnBackgroundImagesChanged(
-    const rebel::RemoteNtpBackgroundImageMap& images) {
-  remote_ntp_router_.SendBackgroundImagesChanged(images);
-}
-
 void RemoteNtpTabHelper::OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
-#if !BUILDFLAG(IS_ANDROID)
-  remote_ntp_theme_provider_->ApplyColorToTheme(web_contents(), theme.get());
-#endif
-
   remote_ntp_router_.SendThemeChanged(std::move(theme));
 }
 

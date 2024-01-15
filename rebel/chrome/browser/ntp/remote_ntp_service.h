@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "base/files/file_path.h"
-#include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
@@ -20,7 +19,7 @@
 
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_storage.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_theme_delegate.h"
-#include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
+#include "rebel/chrome/common/ntp/remote_ntp.mojom-forward.h"
 #include "rebel/chrome/common/ntp/remote_ntp_types.h"
 
 class AutocompleteController;
@@ -46,15 +45,6 @@ class RemoteNtpService : public KeyedService,
    public:
     // Indicates that the stored NTP tiles have changed in some way.
     virtual void OnNtpTilesChanged(const rebel::RemoteNtpTileList& ntp_tiles) {}
-
-    // Indicates that the background collections have changed in some way.
-    virtual void OnBackgroundCollectionsChanged(
-        const rebel::RemoteNtpBackgroundCollectionList& collections) {}
-
-    // Indicates that the images for a background collection have changed in
-    // some way.
-    virtual void OnBackgroundImagesChanged(
-        const rebel::RemoteNtpBackgroundImageMap& images) {}
 
     // Indicates that the browser or system theme has changed in some way.
     virtual void OnThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {}
@@ -114,16 +104,6 @@ class RemoteNtpService : public KeyedService,
                       const GURL& new_tile_url,
                       const std::u16string& new_tile_title);
 
-  // Invoked when the NTP wants the list of background collections.
-  void LoadBackgroundCollections();
-
-  // Invoked when the NTP wants a list of images for a background collection.
-  void LoadBackgroundImages(const std::string& collection_id);
-
-  // Invoked when the NTP wants to set the background image.
-  void SetBackgroundImage(const std::string& collection_id,
-                          rebel::mojom::BackgroundImagePtr image);
-
   // Invoked when the system dark mode setting has changed.
   void SetDarkModeEnabled(bool dark_mode_enabled);
 
@@ -156,10 +136,6 @@ class RemoteNtpService : public KeyedService,
   // Overridden from KeyedService:
   void Shutdown() override;
 
-  virtual void FetchBackgroundCollections() {}
-  virtual void FetchBackgroundImages(const std::string& collection_id) {}
-  virtual void StoreBackgroundImage(const std::string& collection_id,
-                                    rebel::mojom::BackgroundImagePtr image) {}
   virtual rebel::mojom::RemoteNtpThemePtr CreateTheme();
 
  private:
@@ -173,11 +149,6 @@ class RemoteNtpService : public KeyedService,
   void OnIconMadeAvailable(const GURL& site_url) override;
 
   // Overridden from rebel::RemoteNtpThemeDelegate:
-  void OnBackgroundCollectionsAvailable(
-      rebel::RemoteNtpBackgroundCollectionList collections) override;
-  void OnBackgroundImagesAvailable(
-      const std::string& collection,
-      rebel::RemoteNtpBackgroundImageList images) override;
   void OnThemeUpdated() override;
 
   // Overridden from rebel::RemoteNtpIconStorage::Delegate:
@@ -188,8 +159,6 @@ class RemoteNtpService : public KeyedService,
   void OnIconLoadComplete(const GURL& origin, bool successful) override;
 
   void NotifyAboutNtpTiles();
-  void NotifyAboutBackgroundCollections();
-  void NotifyAboutBackgroundImages();
   void NotifyAboutTheme();
   void NotifyAboutWiFiStatus();
 
@@ -201,8 +170,6 @@ class RemoteNtpService : public KeyedService,
   std::unique_ptr<ntp_tiles::MostVisitedSites> most_visited_;
   rebel::RemoteNtpTileList ntp_tiles_;
 
-  rebel::RemoteNtpBackgroundCollectionList background_collections_;
-  rebel::RemoteNtpBackgroundImageMap background_images_;
   rebel::mojom::RemoteNtpThemePtr theme_;
 
   std::unique_ptr<rebel::RemoteNtpIconStorage> icon_storage_;

@@ -22,6 +22,7 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui_url_loader_factory.h"
 #include "content/public/common/content_switches.h"
+#include "content/public/common/url_constants.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "rebel/chrome/browser/ntp/remote_ntp_icon_receiver.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom.h"
@@ -280,6 +281,11 @@ void RebelContentBrowserClient::RegisterNonNetworkSubresourceURLLoaderFactories(
           chrome::kChromeSearchScheme,
           content::CreateWebUIURLLoaderFactory(
               frame_host, chrome::kChromeSearchScheme,
+              /*allowed_webui_hosts=*/base::flat_set<std::string>()));
+      factories->emplace(
+          content::kChromeUIUntrustedScheme,
+          content::CreateWebUIURLLoaderFactory(
+              frame_host, content::kChromeUIUntrustedScheme,
               /*allowed_webui_hosts=*/base::flat_set<std::string>()));
     }
   }

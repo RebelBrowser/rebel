@@ -17,7 +17,6 @@
 
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
 #include "rebel/chrome/common/ntp/remote_ntp.mojom-forward.h"
-#include "rebel/chrome/common/ntp/remote_ntp_types.h"
 
 class AutocompleteController;
 class AutocompleteControllerDelegate;
@@ -82,10 +81,6 @@ class RemoteNtpServiceImpl : public RemoteNtpService,
 
   // Overridden from RemoteNtpService:
   void Shutdown() final;
-  void FetchBackgroundCollections() override;
-  void FetchBackgroundImages(const std::string& collection_id) override;
-  void StoreBackgroundImage(const std::string& collection_id,
-                            rebel::mojom::BackgroundImagePtr image) override;
   rebel::mojom::RemoteNtpThemePtr CreateTheme() override;
   void UpdateWiFiStatus() override;
 

@@ -4,7 +4,6 @@
 
 #include "rebel/chrome/browser/ui/ntp/remote_ntp_router.h"
 
-#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_frame_host_receiver_set.h"
@@ -13,7 +12,6 @@
 #include "mojo/public/cpp/bindings/associated_remote.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
-#include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 #include "url/gurl.h"
 
 #include "rebel/chrome/browser/ntp/remote_ntp_service.h"
@@ -148,49 +146,6 @@ void RemoteNtpRouter::SendAutocompleteResultChanged(
   remote_ntp_client()->AutocompleteResultChanged(std::move(result));
 }
 
-void RemoteNtpRouter::SendBackgroundCollectionsChanged(
-    const rebel::RemoteNtpBackgroundCollectionList& collections) {
-  if (!remote_ntp_client()) {
-    return;
-  }
-
-  rebel::RemoteNtpBackgroundCollectionList mojo_collections;
-  for (const auto& collection : collections) {
-    mojo_collections.push_back(collection->Clone());
-  }
-
-  remote_ntp_client()->BackgroundCollectionsChanged(
-      std::move(mojo_collections));
-}
-
-void RemoteNtpRouter::SendBackgroundImagesChanged(
-    const rebel::RemoteNtpBackgroundImageMap& images) {
-  if (!remote_ntp_client()) {
-    return;
-  }
-
-  rebel::RemoteNtpBackgroundImageMap mojom_images;
-  for (const auto& id_and_images : images) {
-    std::vector<rebel::mojom::BackgroundImagePtr> background_images;
-
-    for (const auto& image : id_and_images.second) {
-      background_images.push_back(image->Clone());
-    }
-
-    mojom_images.emplace(id_and_images.first, std::move(background_images));
-  }
-
-  remote_ntp_client()->BackgroundImagesChanged(std::move(mojom_images));
-}
-
-void RemoteNtpRouter::SendLocalBackgroundImageSelected() {
-  if (!remote_ntp_client()) {
-    return;
-  }
-
-  remote_ntp_client()->LocalBackgroundImageSelected();
-}
-
 void RemoteNtpRouter::SendThemeChanged(rebel::mojom::RemoteNtpThemePtr theme) {
   if (!remote_ntp_client()) {
     return;
@@ -254,34 +209,8 @@ void RemoteNtpRouter::OpenAutocompleteMatch(uint32_t index,
                                      ctrl_key, meta_key, shift_key);
 }
 
-void RemoteNtpRouter::LoadBackgroundCollections() {
-  delegate_->OnLoadBackgroundCollections();
-}
-
-void RemoteNtpRouter::LoadBackgroundImages(const std::string& collection_id) {
-  delegate_->OnLoadBackgroundImages(collection_id);
-}
-
-void RemoteNtpRouter::SetBackgroundImage(
-    const std::string& collection_id,
-    rebel::mojom::BackgroundImagePtr image) {
-  delegate_->OnSetBackgroundImage(collection_id, std::move(image));
-}
-
-void RemoteNtpRouter::SelectLocalBackgroundImage() {
-  delegate_->OnSelectLocalBackgroundImage();
-}
-
-void RemoteNtpRouter::PreviewColor(SkColor color) {
-  delegate_->OnPreviewColor(color);
-}
-
-void RemoteNtpRouter::RevertColor() {
-  delegate_->OnRevertColor();
-}
-
-void RemoteNtpRouter::CommitColor() {
-  delegate_->OnCommitColor();
+void RemoteNtpRouter::ShowOrHideCustomizeMenu() {
+  delegate_->OnShowOrHideCustomizeMenu();
 }
 
 void RemoteNtpRouter::UpdateWiFiStatus() {

@@ -19,9 +19,6 @@ class RemoteNtpExtension {
   // Helpers to dispatch Javascript events.
   static void DispatchNtpTilesChanged(blink::WebLocalFrame* frame);
   static void DispatchAutocompleteResultChanged(blink::WebLocalFrame* frame);
-  static void DispatchBackgroundCollectionsChanged(blink::WebLocalFrame* frame);
-  static void DispatchBackgroundImagesChanged(blink::WebLocalFrame* frame);
-  static void DispatchLocalBackgroundImageSelected(blink::WebLocalFrame* frame);
   static void DispatchThemeChanged(blink::WebLocalFrame* frame);
   static void DispatchWiFiStatusChanged(blink::WebLocalFrame* frame);
 
