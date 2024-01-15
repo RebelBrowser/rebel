@@ -30,7 +30,12 @@ BASE_FEATURE(kAllowEyeDropperWGCScreenCapture,
 );
 
 // Enables Chrome Labs menu in the toolbar. See https://crbug.com/1145666
+#if BUILDFLAG(REBEL_BROWSER)
+// Rebel: Disallow Chrome Labs to avoid branding confusion.
+BASE_FEATURE(kChromeLabs, "ChromeLabs", base::FEATURE_DISABLED_BY_DEFAULT);
+#else
 BASE_FEATURE(kChromeLabs, "ChromeLabs", base::FEATURE_ENABLED_BY_DEFAULT);
+#endif
 const char kChromeLabsActivationParameterName[] =
     "chrome_labs_activation_percentage";
 const base::FeatureParam<int> kChromeLabsActivationPercentage{
