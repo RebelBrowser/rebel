@@ -519,6 +519,9 @@ vars = {
 
   # condition to allowlist deps for non-git-source processing.
   'non_git_source': 'True',
+
+  # Rebel vars:
+  'rebel_enable_reclient': False,
 }
 
 # Only these hosts are allowed for dependencies in this DEPS file.
@@ -756,6 +759,12 @@ deps = {
     ],
     'condition': 'non_git_source',
     'dep_type': 'cipd',
+  },
+
+  # Rebel deps:
+  'src/rebel/third_party/reclient_configs': {
+    'url': 'https://github.com/EngFlow/reclient-configs.git@21c8fe69ff771956c179847b8c1d9fd216181967',
+    'condition': 'rebel_enable_reclient',
   },
 
   # We don't know target_cpu at deps time. At least until there's a universal
@@ -5746,6 +5755,18 @@ hooks = [
                'rsync',
                'gs://aom-test-data',
                'src/third_party/libaom/testdata']
+  },
+
+  # Rebel hooks:
+  {
+    'name': 'configure_reclient',
+    'pattern': '.',
+    'condition': 'rebel_enable_reclient',
+    'action': [
+                'python3',
+                'src/rebel/third_party/reclient_configs/configure_reclient.py',
+                '--src_dir=src',
+    ],
   },
 ]
 
