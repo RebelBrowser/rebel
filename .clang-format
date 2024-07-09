@@ -41,6 +41,9 @@ IncludeCategories:
   # C++ standard library headers.
   - Regex:           '^<.*'
     Priority:        4
+  # Rebel headers.
+  - Regex:           '^"rebel/.*\.h"'
+    Priority:        99
   # Other libraries.
   - Regex:           '.*'
     Priority:        5
